@@ -4,6 +4,7 @@ NAME = ft_vox
 # ----------------------------------------Files
 FILES_SRCS = \
 			main.cpp \
+			VoxEngine.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -15,8 +16,6 @@ DIR_GLU = $(DIR_LIB)glu/
 
 vpath %.cpp \
 	$(DIR_SRCS) \
-	$(DIR_LIB) \
-	$(DIR_LIB)bmp \
 
 # ----------------------------------------Sources
 SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
