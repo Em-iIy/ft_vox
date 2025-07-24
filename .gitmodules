@@ -1,0 +1,3 @@
+[submodule "lib/glu"]
+	path = lib/glu
+	url = https://github.com/em-iiy/gl-utils.git
