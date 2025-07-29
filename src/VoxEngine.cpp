@@ -22,6 +22,7 @@ void	VoxEngine::mainLoop()
 {
 	while (!glfwWindowShouldClose(_window.get_window()))
 	{
+		_window.update();
 		glfwPollEvents();
 	}
 }
