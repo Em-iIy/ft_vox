@@ -1,9 +1,9 @@
-- Create Camera
++ Create Camera
 
 - Create Cube
-	- mesh
+	+ mesh
 	- textures
-	- shaders
+	+ shaders
 
-- Setup input
++ Setup input
 

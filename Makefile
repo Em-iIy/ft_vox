@@ -6,6 +6,7 @@ FILES_SRCS = \
 			main.cpp \
 			VoxEngine.cpp \
 			Camera.cpp \
+			Input.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

@@ -6,17 +6,27 @@ Created on: 24/07/2025
 #pragma once
 
 #include "glu/gl-utils.hpp"
+#include "Camera.hpp"
+#include "Input.hpp"
 
 const mlm::ivec2	WINDOW_SIZE(800, 600);
 
-class VoxEngine {
+class VoxEngine: public Window {
 	public:
 		void	run();
 	
+		Camera	&getCamera();
+		Input	&getInput();
+
 	private:
 		void	init();
+
 		void	mainLoop();
+		void	input();
+
 		void	cleanup();
 
-		Window		_window;
+
+		Camera		_camera;
+		Input		_input;
 };

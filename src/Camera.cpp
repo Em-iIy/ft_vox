@@ -78,6 +78,7 @@ void		Camera::processMouseScroll(float yOffset)
 		_zoom = 90.0f;
 	else if (_zoom < 1.0f)
 		_zoom = 1.0f;
+	std::cout << _zoom << std::endl;
 }
 
 void		Camera::updateVectors()
@@ -94,3 +95,7 @@ void		Camera::updateVectors()
 	_up = mlm::cross(_right, _front);
 }
 
+float	Camera::getZoom() const
+{
+	return (_zoom);
+}
