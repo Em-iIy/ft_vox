@@ -99,6 +99,27 @@ void	Input::handleKeys()
 		camera.processKeyboard(Camera::BACKWARD, (1.f / 60.f));
 	if (keys[GLFW_KEY_D].isDown())
 		camera.processKeyboard(Camera::RIGHT, (1.f / 60.f));
+	if (keys[GLFW_KEY_SPACE].isDown())
+		camera.processKeyboard(Camera::UP, (1.f / 60.f));
+	if (keys[GLFW_KEY_LEFT_SHIFT].isDown())
+		camera.processKeyboard(Camera::DOWN, (1.f / 60.f));
+	
+	if (keys[GLFW_KEY_TAB].isPressed() && 0)
+	{
+		std::cout << "before: " << std::boolalpha << wireFrameMode << std::noboolalpha << std::endl;
+		wireFrameMode = !wireFrameMode;
+		std::cout << "after: " << std::boolalpha << wireFrameMode << std::noboolalpha << std::endl;
+		if (wireFrameMode)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	if (keys[GLFW_KEY_X].isPressed())
+	{
+		KeyState &key = keys[GLFW_KEY_X];
+		std::cout << key.current << " " << key.prev << std::endl;
+	}
+
 	if (keys[GLFW_KEY_ESCAPE].isPressed())
 		glfwSetWindowShouldClose(_window, GLFW_TRUE);
 }
@@ -113,5 +134,13 @@ void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scanco
 
 	Input &input = pEngine->getInput();
 	input.keys[key].updateState(action);
+	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+	{
+		input.wireFrameMode = !input.wireFrameMode;
+		if (input.wireFrameMode)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		else
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
 }
 

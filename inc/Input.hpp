@@ -37,5 +37,6 @@ class Input {
 		static void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 	private:
-		GLFWwindow *_window;		
+		GLFWwindow *_window;	
+		bool		wireFrameMode = false;	
 };
