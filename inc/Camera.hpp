@@ -9,7 +9,7 @@ Created on: 25/07/2025
 
 const float	YAW 	= -90.0f;
 const float	PITCH 	= 0.0f;
-const float	SPEED 	= 5.5f;
+const float	SPEED 	= 20.0f;
 const float	SENS 	= 0.1f;
 const float	ZOOM 	= 60.0f;
 
@@ -28,6 +28,8 @@ class Camera {
 		
 		mlm::mat4	getViewMatrix() const;
 		float		getZoom() const;
+
+		void		setPos(const mlm::vec3 &pos);
 
 		void		processKeyboard(Direction dir, float deltaTime);
 		void		processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
