@@ -7,6 +7,9 @@ FILES_SRCS = \
 			VoxEngine.cpp \
 			Camera.cpp \
 			Input.cpp \
+			Block.cpp \
+			Chunk.cpp \
+			Perlin.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -33,6 +36,8 @@ GLU_SM = $(DIR_GLU).git
 CC = c++
 CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
+CFLAGS += -g
+CFLAGS += -std=c++20
 # CFLAGS += -fsanitize=address -g
 LFLAGS = -lglfw
 

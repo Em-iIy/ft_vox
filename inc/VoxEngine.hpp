@@ -8,8 +8,10 @@ Created on: 24/07/2025
 #include "glu/gl-utils.hpp"
 #include "Camera.hpp"
 #include "Input.hpp"
+#include "Block.hpp"
+#include "Chunk.hpp"
 
-const mlm::ivec2	WINDOW_SIZE(800, 600);
+const mlm::ivec2	WINDOW_SIZE(1000, 1000);
 
 class VoxEngine: public Window {
 	public:
