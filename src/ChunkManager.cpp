@@ -48,7 +48,6 @@ void						ChunkManager::init()
 			}	
 		}
 	}
-	// std::cout << "size: " << chunks.size() << std::endl;
 	for (auto &[_, chunk]: chunks)
 	{
 		chunk.update();
@@ -72,7 +71,6 @@ std::expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 		mlm::ivec2 chunkCoord = getChunkCoord(blockCoord);
 		Chunk &chunk = chunks.at(chunkCoord);
 		mlm::ivec3 blockChunkCoord = getBlockChunkCoord(blockCoord);
-		// std::cout << "chunkCoord: " << chunkCoord << " " << "blockChunkCoord: " << blockChunkCoord << " ";
 		Block	&block = chunk.getBlock(blockChunkCoord);
 		return (&block);
 	}
@@ -84,14 +82,11 @@ std::expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 
 bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 {
-	// std::cout << "coord: " << blockCoord << " ";
 	auto result = getBlock(blockCoord);
 	if (!result.has_value())
 	{
-		// std::cout << std::endl;
 		return (true);
 	}
 	Block	*block = result.value();
-	// std::cout << block << std::endl;
 	return (block->getEnabled());
 }
