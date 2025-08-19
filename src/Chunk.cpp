@@ -29,13 +29,14 @@ static uint64_t	index3D(const mlm::ivec3 &coord)
 	return (coord.z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + coord.y * CHUNK_SIZE_X + coord.x);
 }
 
-void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const mlm::ivec3 &ipos)
+void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 {
-	uint32_t	offset = vertices.size();
 	mlm::ivec3	worldPos(_chunkPos.x * CHUNK_SIZE_X + ipos.x, ipos.y, _chunkPos.y * CHUNK_SIZE_Z + ipos.z);
 	mlm::vec3	pos(ipos);
 	Block		&block = blocks[index3D(ipos.x, ipos.y, ipos.z)];
 	mlm::vec3	color = block.getTypeColor();
+	std::vector<Vertex>	tempVertices;
+	tempVertices.reserve(8);
 	
 	const	mlm::ivec3 neighbors[] = {
 		mlm::ivec3(1, 0, 0),
@@ -45,73 +46,109 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 		mlm::ivec3(0, 0, 1),
 		mlm::ivec3(0, 0, -1),
 	};
-	vertices.push_back({mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); // 0 back bottom left
-	vertices.push_back({mlm::vec3(0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  1 back bottom right
-	vertices.push_back({mlm::vec3(-0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //  2 back top left
-	vertices.push_back({mlm::vec3(0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //   3 back top right
-	vertices.push_back({mlm::vec3(-0.5f, -0.5f, 0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  4 front bottom left
-	vertices.push_back({mlm::vec3(0.5f, -0.5f, 0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //   5 front bottom right
-	vertices.push_back({mlm::vec3(-0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //   6 front top left
-	vertices.push_back({mlm::vec3(0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //    7 front top right
+	tempVertices.push_back({mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); // 0 back bottom left
+	tempVertices.push_back({mlm::vec3(0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  1 back bottom right
+	tempVertices.push_back({mlm::vec3(-0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //  2 back top left
+	tempVertices.push_back({mlm::vec3(0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //   3 back top right
+	tempVertices.push_back({mlm::vec3(-0.5f, -0.5f, 0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  4 front bottom left
+	tempVertices.push_back({mlm::vec3(0.5f, -0.5f, 0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //   5 front bottom right
+	tempVertices.push_back({mlm::vec3(-0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //   6 front top left
+	tempVertices.push_back({mlm::vec3(0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //    7 front top right
 	// back face
 	if (_manager.isBlockTransparent(worldPos + neighbors[5]) == false)
 	{
-		indices.push_back(0 + offset);
-		indices.push_back(2 + offset);
-		indices.push_back(1 + offset);
-		indices.push_back(1 + offset);
-		indices.push_back(2 + offset);
-		indices.push_back(3 + offset);
+		vertices.push_back(tempVertices[0]);
+		vertices.push_back(tempVertices[2]);
+		vertices.push_back(tempVertices[1]);
+		vertices.push_back(tempVertices[1]);
+		vertices.push_back(tempVertices[2]);
+		vertices.push_back(tempVertices[3]);
+		// indices.push_back(0 + offset);
+		// indices.push_back(2 + offset);
+		// indices.push_back(1 + offset);
+		// indices.push_back(1 + offset);
+		// indices.push_back(2 + offset);
+		// indices.push_back(3 + offset);
 	}
 	// front face
 	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
 	{
-		indices.push_back(4 + offset);
-		indices.push_back(5 + offset);
-		indices.push_back(6 + offset);
-		indices.push_back(5 + offset);
-		indices.push_back(7 + offset);
-		indices.push_back(6 + offset);
+		vertices.push_back(tempVertices[4]);
+		// indices.push_back(4 + offset);
+		vertices.push_back(tempVertices[5]);
+		// indices.push_back(5 + offset);
+		vertices.push_back(tempVertices[6]);
+		// indices.push_back(6 + offset);
+		vertices.push_back(tempVertices[5]);
+		// indices.push_back(5 + offset);
+		vertices.push_back(tempVertices[7]);
+		// indices.push_back(7 + offset);
+		vertices.push_back(tempVertices[6]);
+		// indices.push_back(6 + offset);
 	}
 	// left face
 	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
 	{
-		indices.push_back(0 + offset);
-		indices.push_back(4 + offset);
-		indices.push_back(6 + offset);
-		indices.push_back(0 + offset);
-		indices.push_back(6 + offset);
-		indices.push_back(2 + offset);
+		vertices.push_back(tempVertices[0]);
+		// indices.push_back(0 + offset);
+		vertices.push_back(tempVertices[4]);
+		// indices.push_back(4 + offset);
+		vertices.push_back(tempVertices[6]);
+		// indices.push_back(6 + offset);
+		vertices.push_back(tempVertices[0]);
+		// indices.push_back(0 + offset);
+		vertices.push_back(tempVertices[6]);
+		// indices.push_back(6 + offset);
+		vertices.push_back(tempVertices[2]);
+		// indices.push_back(2 + offset);
 	}
 	// right face
 	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
 	{
-		indices.push_back(1 + offset);
-		indices.push_back(7 + offset);
-		indices.push_back(5 + offset);
-		indices.push_back(1 + offset);
-		indices.push_back(3 + offset);
-		indices.push_back(7 + offset);
+		vertices.push_back(tempVertices[1]);
+		// indices.push_back(1 + offset);
+		vertices.push_back(tempVertices[7]);
+		// indices.push_back(7 + offset);
+		vertices.push_back(tempVertices[5]);
+		// indices.push_back(5 + offset);
+		vertices.push_back(tempVertices[1]);
+		// indices.push_back(1 + offset);
+		vertices.push_back(tempVertices[3]);
+		// indices.push_back(3 + offset);
+		vertices.push_back(tempVertices[7]);
+		// indices.push_back(7 + offset);
 	}
 	// top face
 	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
 	{
-		indices.push_back(2 + offset);
-		indices.push_back(6 + offset);
-		indices.push_back(7 + offset);
-		indices.push_back(2 + offset);
-		indices.push_back(7 + offset);
-		indices.push_back(3 + offset);
+		vertices.push_back(tempVertices[2]);
+		// indices.push_back(2 + offset);
+		vertices.push_back(tempVertices[6]);
+		// indices.push_back(6 + offset);
+		vertices.push_back(tempVertices[7]);
+		// indices.push_back(7 + offset);
+		vertices.push_back(tempVertices[2]);
+		// indices.push_back(2 + offset);
+		vertices.push_back(tempVertices[7]);
+		// indices.push_back(7 + offset);
+		vertices.push_back(tempVertices[3]);
+		// indices.push_back(3 + offset);
 	}
 	// bottom face
 	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
 	{
-		indices.push_back(1 + offset);
-		indices.push_back(4 + offset);
-		indices.push_back(0 + offset);
-		indices.push_back(1 + offset);
-		indices.push_back(5 + offset);
-		indices.push_back(4 + offset);
+		vertices.push_back(tempVertices[1]);
+		// indices.push_back(1 + offset);
+		vertices.push_back(tempVertices[4]);
+		// indices.push_back(4 + offset);
+		vertices.push_back(tempVertices[0]);
+		// indices.push_back(0 + offset);
+		vertices.push_back(tempVertices[1]);
+		// indices.push_back(1 + offset);
+		vertices.push_back(tempVertices[5]);
+		// indices.push_back(5 + offset);
+		vertices.push_back(tempVertices[4]);
+		// indices.push_back(4 + offset);
 	}
 }
 
@@ -178,15 +215,13 @@ void	Chunk::draw(Shader &shader)
 	mlm::mat4 model(1.0f);
 	model = mlm::translate(model, mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
 	shader.set_mat4("model", model);
-	_mesh.draw(shader); // fix mesh (either add a single cube to test, or generate the whole chunk)
+	_mesh.draw(shader);
 }
 
 void	Chunk::update()
 {
 	std::vector<Vertex> vertices;
 	vertices.reserve(8 * blocks.size());
-	std::vector<uint32_t> indices;
-	indices.reserve(6 * 2 * 3 * blocks.size()); // 6 Sides per cube, 2 triangles per side, 3 indices per triangle
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
@@ -198,11 +233,11 @@ void	Chunk::update()
 				Block		&block = blocks[index];
 
 				if (block.getEnabled())
-					addCube(vertices, indices, pos);
+					addCube(vertices, pos);
 			}
 		}
 	}
-	_mesh = Mesh(vertices, indices);
+	_mesh = ChunkMesh(vertices);
 }
 
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
