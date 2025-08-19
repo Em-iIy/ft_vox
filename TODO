@@ -3,8 +3,36 @@
 - Create Cube
 	+ mesh
 	- textures
+		- create texture atlas
+		- create texture uvs
+		- add texture uvs to chunk::update()
+		- add texture to shaders
 	+ shaders
 
-+ Setup input
+- Chunk management
+	+ make chunks accessible from other chunks
+	- lists
+		- update
+		- load
+		- generate
+	- limit chunk generation per frame
+
+- Terrain generation
+	- different noise values per block
+	- splines
+	- biomes
+	- decoration
+		- trees
+		- water
+
+- Setup input
+	+ move camera
+	- make input tied to window
+	- switch to callbacks (std::bind)
+	- deltaTime (put in glu?)
+
+general
+	- make alternative for std::expected :(
+	- clean up helper functions in chunk and chunk management (static in class etc)
 
 - follow voxel engine tutorial (https://sites.google.com/site/letsmakeavoxelengine/home/basic-block-rendering)
