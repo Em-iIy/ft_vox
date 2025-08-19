@@ -35,10 +35,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	mlm::vec3	pos(ipos);
 	Block		&block = blocks[index3D(ipos.x, ipos.y, ipos.z)];
 	mlm::vec3	color = block.getTypeColor();
-	std::vector<Vertex>	tempVertices;
-	tempVertices.reserve(8);
 	
-	const	mlm::ivec3 neighbors[] = {
+	const mlm::ivec3	neighbors[] = {
 		mlm::ivec3(1, 0, 0),
 		mlm::ivec3(-1, 0, 0),
 		mlm::ivec3(0, 1, 0),
@@ -46,73 +44,81 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::ivec3(0, 0, 1),
 		mlm::ivec3(0, 0, -1),
 	};
-	tempVertices.push_back({mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); // 0 back bottom left
-	tempVertices.push_back({mlm::vec3(0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  1 back bottom right
-	tempVertices.push_back({mlm::vec3(-0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //  2 back top left
-	tempVertices.push_back({mlm::vec3(0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //   3 back top right
-	tempVertices.push_back({mlm::vec3(-0.5f, -0.5f, 0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  4 front bottom left
-	tempVertices.push_back({mlm::vec3(0.5f, -0.5f, 0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //   5 front bottom right
-	tempVertices.push_back({mlm::vec3(-0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //   6 front top left
-	tempVertices.push_back({mlm::vec3(0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //    7 front top right
+	const mlm::vec3	positions[] = {
+		mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, // 0 back bottom left
+		mlm::vec3(0.5f, -0.5f, -0.5f) + pos, //  1 back bottom right
+		mlm::vec3(-0.5f, 0.5f, -0.5f) + pos, //  2 back top left
+		mlm::vec3(0.5f, 0.5f, -0.5f) + pos, //   3 back top right
+		mlm::vec3(-0.5f, -0.5f, 0.5f) + pos, //  4 front bottom left
+		mlm::vec3(0.5f, -0.5f, 0.5f) + pos, //   5 front bottom right
+		mlm::vec3(-0.5f, 0.5f, 0.5f) + pos, //   6 front top left
+		mlm::vec3(0.5f, 0.5f, 0.5f) + pos, //    7 front top right
+	};
 	// back face
 	if (_manager.isBlockTransparent(worldPos + neighbors[5]) == false)
 	{
-		vertices.push_back(tempVertices[0]);
-		vertices.push_back(tempVertices[2]);
-		vertices.push_back(tempVertices[1]);
-		vertices.push_back(tempVertices[1]);
-		vertices.push_back(tempVertices[2]);
-		vertices.push_back(tempVertices[3]);
+		mlm::vec3	tempColor = color * 0.7f;
+		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[3], tempColor, mlm::vec2(0.0f)});
 	}
 	// front face
 	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
 	{
-		vertices.push_back(tempVertices[4]);
-		vertices.push_back(tempVertices[5]);
-		vertices.push_back(tempVertices[6]);
-		vertices.push_back(tempVertices[5]);
-		vertices.push_back(tempVertices[7]);
-		vertices.push_back(tempVertices[6]);
+		mlm::vec3	tempColor = color * 0.7f;
+		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
 	}
 	// left face
 	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
 	{
-		vertices.push_back(tempVertices[0]);
-		vertices.push_back(tempVertices[4]);
-		vertices.push_back(tempVertices[6]);
-		vertices.push_back(tempVertices[0]);
-		vertices.push_back(tempVertices[6]);
-		vertices.push_back(tempVertices[2]);
+		mlm::vec3	tempColor = color * 0.8f;
+		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
 	}
 	// right face
 	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
 	{
-		vertices.push_back(tempVertices[1]);
-		vertices.push_back(tempVertices[7]);
-		vertices.push_back(tempVertices[5]);
-		vertices.push_back(tempVertices[1]);
-		vertices.push_back(tempVertices[3]);
-		vertices.push_back(tempVertices[7]);
+		mlm::vec3	tempColor = color * 0.8f;
+		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[3], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
 	}
 	// top face
 	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
 	{
-		vertices.push_back(tempVertices[2]);
-		vertices.push_back(tempVertices[6]);
-		vertices.push_back(tempVertices[7]);
-		vertices.push_back(tempVertices[2]);
-		vertices.push_back(tempVertices[7]);
-		vertices.push_back(tempVertices[3]);
+		mlm::vec3	tempColor = color * 0.9f;
+		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[3], tempColor, mlm::vec2(0.0f)});
 	}
 	// bottom face
 	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
 	{
-		vertices.push_back(tempVertices[1]);
-		vertices.push_back(tempVertices[4]);
-		vertices.push_back(tempVertices[0]);
-		vertices.push_back(tempVertices[1]);
-		vertices.push_back(tempVertices[5]);
-		vertices.push_back(tempVertices[4]);
+		mlm::vec3	tempColor = color * 0.9f;
+		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
 	}
 }
 
@@ -206,6 +212,5 @@ void	Chunk::update()
 
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
-	// std::cout << blockChunkCoord << " -> " << index3D(blockChunkCoord) << std::endl;
 	return (blocks[index3D(blockChunkCoord)]);
 }
