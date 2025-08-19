@@ -63,92 +63,56 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		vertices.push_back(tempVertices[1]);
 		vertices.push_back(tempVertices[2]);
 		vertices.push_back(tempVertices[3]);
-		// indices.push_back(0 + offset);
-		// indices.push_back(2 + offset);
-		// indices.push_back(1 + offset);
-		// indices.push_back(1 + offset);
-		// indices.push_back(2 + offset);
-		// indices.push_back(3 + offset);
 	}
 	// front face
 	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
 	{
 		vertices.push_back(tempVertices[4]);
-		// indices.push_back(4 + offset);
 		vertices.push_back(tempVertices[5]);
-		// indices.push_back(5 + offset);
 		vertices.push_back(tempVertices[6]);
-		// indices.push_back(6 + offset);
 		vertices.push_back(tempVertices[5]);
-		// indices.push_back(5 + offset);
 		vertices.push_back(tempVertices[7]);
-		// indices.push_back(7 + offset);
 		vertices.push_back(tempVertices[6]);
-		// indices.push_back(6 + offset);
 	}
 	// left face
 	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
 	{
 		vertices.push_back(tempVertices[0]);
-		// indices.push_back(0 + offset);
 		vertices.push_back(tempVertices[4]);
-		// indices.push_back(4 + offset);
 		vertices.push_back(tempVertices[6]);
-		// indices.push_back(6 + offset);
 		vertices.push_back(tempVertices[0]);
-		// indices.push_back(0 + offset);
 		vertices.push_back(tempVertices[6]);
-		// indices.push_back(6 + offset);
 		vertices.push_back(tempVertices[2]);
-		// indices.push_back(2 + offset);
 	}
 	// right face
 	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
 	{
 		vertices.push_back(tempVertices[1]);
-		// indices.push_back(1 + offset);
 		vertices.push_back(tempVertices[7]);
-		// indices.push_back(7 + offset);
 		vertices.push_back(tempVertices[5]);
-		// indices.push_back(5 + offset);
 		vertices.push_back(tempVertices[1]);
-		// indices.push_back(1 + offset);
 		vertices.push_back(tempVertices[3]);
-		// indices.push_back(3 + offset);
 		vertices.push_back(tempVertices[7]);
-		// indices.push_back(7 + offset);
 	}
 	// top face
 	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
 	{
 		vertices.push_back(tempVertices[2]);
-		// indices.push_back(2 + offset);
 		vertices.push_back(tempVertices[6]);
-		// indices.push_back(6 + offset);
 		vertices.push_back(tempVertices[7]);
-		// indices.push_back(7 + offset);
 		vertices.push_back(tempVertices[2]);
-		// indices.push_back(2 + offset);
 		vertices.push_back(tempVertices[7]);
-		// indices.push_back(7 + offset);
 		vertices.push_back(tempVertices[3]);
-		// indices.push_back(3 + offset);
 	}
 	// bottom face
 	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
 	{
 		vertices.push_back(tempVertices[1]);
-		// indices.push_back(1 + offset);
 		vertices.push_back(tempVertices[4]);
-		// indices.push_back(4 + offset);
 		vertices.push_back(tempVertices[0]);
-		// indices.push_back(0 + offset);
 		vertices.push_back(tempVertices[1]);
-		// indices.push_back(1 + offset);
 		vertices.push_back(tempVertices[5]);
-		// indices.push_back(5 + offset);
 		vertices.push_back(tempVertices[4]);
-		// indices.push_back(4 + offset);
 	}
 }
 
