@@ -51,7 +51,7 @@ all:
 .PHONY: all
 
 $(NAME): $(GLU) $(DIR_OBJS) $(OBJS)
-	$(CC) -o $(NAME) $(OBJS) $(GLU) $(LFLAGS)
+	$(CC) -o $(NAME) $(OBJS) $(GLU) $(CFLAGS) $(LFLAGS)
 
 $(DIR_OBJS)%.o : %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
