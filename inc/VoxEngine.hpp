@@ -10,6 +10,7 @@ Created on: 24/07/2025
 #include "Input.hpp"
 #include "Block.hpp"
 #include "Chunk.hpp"
+#include "ChunkManager.hpp"
 
 const mlm::ivec2	WINDOW_SIZE(1000, 1000);
 

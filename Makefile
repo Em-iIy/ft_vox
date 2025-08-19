@@ -10,6 +10,7 @@ FILES_SRCS = \
 			Block.cpp \
 			Chunk.cpp \
 			Perlin.cpp \
+			ChunkManager.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -37,7 +38,7 @@ CC = c++
 CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
 CFLAGS += -g
-CFLAGS += -std=c++20
+CFLAGS += -std=c++23
 # CFLAGS += -fsanitize=address -g
 LFLAGS = -lglfw
 

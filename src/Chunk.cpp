@@ -25,6 +25,11 @@ static uint64_t	index3D(uint64_t x, uint64_t y, uint64_t z)
 	return (z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + y * CHUNK_SIZE_X + x);
 }
 
+static uint64_t	index3D(const mlm::ivec3 &coord)
+{
+	return (coord.z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + coord.y * CHUNK_SIZE_X + coord.x);
+}
+
 void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const mlm::ivec3 &ipos)
 {
 	uint32_t	offset = vertices.size();
@@ -192,4 +197,9 @@ void	Chunk::update()
 		}
 	}
 	_mesh = Mesh(vertices, indices);
+}
+
+Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
+{
+	return (blocks[index3D(blockChunkCoord)]);
 }

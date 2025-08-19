@@ -8,9 +8,9 @@ Created on: 06/08/2025
 #include "Block.hpp"
 #include <array>
 
-const uint64_t	CHUNK_SIZE_X = 16;
+const uint64_t	CHUNK_SIZE_X = 16; // MUST BE POWER OF 2
 const uint64_t	CHUNK_SIZE_Y = 48;
-const uint64_t	CHUNK_SIZE_Z = 16;
+const uint64_t	CHUNK_SIZE_Z = 16; // MUST BE POWER OF 2
 
 class Chunk {
 	public:
@@ -28,6 +28,8 @@ class Chunk {
 		void	generate();
 		void	draw(Shader &shader);
 		void	update();
+
+		Block	&getBlock(const mlm::ivec3 &blockChunkCoord);
 };
 
 struct ivec2Hash {
