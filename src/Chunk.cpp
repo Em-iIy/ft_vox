@@ -7,12 +7,11 @@ Created on: 06/08/2025
 
 #include "Perlin.hpp"
 
-Chunk::Chunk()
+Chunk::Chunk(ChunkManager &manager): _manager(manager)
 {
-	
 }
 
-Chunk::Chunk(const mlm::ivec2 &chunkPos): _chunkPos(chunkPos)
+Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
 {
 }
 
@@ -33,11 +32,19 @@ static uint64_t	index3D(const mlm::ivec3 &coord)
 void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indices, const mlm::ivec3 &ipos)
 {
 	uint32_t	offset = vertices.size();
+	mlm::ivec3	worldPos(_chunkPos.x * CHUNK_SIZE_X + ipos.x, ipos.y, _chunkPos.y * CHUNK_SIZE_Z + ipos.z);
 	mlm::vec3	pos(ipos);
 	Block		&block = blocks[index3D(ipos.x, ipos.y, ipos.z)];
 	mlm::vec3	color = block.getTypeColor();
 	
-
+	const	mlm::ivec3 neighbors[] = {
+		mlm::ivec3(1, 0, 0),
+		mlm::ivec3(-1, 0, 0),
+		mlm::ivec3(0, 1, 0),
+		mlm::ivec3(0, -1, 0),
+		mlm::ivec3(0, 0, 1),
+		mlm::ivec3(0, 0, -1),
+	};
 	vertices.push_back({mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); // 0 back bottom left
 	vertices.push_back({mlm::vec3(0.5f, -0.5f, -0.5f) + pos, color * 0.7f, mlm::vec2(0.0f)}); //  1 back bottom right
 	vertices.push_back({mlm::vec3(-0.5f, 0.5f, -0.5f) + pos, color * 0.9f, mlm::vec2(0.0f)}); //  2 back top left
@@ -47,7 +54,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 	vertices.push_back({mlm::vec3(-0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //   6 front top left
 	vertices.push_back({mlm::vec3(0.5f, 0.5f, 0.5f) + pos, color * 0.8f, mlm::vec2(0.0f)}); //    7 front top right
 	// back face
-	if (ipos.z == 0 || blocks[index3D(ipos.x, ipos.y, ipos.z - 1)].getEnabled() == false)
+	if (_manager.isBlockTransparent(worldPos + neighbors[5]) == false)
 	{
 		indices.push_back(0 + offset);
 		indices.push_back(2 + offset);
@@ -57,7 +64,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 		indices.push_back(3 + offset);
 	}
 	// front face
-	if (ipos.z == CHUNK_SIZE_Z - 1 || blocks[index3D(ipos.x, ipos.y, ipos.z + 1)].getEnabled() == false)
+	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
 	{
 		indices.push_back(4 + offset);
 		indices.push_back(5 + offset);
@@ -67,7 +74,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 		indices.push_back(6 + offset);
 	}
 	// left face
-	if (ipos.x == 0 || blocks[index3D(ipos.x - 1, ipos.y, ipos.z)].getEnabled() == false)
+	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
 	{
 		indices.push_back(0 + offset);
 		indices.push_back(4 + offset);
@@ -77,7 +84,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 		indices.push_back(2 + offset);
 	}
 	// right face
-	if (ipos.x == CHUNK_SIZE_X - 1 || blocks[index3D(ipos.x + 1, ipos.y, ipos.z)].getEnabled() == false)
+	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
 	{
 		indices.push_back(1 + offset);
 		indices.push_back(7 + offset);
@@ -87,7 +94,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 		indices.push_back(7 + offset);
 	}
 	// top face
-	if (ipos.y == CHUNK_SIZE_Y - 1 || blocks[index3D(ipos.x, ipos.y + 1, ipos.z)].getEnabled() == false)
+	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
 	{
 		indices.push_back(2 + offset);
 		indices.push_back(6 + offset);
@@ -97,7 +104,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, std::vector<uint32_t> &indice
 		indices.push_back(3 + offset);
 	}
 	// bottom face
-	if (ipos.y == 0 || blocks[index3D(ipos.x, ipos.y - 1, ipos.z)].getEnabled() == false)
+	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
 	{
 		indices.push_back(1 + offset);
 		indices.push_back(4 + offset);
@@ -164,7 +171,6 @@ void	Chunk::generate()
 			}
 		}
 	}
-	update();
 }
 
 void	Chunk::draw(Shader &shader)
@@ -201,5 +207,6 @@ void	Chunk::update()
 
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
+	// std::cout << blockChunkCoord << " -> " << index3D(blockChunkCoord) << std::endl;
 	return (blocks[index3D(blockChunkCoord)]);
 }

@@ -10,26 +10,48 @@ int	roundUp(int num, int mult)
 	return ((num + mult - 1) & -mult);
 }
 
-mlm::ivec2	getChunkCoord(const mlm::ivec3 &worldCoord)
+constexpr int LOG2_CHUNK_SIZE_X = std::bit_width(CHUNK_SIZE_X) - 1;
+constexpr int LOG2_CHUNK_SIZE_Z = std::bit_width(CHUNK_SIZE_Z) - 1;
+
+mlm::ivec2 getChunkCoord(const mlm::ivec3 &worldCoord)
 {
-	return (mlm::ivec2(roundUp(worldCoord.x, CHUNK_SIZE_X) / CHUNK_SIZE_X - 1, roundUp(worldCoord.z, CHUNK_SIZE_Z) / CHUNK_SIZE_Z) - 1);
+	return mlm::ivec2(
+		worldCoord.x >> LOG2_CHUNK_SIZE_X,
+		worldCoord.z >> LOG2_CHUNK_SIZE_Z
+	);
 }
 
-mlm::ivec3	getBlockChunkCoord(const mlm::ivec3 &worldCoord)
+mlm::ivec3 getBlockChunkCoord(const mlm::ivec3 &worldCoord)
 {
-	return (worldCoord - mlm::ivec3(roundUp(worldCoord.x, CHUNK_SIZE_X), 0, roundUp(worldCoord.z, CHUNK_SIZE_Z)));
+	return mlm::ivec3(
+		worldCoord.x & (CHUNK_SIZE_X - 1),
+		worldCoord.y,
+		worldCoord.z & (CHUNK_SIZE_Z - 1)
+	);
 }
 
 void						ChunkManager::init()
 {
-	for (int x = -5; x <= 5; x++)
+	for (int x = -10; x <= 10; x++)
 	{
-		for (int y = -5; y <= 5; y++)
+		for (int y = -10; y <= 10; y++)
 		{
 			mlm::ivec2	pos(x, y);
-			chunks[pos] = Chunk(pos);
-			chunks[pos].generate();
+			chunks.try_emplace(pos, pos, *this);
+			try
+			{
+				Chunk	&chunk = chunks.at(pos);
+				chunk.generate();
+			}
+			catch(const std::exception& e)
+			{
+			}	
 		}
+	}
+	// std::cout << "size: " << chunks.size() << std::endl;
+	for (auto &[_, chunk]: chunks)
+	{
+		chunk.update();
 	}
 }
 
@@ -43,11 +65,14 @@ void						ChunkManager::render(Shader &shader)
 
 std::expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 {
+	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
+		return (std::unexpected(0));
 	try
 	{
 		mlm::ivec2 chunkCoord = getChunkCoord(blockCoord);
 		Chunk &chunk = chunks.at(chunkCoord);
 		mlm::ivec3 blockChunkCoord = getBlockChunkCoord(blockCoord);
+		// std::cout << "chunkCoord: " << chunkCoord << " " << "blockChunkCoord: " << blockChunkCoord << " ";
 		Block	&block = chunk.getBlock(blockChunkCoord);
 		return (&block);
 	}
@@ -59,8 +84,14 @@ std::expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 
 bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 {
+	// std::cout << "coord: " << blockCoord << " ";
 	auto result = getBlock(blockCoord);
 	if (!result.has_value())
-		return (false);
-	return (result.value()->getEnabled());
+	{
+		// std::cout << std::endl;
+		return (true);
+	}
+	Block	*block = result.value();
+	// std::cout << block << std::endl;
+	return (block->getEnabled());
 }
