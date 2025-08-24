@@ -7,6 +7,8 @@ Created on: 06/08/2025
 
 #include "Perlin.hpp"
 
+#include "Spline.hpp"
+
 Chunk::Chunk(ChunkManager &manager): _manager(manager)
 {
 }
@@ -139,10 +141,25 @@ float octaves(mlm::vec3 pos, uint64_t depth, float step)
 	return (ret);
 }
 
+float	continentalnessSpline(const float value)
+{
+	static Spline spline({
+		mlm::vec2(-1.f, 1.0f),
+		mlm::vec2(-0.3f, -0.4f),
+		mlm::vec2(0.0f, -0.1f),
+		mlm::vec2(0.1f, 0.2f),
+		mlm::vec2(0.25f, 0.25f),
+		mlm::vec2(0.45f, 0.50f),
+	});
+	float ret = spline.evaluate(value);
+	return (ret);
+}
+
+
 int	heightRand(const mlm::ivec3 &pos)
 {
 	int	ret = 0;
-	ret += static_cast<int>(octaves(static_cast<mlm::vec3>(pos) / 200.0f, 4, 2.0f) * 48.0f);
+	ret += static_cast<int>(continentalnessSpline(octaves(static_cast<mlm::vec3>(pos) / 200.0f, 4, 2.0f)) * 48.0f);
 	return (ret);
 }
 
@@ -162,7 +179,7 @@ void	Chunk::generate()
 				mlm::vec3	color;
 				if (iPos.y > tempYMax)
 				{
-					blocks[index] = Block(mlm::vec3(0.0f), Block::AIR);
+					blocks[index] = Block(Block::AIR);
 					blocks[index].setEnabled(false);
 				}
 				else
@@ -172,7 +189,7 @@ void	Chunk::generate()
 						type = Block::GRASS;
 					else if (iPos.y < tempYMax && iPos.y > tempYMax - 4)
 						type = Block::DIRT;
-					blocks[index] = Block(mlm::vec3(1.0f), type);
+					blocks[index] = Block(type);
 					blocks[index].setEnabled(true);
 				}
 			}

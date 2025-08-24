@@ -12,6 +12,7 @@ FILES_SRCS = \
 			Perlin.cpp \
 			ChunkManager.cpp \
 			ChunkMesh.cpp \
+			Spline.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

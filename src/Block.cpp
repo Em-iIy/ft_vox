@@ -6,15 +6,14 @@ Created on: 06/08/2025
 #include "Block.hpp"
 
 
-Block::Block(): _color(mlm::vec3(0.0f)), _type(AIR)
+Block::Block(): _type(AIR)
 {}
 
-Block::Block(const mlm::vec3 &color, Type type): _color(color), _type(type)
+Block::Block(Type type): _type(type)
 {}
 
 Block	&Block::operator=(const Block &src)
 {
-	_color = src._color;
 	_type = src._type;
 	return (*this);
 }
