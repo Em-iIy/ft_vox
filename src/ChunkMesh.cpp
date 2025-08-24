@@ -7,6 +7,12 @@ Created on: 19/08/2025
 
 ChunkMesh::ChunkMesh() {}
 
+ChunkMesh::~ChunkMesh()
+{
+	_vao.del();
+	_vbo.del();
+}
+
 ChunkMesh::ChunkMesh(const std::vector<Vertex> &vertices): _vertices(vertices)
 {
 	setup_mesh();

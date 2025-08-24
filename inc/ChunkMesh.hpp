@@ -12,6 +12,7 @@ class ChunkMesh {
 		std::vector<Vertex>		_vertices;
 		std::vector<uint32_t>	_indices;
 		ChunkMesh();
+		~ChunkMesh();
 		ChunkMesh(const std::vector<Vertex> &vertices);
 
 		void	draw(Shader &shader);
