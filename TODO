@@ -4,10 +4,25 @@
 	+ mesh
 	- textures
 		- create texture atlas
+			? class
 		- create texture uvs
 		- add texture uvs to chunk::update()
 		- add texture to shaders
 	+ shaders
+
+- Skybox
+	- texture
+		- stars
+		- sun
+		- moon
+	- render
+
+- Lighting
+	- sunlight
+		- day/night cycle
+	- torches/lightsource
+		? colors
+	- fog
 
 - Chunk management
 	+ make chunks accessible from other chunks
@@ -16,20 +31,40 @@
 		- load
 		- generate
 	- limit chunk generation per frame
+	- save chunk to file
 
 - Terrain generation
+	- move generation to separate class
 	- different noise values per block
-	- splines
+	+ splines
 	- biomes
 	- decoration
 		- trees
 		- water
+	- caves
+		- 3D perlin noise
 
 - Setup input
 	+ move camera
 	- make input tied to window
 	- switch to callbacks (std::bind)
 	- deltaTime (put in glu?)
+
+- Settings
+	- create configs
+		- input verification
+		- chunk dimensions
+		- render distance
+		- terrain generation
+			- spline settings
+			- noise settings
+				- octaves
+				- amplitude
+				- frequency
+		- seed
+		- load map
+	? reload
+
 
 general
 	- make alternative for std::expected :(
