@@ -5,6 +5,8 @@ Created on: 19/08/2025
 
 #include "ChunkManager.hpp"
 
+#include <memory>
+
 int	roundUp(int num, int mult)
 {
 	return ((num + mult - 1) & -mult);
@@ -37,20 +39,14 @@ void						ChunkManager::init()
 		for (int y = -10; y <= 10; y++)
 		{
 			mlm::ivec2	pos(x, y);
-			chunks.try_emplace(pos, pos, *this);
-			try
-			{
-				Chunk	&chunk = chunks.at(pos);
-				chunk.generate();
-			}
-			catch(const std::exception& e)
-			{
-			}	
+			std::unique_ptr<Chunk>	chunk = std::make_unique<Chunk>(pos, *this);
+			chunk->generate();
+			chunks[pos] = std::move(chunk);
 		}
 	}
 	for (auto &[_, chunk]: chunks)
 	{
-		chunk.update();
+		chunk->update();
 	}
 }
 
@@ -58,7 +54,7 @@ void						ChunkManager::render(Shader &shader)
 {
 	for (auto &[_, chunk]: chunks)
 	{
-		chunk.draw(shader);
+		chunk->draw(shader);
 	}
 }
 
@@ -69,9 +65,9 @@ std::expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 	try
 	{
 		mlm::ivec2 chunkCoord = getChunkCoord(blockCoord);
-		Chunk &chunk = chunks.at(chunkCoord);
+		std::unique_ptr<Chunk> &chunk = chunks.at(chunkCoord);
 		mlm::ivec3 blockChunkCoord = getBlockChunkCoord(blockCoord);
-		Block	&block = chunk.getBlock(blockChunkCoord);
+		Block	&block = chunk->getBlock(blockChunkCoord);
 		return (&block);
 	}
 	catch(const std::exception& e)

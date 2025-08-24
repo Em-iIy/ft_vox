@@ -10,6 +10,7 @@ Created on: 19/08/2025
 
 #include <unordered_map>
 #include <expected>
+#include <memory>
 
 struct ivec2Hash {
 	size_t	operator()(const mlm::ivec2 &v) const
@@ -25,7 +26,7 @@ class Chunk;
 
 class ChunkManager {
 	public:
-		std::unordered_map<mlm::ivec2, Chunk, ivec2Hash>	chunks;
+		std::unordered_map<mlm::ivec2, std::unique_ptr<Chunk>, ivec2Hash>	chunks;
 
 		void						init();
 		void						render(Shader &shader);
