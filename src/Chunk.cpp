@@ -19,6 +19,7 @@ Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunk
 
 Chunk::~Chunk()
 {
+	_mesh.del();
 }
 
 static uint64_t	index3D(uint64_t x, uint64_t y, uint64_t z)
@@ -159,7 +160,7 @@ float	continentalnessSpline(const float value)
 int	heightRand(const mlm::ivec3 &pos)
 {
 	int	ret = 0;
-	ret += static_cast<int>(continentalnessSpline(octaves(static_cast<mlm::vec3>(pos) / 200.0f, 4, 2.0f)) * 48.0f);
+	ret += static_cast<int>(continentalnessSpline(octaves(static_cast<mlm::vec3>(pos) / 200.0f, 4, 2.0f)) * 28.0f);
 	return (ret);
 }
 

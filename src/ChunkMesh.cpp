@@ -9,8 +9,6 @@ ChunkMesh::ChunkMesh() {}
 
 ChunkMesh::~ChunkMesh()
 {
-	_vao.del();
-	_vbo.del();
 }
 
 ChunkMesh::ChunkMesh(const std::vector<Vertex> &vertices): _vertices(vertices)
@@ -40,4 +38,10 @@ void	ChunkMesh::setup_mesh()
 
 	_vao.unbind();
 	_vbo.unbind();
+}
+
+void	ChunkMesh::del()
+{
+	_vao.del();	
+	_vbo.del();	
 }
