@@ -65,7 +65,7 @@ void						ChunkManager::render(Shader &shader)
 std::expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 {
 	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
-		return (std::unexpected(0));
+		return (std::unexpected(1));
 	try
 	{
 		mlm::ivec2 chunkCoord = getChunkCoord(blockCoord);
@@ -85,6 +85,8 @@ bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 	auto result = getBlock(blockCoord);
 	if (!result.has_value())
 	{
+		if (result.error() == 1)
+			return (false);
 		return (true);
 	}
 	Block	*block = result.value();
