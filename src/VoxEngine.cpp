@@ -64,7 +64,7 @@ void	VoxEngine::mainLoop()
 		shader.set_mat4("view", view);
 
 		shader.set_vec3("color", mlm::vec3(0.3f, 0.2f, 0.3f));
-
+		chunkManager.update();
 		chunkManager.render(shader);
 
 		glfwSwapBuffers(Window::get_window());

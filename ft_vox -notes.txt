@@ -42,7 +42,7 @@ update chunks {
 	update flags: probably not needed
 
 	unload: free/write to file chunk block data {
-		loop through unload list until threshold {
+		loop through unload list {
 			if chunk is loaded and not built {
 				build chunk
 				set visibility update flag
@@ -81,7 +81,7 @@ update chunks {
 		clear render list
 		loop through {
 			check if chunk is loaded and built {
-				? check frustrum culling {
+				? check frustum culling {
 					add to render list
 				}
 			}

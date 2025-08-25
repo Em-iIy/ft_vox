@@ -10,6 +10,7 @@ Created on: 19/08/2025
 #include "Expected.hpp"
 
 #include <unordered_map>
+#include <set>
 #include <memory>
 
 struct ivec2Hash {
@@ -26,12 +27,37 @@ class Chunk;
 
 class ChunkManager {
 	public:
-		std::unordered_map<mlm::ivec2, std::unique_ptr<Chunk>, ivec2Hash>	chunks;
+		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
+		std::vector<mlm::ivec2>					chunkLoadList;
+		std::vector<std::shared_ptr<Chunk>>		chunkSetupList;
+		std::vector<std::shared_ptr<Chunk>>		chunkRebuildList;
+		std::set<std::shared_ptr<Chunk>>		chunkUpdateFlagList;
+		std::vector<std::shared_ptr<Chunk>>		chunkUnloadList;
+		std::vector<std::shared_ptr<Chunk>>		chunkVisibleList;
+		std::vector<std::shared_ptr<Chunk>>		chunkRenderList;
 
 		void						init();
+
+		void						update();
+
 		void						render(Shader &shader);
 
 
 		Expected<Block *, int>		getBlock(const mlm::ivec3 &blockCoord);
 		bool						isBlockTransparent(const mlm::ivec3 &blockCoord);
+	
+	private:
+		bool						_updateVisibility = true;
+
+		void						_updateLoadList();
+		void						_updateSetupList();
+		void						_updateRebuildList();
+		void						_updateUnloadList();
+		void						_updateFlagList();
+		void						_updateVisibleList();
+		void						_updateRenderList();
+
+		bool						_loadChunk(const mlm::ivec2 &chunkCoord);
+		void						_unloadChunk(std::shared_ptr<Chunk> chunk);
+
 };

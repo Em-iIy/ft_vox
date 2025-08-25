@@ -202,6 +202,7 @@ void	Chunk::generate()
 			}
 		}
 	}
+	_setup = true;
 }
 
 void	Chunk::draw(Shader &shader)
@@ -225,16 +226,36 @@ void	Chunk::update()
 				uint64_t	index = index3D(x, y, z);
 				mlm::ivec3	pos(x, y, z);
 				Block		&block = blocks[index];
-
 				if (block.getEnabled())
 					addCube(vertices, pos);
 			}
 		}
 	}
 	_mesh = ChunkMesh(vertices);
+	_built = true;
 }
 
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
 	return (blocks[index3D(blockChunkCoord)]);
+}
+
+bool	Chunk::isLoaded() const
+{
+	return (_loaded);
+}
+
+bool	Chunk::isSetup() const
+{
+	return (_setup);
+}
+
+bool	Chunk::isBuilt() const
+{
+	return (_built);
+}
+
+void	Chunk::requireRebuild()
+{
+	_built = false;
 }

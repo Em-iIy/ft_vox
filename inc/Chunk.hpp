@@ -36,4 +36,15 @@ class Chunk {
 		void	update();
 
 		Block	&getBlock(const mlm::ivec3 &blockChunkCoord);
+	
+		bool	isLoaded() const;
+		bool	isSetup() const;
+		bool	isBuilt() const;
+		
+		void	requireRebuild();
+
+	private:
+		bool	_loaded = true;
+		bool	_setup = false;
+		bool	_built = false;
 };
