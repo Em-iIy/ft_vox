@@ -9,17 +9,26 @@ Created on: 06/08/2025
 
 #include "Spline.hpp"
 
+int chunk_count = 0;
+
+int	getChunkCount()
+{
+	return (chunk_count);
+}
+
 Chunk::Chunk(ChunkManager &manager): _manager(manager)
 {
 }
 
 Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
 {
+	chunk_count++;
 }
 
 Chunk::~Chunk()
 {
 	_mesh.del();
+	chunk_count--;
 }
 
 static uint64_t	index3D(uint64_t x, uint64_t y, uint64_t z)

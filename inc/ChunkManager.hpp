@@ -36,6 +36,8 @@ class ChunkManager {
 		std::vector<std::shared_ptr<Chunk>>		chunkVisibleList;
 		std::vector<std::shared_ptr<Chunk>>		chunkRenderList;
 
+		~ChunkManager();
+
 		void						init();
 
 		void						update();
@@ -58,6 +60,6 @@ class ChunkManager {
 		void						_updateRenderList();
 
 		bool						_loadChunk(const mlm::ivec2 &chunkCoord);
-		void						_unloadChunk(std::shared_ptr<Chunk> chunk);
+		void						_unloadChunk(std::shared_ptr<Chunk> &chunk);
 
 };

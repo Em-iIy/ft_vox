@@ -7,10 +7,12 @@ Created on: 19/08/2025
 
 #include <memory>
 
-const int	MAX_LOAD_PER_FRAME = 5;
-const int	MAX_SETUP_PER_FRAME = 5;
+const int	MAX_LOAD_PER_FRAME = 2;
+const int	MAX_SETUP_PER_FRAME = 2;
 const int	MAX_BUILD_PER_FRAME = 2;
 const int	MAX_UPDATE_PER_FRAME = 5;
+
+int	getChunkCount();
 
 int	roundUp(int num, int mult)
 {
@@ -36,6 +38,11 @@ mlm::ivec3 getBlockChunkCoord(const mlm::ivec3 &worldCoord)
 		worldCoord.z & (CHUNK_SIZE_Z - 1)
 	);
 }
+
+ChunkManager::~ChunkManager()
+{
+}
+
 
 void						ChunkManager::init()
 {
@@ -148,14 +155,18 @@ void						ChunkManager::_updateUnloadList()
 void						ChunkManager::_updateFlagList()
 {
 	int	updateCount = 0;
+	std::vector<std::shared_ptr<Chunk>>	temp;
+	temp.reserve(MAX_UPDATE_PER_FRAME);
 	for (std::shared_ptr<Chunk> chunk : chunkUpdateFlagList)
 	{
 		if (updateCount >= MAX_UPDATE_PER_FRAME)
 			break ;
 		chunk->update();
-		chunkUpdateFlagList.erase(chunk);
+		temp.push_back(chunk);
 		updateCount++;
 	}
+	for (std::shared_ptr<Chunk> &chunk : temp)
+		chunkUpdateFlagList.erase(chunk);
 }
 
 void						ChunkManager::_updateVisibleList()
@@ -163,15 +174,15 @@ void						ChunkManager::_updateVisibleList()
 	if (!_updateVisibility)
 		return ;
 	chunkVisibleList.clear();
-	std::cout << "Updating visibility" << std::endl;
+	// std::cout << "Updating visibility" << std::endl;
 	const mlm::ivec2	camera_pos(0);
-	const int			render_distance = 2;
+	const int			render_distance = 10;
 
 	const mlm::ivec2	render_min = camera_pos - mlm::ivec2(render_distance);
 	const mlm::ivec2	render_max = camera_pos + mlm::ivec2(render_distance);
-	for (int x = render_min.x; x < render_max.x; ++x)
+	for (int x = render_min.x; x <= render_max.x; ++x)
 	{
-		for (int y = render_min.y; y < render_max.y; ++y)
+		for (int y = render_min.y; y <= render_max.y; ++y)
 		{
 			const mlm::ivec2		chunkCoord(x, y);
 			std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
@@ -192,6 +203,8 @@ void						ChunkManager::_updateVisibleList()
 	}
 	for (auto &[chunkCoord, chunk]: chunks)
 	{
+		if (!chunk)
+			continue;
 		if (
 			(chunkCoord.x >= render_min.x && chunkCoord.y >= render_min.y)
 			&& (chunkCoord.x <= render_max.x && chunkCoord.y <= render_max.y)
@@ -222,21 +235,22 @@ bool						ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 	// else
 	if (chunks[chunkCoord] != nullptr)
 		return (false);
-	std::cout << "loading chunk " << chunkCoord << std::endl;
+	// std::cout << "loading chunk " << chunkCoord << std::endl;
 	std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(chunkCoord, *this);
 	chunks[chunkCoord] = std::move(chunk);
 	return (true);
 }
 
-void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> chunk)
+void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 {
 	if (!chunk)
 		return ;
 	const mlm::ivec2	&chunkCoord = chunk->_chunkPos;
+	std::cout << "unloading " << chunk->_chunkPos << std::endl;
 	if (chunk.unique() != true)
 	{
-		std::cerr << "WARNING: Chunk " << chunkCoord << " set for unloading, but isn't unique!" << std::endl;
-		return ;
+		std::cerr << "WARNING: Chunk " << chunkCoord << " set for unloading, but isn't unique! found " << chunk.use_count() << " times" << std::endl;
+		std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " v" << chunkRenderList.size() << std::endl;
 	}
 	chunks.erase(chunkCoord);
 }
@@ -244,11 +258,12 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> chunk)
 void						ChunkManager::render(Shader &shader)
 {
 	// for (auto &[_, chunk]: chunks)
-	std::cout << chunks.size() << " " << chunkLoadList.size() << " " << chunkSetupList.size() << " " << chunkRebuildList.size() << " " << chunkUnloadList.size() << " " << chunkUpdateFlagList.size() << " " << chunkVisibleList.size() << " " << chunkRenderList.size() << std::endl;
+	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
 	for (auto chunk : chunkRenderList)
 	{
 		chunk->draw(shader);
 	}
+	chunkRenderList.clear();
 }
 
 Expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
