@@ -30,6 +30,8 @@ mlm::vec3	Block::getTypeColor() const
 		return (mlm::vec3(0.2f, 1.0f, 0.25f));
 	case STONE:
 		return (mlm::vec3(0.5f));
+	case WATER:
+		return (mlm::vec3(0.0f, 0.1f, 1.0f));
 	}
 	return (mlm::vec3(0.0f));
 }

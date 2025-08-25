@@ -128,7 +128,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 float octaves(mlm::vec3 pos, uint64_t depth, float step)
 {
 	Perlin perlin;
-	perlin.setSeed(3);
+	perlin.setSeed(1);
 	float ret = 0.0f;
 	for (; depth > 0; --depth)
 	{
@@ -146,7 +146,7 @@ float	continentalnessSpline(const float value)
 {
 	static Spline spline({
 		mlm::vec2(-1.f, 1.0f),
-		mlm::vec2(-0.3f, -0.4f),
+		mlm::vec2(-0.5f, 0.8f),
 		mlm::vec2(0.0f, -0.1f),
 		mlm::vec2(0.1f, 0.2f),
 		mlm::vec2(0.25f, 0.25f),
@@ -160,12 +160,13 @@ float	continentalnessSpline(const float value)
 int	heightRand(const mlm::ivec3 &pos)
 {
 	int	ret = 0;
-	ret += static_cast<int>(continentalnessSpline(octaves(static_cast<mlm::vec3>(pos) / 200.0f, 4, 2.0f)) * 28.0f);
+	ret += static_cast<int>(continentalnessSpline(octaves(static_cast<mlm::vec3>(pos) / 500.0f, 4, 2.0f)) * 128.0f);
 	return (ret);
 }
 
 void	Chunk::generate()
 {
+	const int	seaLevel = 60;
 	const uint64_t	yMax = CHUNK_SIZE_Y / 2;
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
@@ -187,7 +188,12 @@ void	Chunk::generate()
 				{
 					Block::Type type = Block::STONE;
 					if (iPos.y == tempYMax)
-						type = Block::GRASS;
+					{
+						if (iPos.y < seaLevel)
+							type = Block::WATER;
+						else
+							type = Block::GRASS;
+					}
 					else if (iPos.y < tempYMax && iPos.y > tempYMax - 4)
 						type = Block::DIRT;
 					blocks[index] = Block(type);

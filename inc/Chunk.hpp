@@ -11,7 +11,7 @@ Created on: 06/08/2025
 #include <array>
 
 constexpr uint64_t	CHUNK_SIZE_X = 16; // MUST BE POWER OF 2
-constexpr uint64_t	CHUNK_SIZE_Y = 48;
+constexpr uint64_t	CHUNK_SIZE_Y = 128;
 constexpr uint64_t	CHUNK_SIZE_Z = 16; // MUST BE POWER OF 2
 
 class ChunkManager;

@@ -67,7 +67,7 @@
 
 
 general
-	- make alternative for std::expected :(
+	+ make alternative for std::expected :(
 	- clean up helper functions in chunk and chunk management (static in class etc)
 
 - follow voxel engine tutorial (https://sites.google.com/site/letsmakeavoxelengine/home/basic-block-rendering)
