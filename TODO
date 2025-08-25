@@ -26,12 +26,15 @@
 
 - Chunk management
 	+ make chunks accessible from other chunks
-	- lists
-		- update
-		- load
-		- generate
-	- limit chunk generation per frame
+	+ lists
+		+ update
+		+ load
+		+ generate
+		+ unload
+	+ limit chunk generation per frame
+	- assure chunk neighbors are setup before building
 	- save chunk to file
+	- multithreaded
 
 - Terrain generation
 	- move generation to separate class
