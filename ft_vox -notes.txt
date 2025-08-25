@@ -1,0 +1,97 @@
+/*
+ * File Created: Sunday, 24th August 2025 10:49:39 pm
+ * Author: Emily (Em-iIy) Winnink (emily.winnink@gmail.com)
+ */
+
+chunk:
+
+update chunks {
+	load: load from file the chunk block data {
+		loop through load list until threshold {
+			if chunk not loaded {
+				load chunk
+				set visibility update flag
+			}
+		}
+		clear load list
+	}
+
+	setup: generate block data/set active blocks {
+		loop through setup list until threshold {
+			if chunk is loaded and not setup {
+				setup chunk
+				set visibility update flag
+			}
+		}
+		clear setup list
+	}
+
+	rebuild: create/update mesh {
+		loop through rebuild list until threshold {
+			if chunk is loaded and setup {
+				for neighboring chunks {
+					set rebuild flag
+					set visibility update flag
+				}
+				build chunk
+			}
+		}
+		clear rebuild list
+	}
+
+	update flags: probably not needed
+
+	unload: free/write to file chunk block data {
+		loop through unload list until threshold {
+			if chunk is loaded and not built {
+				build chunk
+				set visibility update flag
+			}
+		}
+		clear rebuild list
+	}
+
+	visible: updates whether chunks should be loaded/rebuilt/unloaded/rendered (visible) {
+		if visibility update flag is set {
+			loop through all chunks? {
+				if chunk in of render distance {
+					if chunk is null {
+						push to load list
+					}
+					else if chunk is loaded {
+						if chunk is not set up {
+							push to setup list
+						}
+						else if chunk should rebuild {
+							push to rebuild list
+						}
+						else {
+							push to visible list
+						}
+					}
+				}
+				else if chunk is outside render distance {
+					push to unload list
+				}
+			}
+		}
+	}
+
+	render: check if chunk should be rendered {
+		clear render list
+		loop through {
+			check if chunk is loaded and built {
+				? check frustrum culling {
+					add to render list
+				}
+			}
+		}
+	}
+}
+
+render {
+	loop through render list {
+		draw chunks
+	}
+}
+
