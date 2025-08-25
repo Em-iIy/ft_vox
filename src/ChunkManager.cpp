@@ -112,7 +112,7 @@ void						ChunkManager::_updateSetupList()
 
 void						ChunkManager::_updateRebuildList()
 {
-	const mlm::ivec2	neighbors[] = {
+	const std::vector<mlm::ivec2>	neighbors = {
 		mlm::ivec2(0, 1),
 		mlm::ivec2(0, -1),
 		mlm::ivec2(1, 0),
@@ -125,15 +125,22 @@ void						ChunkManager::_updateRebuildList()
 			break ;
 		if (chunk && chunk->isLoaded() && chunk->isSetup())
 		{
-			chunk->update();
+			uint64_t	neighborSetupCount = 0;
 			for (const mlm::ivec2 &neighbor : neighbors)
 			{
 				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->_chunkPos - neighbor];
-				if (chunkNeighbor && chunkNeighbor->isBuilt())
-					chunkUpdateFlagList.insert(chunkNeighbor);
+				if (!chunkNeighbor || !chunkNeighbor->isSetup())
+					break ;
+				// if (chunkNeighbor && chunkNeighbor->isBuilt())
+				// 	chunkUpdateFlagList.insert(chunkNeighbor);
+				neighborSetupCount++;
 			}
-			rebuildCount++;
-			_updateVisibility = true;
+			if (neighborSetupCount == neighbors.size())
+			{
+				chunk->update();
+				rebuildCount++;
+				_updateVisibility = true;
+			}
 		}
 	}
 	chunkRebuildList.clear();
