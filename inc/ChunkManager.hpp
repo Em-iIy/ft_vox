@@ -7,9 +7,9 @@ Created on: 19/08/2025
 
 #include "glu/gl-utils.hpp"
 #include "Chunk.hpp"
+#include "Expected.hpp"
 
 #include <unordered_map>
-#include <expected>
 #include <memory>
 
 struct ivec2Hash {
@@ -32,6 +32,6 @@ class ChunkManager {
 		void						render(Shader &shader);
 
 
-		std::expected<Block *, int>	getBlock(const mlm::ivec3 &blockCoord);
+		Expected<Block *, int>		getBlock(const mlm::ivec3 &blockCoord);
 		bool						isBlockTransparent(const mlm::ivec3 &blockCoord);
 };

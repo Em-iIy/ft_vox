@@ -5,6 +5,7 @@ Created on: 24/08/2025
 
 #include "Spline.hpp"
 
+#include <algorithm>
 
 Spline::Spline(const std::vector<mlm::vec2> &points)
 {
