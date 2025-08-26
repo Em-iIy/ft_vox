@@ -9,7 +9,7 @@ Created on: 25/07/2025
 
 const float	YAW 	= -90.0f;
 const float	PITCH 	= 0.0f;
-const float	SPEED 	= 20.0f;
+const float	SPEED 	= 100.0f;
 const float	SENS 	= 0.03f;
 const float	ZOOM 	= 60.0f;
 

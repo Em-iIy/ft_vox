@@ -29,13 +29,13 @@ class VoxEngine;
 class ChunkManager {
 	public:
 		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
-		std::vector<mlm::ivec2>					chunkLoadList;
-		std::vector<std::shared_ptr<Chunk>>		chunkSetupList;
-		std::vector<std::shared_ptr<Chunk>>		chunkRebuildList;
-		std::set<std::shared_ptr<Chunk>>		chunkUpdateFlagList;
-		std::vector<std::shared_ptr<Chunk>>		chunkUnloadList;
-		std::vector<std::shared_ptr<Chunk>>		chunkVisibleList;
-		std::vector<std::shared_ptr<Chunk>>		chunkRenderList;
+		std::vector<mlm::ivec2>					chunkLoadList = {};
+		std::vector<std::shared_ptr<Chunk>>		chunkSetupList = {};
+		std::vector<std::shared_ptr<Chunk>>		chunkRebuildList = {};
+		std::set<std::shared_ptr<Chunk>>		chunkUpdateFlagList = {};
+		std::vector<std::shared_ptr<Chunk>>		chunkUnloadList = {};
+		std::vector<std::shared_ptr<Chunk>>		chunkVisibleList = {};
+		std::vector<std::shared_ptr<Chunk>>		chunkRenderList = {};
 
 		ChunkManager(VoxEngine &engine);
 		~ChunkManager();

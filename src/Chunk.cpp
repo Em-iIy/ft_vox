@@ -134,11 +134,12 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	}
 }
 
-float octaves(mlm::vec3 pos, uint64_t depth, float step)
+float octaves(mlm::vec3 pos, uint64_t depth, float in_step)
 {
 	Perlin perlin;
-	perlin.setSeed(1);
+	perlin.setSeed(4);
 	float ret = 0.0f;
+	float step = 1.0f;
 	for (; depth > 0; --depth)
 	{
 		float temp = perlin.getValue(pos.x * step, pos.z * step) / step;
@@ -146,43 +147,55 @@ float octaves(mlm::vec3 pos, uint64_t depth, float step)
 			ret += temp;
 		else
 			break ;
-		step *= step;
+		step *= in_step;
 	}
 	return (ret);
 }
 
 float	continentalnessSpline(const float value)
 {
+	// static Spline spline({
+	// 	mlm::vec2(-1.f, 50.0f),
+	// 	mlm::vec2(0.3f, 100.0f),
+	// 	mlm::vec2(0.4f, 150.0f),
+	// 	mlm::vec2(1.0f, 150.0f),
+
+	// });
 	static Spline spline({
-		mlm::vec2(-1.f, 1.0f),
-		mlm::vec2(-0.5f, 0.8f),
-		mlm::vec2(0.0f, -0.1f),
-		mlm::vec2(0.1f, 0.2f),
-		mlm::vec2(0.25f, 0.25f),
-		mlm::vec2(0.45f, 0.50f),
+		mlm::vec2(-1.f, 200.0f),
+		mlm::vec2(-0.8f, 45.0f),
+		mlm::vec2(-0.2f, 45.0f),
+		mlm::vec2(0.0f, 58.0f),
+		mlm::vec2(0.1f, 65.0f),
+		mlm::vec2(0.25f, 70.0f),
+		mlm::vec2(0.45f, 130.0f),
+		mlm::vec2(1.00f, 150.0f),
 	});
 	float ret = spline.evaluate(value);
 	return (ret);
 }
 
+float temp(const mlm::ivec3 &pos)
+{
+	return ((octaves(static_cast<mlm::vec3>(pos) / 400.0f, 5, 2.0f)));
+}
 
 int	heightRand(const mlm::ivec3 &pos)
 {
 	int	ret = 0;
-	ret += static_cast<int>(continentalnessSpline(octaves(static_cast<mlm::vec3>(pos) / 500.0f, 4, 2.0f)) * 128.0f);
+	ret += static_cast<int>(continentalnessSpline(temp(pos)));
 	return (ret);
 }
 
 void	Chunk::generate()
 {
 	const int	seaLevel = 60;
-	const uint64_t	yMax = CHUNK_SIZE_Y / 2;
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
 		{
 			mlm::ivec3	iPos(x, 0, z);
-			int			tempYMax = yMax + heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
+			int			tempYMax = heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				iPos.y = y;

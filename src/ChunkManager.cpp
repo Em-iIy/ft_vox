@@ -66,9 +66,9 @@ void						ChunkManager::init()
 {
 	_renderDistance = 10;
 	_updateCameraChunkCoord();
-	// for (int x = -5; x <= 5; x++)
+	// for (int x = -0; x <= 0; x++)
 	// {
-	// 	for (int y = -5; y <= 5; y++)
+	// 	for (int y = -0; y <= 0; y++)
 	// 	{
 	// 		mlm::ivec2				pos(x, y);
 	// 		std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(pos, *this);
@@ -170,6 +170,9 @@ void						ChunkManager::_updateRebuildList()
 
 void						ChunkManager::_updateUnloadList()
 {
+	// std::cout << chunks[mlm::ivec2(-1)] << std::endl;
+	// if (chunkUnloadList.size() > 0)
+	// 	std::cout << chunkUnloadList.size();
 	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
 	{
 		if (chunk && chunk->isLoaded())
@@ -178,7 +181,12 @@ void						ChunkManager::_updateUnloadList()
 			_updateVisibility = true;
 		}
 	}
-	chunkUnloadList.clear();
+	// if (chunkUnloadList.size() > 0)
+	// 	std::cout << " " << chunkUnloadList.size() << std::endl;
+	if (chunkUnloadList.size() > 0)
+	{
+		chunkUnloadList.clear();
+	}
 }
 
 void						ChunkManager::_updateFlagList()
