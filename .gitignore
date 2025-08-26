@@ -1,3 +1,4 @@
 *.a
 *.o
 ft_vox
+.vscode
