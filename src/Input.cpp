@@ -92,17 +92,17 @@ void	Input::handleKeys()
 	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
 	Camera		&camera = pEngine->getCamera();
 	if (keys[GLFW_KEY_W].isDown())
-		camera.processKeyboard(Camera::FORWARD, (1.f / 60.f));
+		camera.processKeyboard(Camera::FORWARD, pEngine->get_delta_time());
 	if (keys[GLFW_KEY_A].isDown())
-		camera.processKeyboard(Camera::LEFT, (1.f / 60.f));
+		camera.processKeyboard(Camera::LEFT, pEngine->get_delta_time());
 	if (keys[GLFW_KEY_S].isDown())
-		camera.processKeyboard(Camera::BACKWARD, (1.f / 60.f));
+		camera.processKeyboard(Camera::BACKWARD, pEngine->get_delta_time());
 	if (keys[GLFW_KEY_D].isDown())
-		camera.processKeyboard(Camera::RIGHT, (1.f / 60.f));
+		camera.processKeyboard(Camera::RIGHT, pEngine->get_delta_time());
 	if (keys[GLFW_KEY_SPACE].isDown())
-		camera.processKeyboard(Camera::UP, (1.f / 60.f));
+		camera.processKeyboard(Camera::UP, pEngine->get_delta_time());
 	if (keys[GLFW_KEY_LEFT_SHIFT].isDown())
-		camera.processKeyboard(Camera::DOWN, (1.f / 60.f));
+		camera.processKeyboard(Camera::DOWN, pEngine->get_delta_time());
 	
 	if (keys[GLFW_KEY_TAB].isPressed() && 0)
 	{
