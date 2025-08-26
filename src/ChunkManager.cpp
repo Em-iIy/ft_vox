@@ -64,26 +64,28 @@ void						ChunkManager::cleanup()
 
 void						ChunkManager::init()
 {
-	_cameraChunkCoord = getChunkCoord(_engine.getCamera().getPos());
-	for (int x = -5; x <= 5; x++)
-	{
-		for (int y = -5; y <= 5; y++)
-		{
-			mlm::ivec2				pos(x, y);
-			std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(pos, *this);
-			if (chunk)
-			{
-				chunk->generate();
-				chunks[pos] = chunk;
-			}
-		}
-	}
-	for (auto &[_, chunk]: chunks)
-	{
-		if (chunk)
-			chunk->update();
-	}
+	_renderDistance = 10;
+	_updateCameraChunkCoord();
+	// for (int x = -5; x <= 5; x++)
+	// {
+	// 	for (int y = -5; y <= 5; y++)
+	// 	{
+	// 		mlm::ivec2				pos(x, y);
+	// 		std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(pos, *this);
+	// 		if (chunk)
+	// 		{
+	// 			chunk->generate();
+	// 			chunks[pos] = chunk;
+	// 		}
+	// 	}
+	// }
+	// for (auto &[_, chunk]: chunks)
+	// {
+	// 	if (chunk)
+	// 		chunk->update();
+	// }
 }
+
 
 void						ChunkManager::update()
 {
@@ -202,39 +204,42 @@ void						ChunkManager::_updateVisibleList()
 		return ;
 	chunkVisibleList.clear();
 	// std::cout << "Updating visibility" << std::endl;
-	const mlm::ivec2	camera_pos = _cameraChunkCoord;
-	const int			render_distance = 20;
-
-	const mlm::ivec2	render_min = camera_pos - mlm::ivec2(render_distance);
-	const mlm::ivec2	render_max = camera_pos + mlm::ivec2(render_distance);
-	for (int x = render_min.x; x <= render_max.x; ++x)
+	// loop through all chunk coordinates within render distance
+	for (int dist = 0; dist <= _renderDistance; ++dist)
 	{
-		for (int y = render_min.y; y <= render_max.y; ++y)
+		for (int x = -dist; x <= dist; ++x)
 		{
-			const mlm::ivec2		chunkCoord(x, y);
-			std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
-			if (chunk == nullptr)
+			for (int y = -dist; y <= dist; ++y)
 			{
-				chunkLoadList.push_back(chunkCoord);
-			}
-			else
-			{
-				if (chunk->isSetup() == false)
-					chunkSetupList.push_back(chunk);
-				else if (chunk->isBuilt() == false)
-					chunkRebuildList.push_back(chunk);
+				// Check only perimeter of chunks at dist
+				if ((x != -dist && x != dist) && (y != -dist && y != dist))
+					y = dist;
+				const mlm::ivec2		chunkCoord = _cameraChunkCoord + mlm::ivec2(x, y);
+				std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
+				if (chunk == nullptr)
+				{
+					chunkLoadList.push_back(chunkCoord);
+				}
 				else
-					chunkVisibleList.push_back(chunk);
+				{
+					if (chunk->isSetup() == false)
+						chunkSetupList.push_back(chunk);
+					else if (chunk->isBuilt() == false)
+						chunkRebuildList.push_back(chunk);
+					else
+						chunkVisibleList.push_back(chunk);
+				}
 			}
 		}
 	}
+	// Loop through all chunks, and unload all outisde of render distance
 	for (auto &[chunkCoord, chunk]: chunks)
 	{
 		if (!chunk)
 			continue;
 		if (
-			(chunkCoord.x >= render_min.x && chunkCoord.y >= render_min.y)
-			&& (chunkCoord.x <= render_max.x && chunkCoord.y <= render_max.y)
+			(chunkCoord.x >= _renderMin.x && chunkCoord.y >= _renderMin.y)
+			&& (chunkCoord.x <= _renderMax.x && chunkCoord.y <= _renderMax.y)
 		)
 			continue ;
 		chunkUnloadList.push_back(chunk);
@@ -262,6 +267,9 @@ void						ChunkManager::_updateCameraChunkCoord()
 	{
 		_cameraChunkCoord = cameraChunkCoord;
 		_updateVisibility = true;
+
+		_renderMin = _cameraChunkCoord - mlm::ivec2(_renderDistance);
+		_renderMax = _cameraChunkCoord + mlm::ivec2(_renderDistance);
 	}
 }
 

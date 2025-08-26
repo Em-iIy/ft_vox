@@ -33,8 +33,8 @@
 		+ unload
 	+ limit chunk generation per frame
 	+ assure chunk neighbors are setup before building
-	- pass camera to update visibility
-	- prioritize generating chunks closer to the player
+	+ pass camera to update visibility
+	+ prioritize generating chunks closer to the player
 	- save chunk to file
 	- multithreaded
 
@@ -46,7 +46,7 @@
 	- decoration
 		- trees
 		- water
-	- caves
+	- caves1;
 		- 3D perlin noise
 
 - Setup input
