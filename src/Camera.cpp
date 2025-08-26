@@ -27,13 +27,16 @@ mlm::mat4	Camera::getViewMatrix() const
 void		Camera::processKeyboard(Direction dir, float deltaTime)
 {
 	float	velocity = _movementSpeed * deltaTime;
+	mlm::vec3	worldFront;
 	switch (dir)
 	{
 		case FORWARD:
-			_pos += _front * velocity;
+			worldFront = mlm::cross(_worldUp, _right);
+			_pos += worldFront * velocity;
 			break ;
 		case BACKWARD:
-			_pos -= _front * velocity;
+			worldFront = mlm::cross(_worldUp, _right);
+			_pos -= worldFront * velocity;
 			break ;
 		case LEFT:
 			_pos -= _right * velocity;
