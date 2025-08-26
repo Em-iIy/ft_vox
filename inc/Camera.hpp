@@ -9,7 +9,7 @@ Created on: 25/07/2025
 
 const float	YAW 	= -90.0f;
 const float	PITCH 	= 0.0f;
-const float	SPEED 	= 50.0f;
+const float	SPEED 	= 20.0f;
 const float	SENS 	= 0.03f;
 const float	ZOOM 	= 60.0f;
 
@@ -26,28 +26,29 @@ class Camera {
 
 		Camera(const mlm::vec3 &pos = mlm::vec3(0.0f), const mlm::vec3 &up = mlm::vec3(0.0f, 1.0f, 0.0f), const float yaw = YAW, const float pitch = PITCH);
 		
-		mlm::mat4	getViewMatrix() const;
-		float		getZoom() const;
+		mlm::mat4		getViewMatrix() const;
+		float			getZoom() const;
+		const mlm::vec3	&getPos() const;
 
-		void		setPos(const mlm::vec3 &pos);
+		void			setPos(const mlm::vec3 &pos);
 
-		void		processKeyboard(Direction dir, float deltaTime);
-		void		processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
-		void		processMouseScroll(float yOffset);
+		void			processKeyboard(Direction dir, float deltaTime);
+		void			processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
+		void			processMouseScroll(float yOffset);
 	
 	private:
-		mlm::vec3	_pos;
-		mlm::vec3	_worldUp;
-		mlm::vec3	_front;
-		mlm::vec3	_up;
-		mlm::vec3	_right;
+		mlm::vec3		_pos;
+		mlm::vec3		_worldUp;
+		mlm::vec3		_front;
+		mlm::vec3		_up;
+		mlm::vec3		_right;
 
-		float		_yaw;
-		float		_pitch;
+		float			_yaw;
+		float			_pitch;
 
-		float		_movementSpeed;
-		float		_mouseSensitivity;
-		float		_zoom;
+		float			_movementSpeed;
+		float			_mouseSensitivity;
+		float			_zoom;
 
-		void		updateVectors();
+		void			updateVectors();
 };

@@ -24,6 +24,7 @@ struct ivec2Hash {
 };
 
 class Chunk;
+class VoxEngine;
 
 class ChunkManager {
 	public:
@@ -36,8 +37,10 @@ class ChunkManager {
 		std::vector<std::shared_ptr<Chunk>>		chunkVisibleList;
 		std::vector<std::shared_ptr<Chunk>>		chunkRenderList;
 
+		ChunkManager(VoxEngine &engine);
 		~ChunkManager();
 
+		void						cleanup();
 		void						init();
 
 		void						update();
@@ -49,7 +52,9 @@ class ChunkManager {
 		bool						isBlockTransparent(const mlm::ivec3 &blockCoord);
 	
 	private:
+		VoxEngine					&_engine;
 		bool						_updateVisibility = true;
+		mlm::ivec2					_cameraChunkCoord;
 
 		void						_updateLoadList();
 		void						_updateSetupList();
@@ -58,6 +63,8 @@ class ChunkManager {
 		void						_updateFlagList();
 		void						_updateVisibleList();
 		void						_updateRenderList();
+
+		void						_updateCameraChunkCoord();
 
 		bool						_loadChunk(const mlm::ivec2 &chunkCoord);
 		void						_unloadChunk(std::shared_ptr<Chunk> &chunk);

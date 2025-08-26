@@ -4,6 +4,7 @@ Created on: 19/08/2025
 */
 
 #include "ChunkManager.hpp"
+#include "VoxEngine.hpp"
 
 #include <memory>
 
@@ -39,13 +40,31 @@ mlm::ivec3 getBlockChunkCoord(const mlm::ivec3 &worldCoord)
 	);
 }
 
+ChunkManager::ChunkManager(VoxEngine &engine): _engine(engine)
+{
+}
+
 ChunkManager::~ChunkManager()
 {
 }
 
+void						ChunkManager::cleanup()
+{
+	// Clear chunk lists before chunk map
+	chunkLoadList.clear();
+	chunkSetupList.clear();
+	chunkRebuildList.clear();
+	chunkUpdateFlagList.clear();
+	chunkUnloadList.clear();
+	chunkVisibleList.clear();
+	chunkRenderList.clear();
+
+	chunks.clear();
+}
 
 void						ChunkManager::init()
 {
+	_cameraChunkCoord = getChunkCoord(_engine.getCamera().getPos());
 	for (int x = -5; x <= 5; x++)
 	{
 		for (int y = -5; y <= 5; y++)
@@ -75,6 +94,7 @@ void						ChunkManager::update()
 	_updateFlagList();
 	_updateVisibleList();
 	_updateRenderList();
+	_updateCameraChunkCoord();
 }
 
 void						ChunkManager::_updateLoadList()
@@ -182,8 +202,8 @@ void						ChunkManager::_updateVisibleList()
 		return ;
 	chunkVisibleList.clear();
 	// std::cout << "Updating visibility" << std::endl;
-	const mlm::ivec2	camera_pos(0);
-	const int			render_distance = 10;
+	const mlm::ivec2	camera_pos = _cameraChunkCoord;
+	const int			render_distance = 20;
 
 	const mlm::ivec2	render_min = camera_pos - mlm::ivec2(render_distance);
 	const mlm::ivec2	render_max = camera_pos + mlm::ivec2(render_distance);
@@ -235,6 +255,17 @@ void						ChunkManager::_updateRenderList()
 	}
 }
 
+void						ChunkManager::_updateCameraChunkCoord()
+{
+	const mlm::ivec2 &cameraChunkCoord = getChunkCoord(_engine.getCamera().getPos());
+	if (cameraChunkCoord != _cameraChunkCoord)
+	{
+		_cameraChunkCoord = cameraChunkCoord;
+		_updateVisibility = true;
+	}
+}
+
+
 bool						ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 {
 	// if loadable from file
@@ -253,12 +284,12 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 	if (!chunk)
 		return ;
 	const mlm::ivec2	&chunkCoord = chunk->_chunkPos;
-	std::cout << "unloading " << chunk->_chunkPos << std::endl;
-	if (chunk.unique() != true)
-	{
-		std::cerr << "WARNING: Chunk " << chunkCoord << " set for unloading, but isn't unique! found " << chunk.use_count() << " times" << std::endl;
-		std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " v" << chunkRenderList.size() << std::endl;
-	}
+	// std::cout << "unloading " << chunk->_chunkPos << std::endl;
+	// if (chunk.unique() != true)
+	// {
+	// 	std::cerr << "WARNING: Chunk " << chunkCoord << " set for unloading, but isn't unique! found " << chunk.use_count() << " times" << std::endl;
+	// 	std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " v" << chunkRenderList.size() << std::endl;
+	// }
 	chunks.erase(chunkCoord);
 }
 

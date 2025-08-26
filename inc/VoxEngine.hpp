@@ -16,20 +16,24 @@ const mlm::ivec2	WINDOW_SIZE(1000, 1000);
 
 class VoxEngine: public Window {
 	public:
-		void	run();
+		VoxEngine();
+		~VoxEngine();
+
+		void			run();
 	
-		Camera	&getCamera();
-		Input	&getInput();
+		Camera			&getCamera();
+		Input			&getInput();
 
 	private:
-		void	init();
+		void			init();
 
-		void	mainLoop();
-		void	input();
+		void			mainLoop();
+		void			input();
 
-		void	cleanup();
+		void			cleanup();
 
 
-		Camera		_camera;
-		Input		_input;
+		Camera			_camera;
+		Input			_input;
+		ChunkManager	_chunkManager;
 };

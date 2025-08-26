@@ -19,6 +19,15 @@ mlm::vec3	randVec3()
 	);
 }
 
+VoxEngine::VoxEngine(): _chunkManager(*this)
+{
+}
+
+VoxEngine::~VoxEngine()
+{
+}
+
+
 void	VoxEngine::run()
 {
 	init();
@@ -41,8 +50,7 @@ void	VoxEngine::mainLoop()
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 3), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 
-	ChunkManager chunkManager;
-	chunkManager.init();
+	_chunkManager.init();
 
 	Shader	shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 
@@ -64,8 +72,8 @@ void	VoxEngine::mainLoop()
 		shader.set_mat4("view", view);
 
 		shader.set_vec3("color", mlm::vec3(0.3f, 0.2f, 0.3f));
-		chunkManager.update();
-		chunkManager.render(shader);
+		_chunkManager.update();
+		_chunkManager.render(shader);
 
 		glfwSwapBuffers(Window::get_window());
 		glfwPollEvents();
@@ -79,6 +87,7 @@ void	VoxEngine::input()
 
 void	VoxEngine::cleanup()
 {
+	_chunkManager.cleanup();
 	glfwTerminate();
 }
 

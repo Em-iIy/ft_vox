@@ -100,6 +100,11 @@ float	Camera::getZoom() const
 	return (_zoom);
 }
 
+const mlm::vec3	&Camera::getPos() const
+{
+	return (_pos);
+}
+
 void		Camera::setPos(const mlm::vec3 &pos)
 {
 	_pos = pos;
