@@ -51,8 +51,8 @@ class ChunkManager {
 		Expected<Block *, int>		getBlock(const mlm::ivec3 &blockCoord);
 		bool						isBlockTransparent(const mlm::ivec3 &blockCoord);
 	
-	private:
 		VoxEngine					&_engine;
+	private:
 		bool						_updateVisibility = true;
 		mlm::ivec2					_cameraChunkCoord = {2147483647};
 		int							_renderDistance = {};

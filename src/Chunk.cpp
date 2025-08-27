@@ -9,6 +9,8 @@ Created on: 06/08/2025
 
 #include "Spline.hpp"
 
+#include "VoxEngine.hpp"
+
 int chunk_count = 0;
 
 int	getChunkCount()
@@ -230,7 +232,8 @@ void	Chunk::generate()
 void	Chunk::draw(Shader &shader)
 {
 	mlm::mat4 model(1.0f);
-	model = mlm::translate(model, mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
+	mlm::vec3 pos = _manager._engine.getCamera().getPos();
+	model = mlm::translate(model, static_cast<mlm::vec3>(mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 0, CHUNK_SIZE_Z * _chunkPos.y)) - pos);
 	shader.set_mat4("model", model);
 	_mesh.draw(shader);
 }

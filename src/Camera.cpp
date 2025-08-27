@@ -21,7 +21,7 @@ Camera::Camera(const mlm::vec3 &pos, const mlm::vec3 &up, const float yaw, const
 
 mlm::mat4	Camera::getViewMatrix() const
 {
-	return (mlm::lookat(_pos, _pos + _front, _up));
+	return (mlm::lookat(_front, _up));
 }
 
 void		Camera::processKeyboard(Direction dir, float deltaTime)
