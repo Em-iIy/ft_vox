@@ -13,6 +13,7 @@ FILES_SRCS = \
 			ChunkManager.cpp \
 			ChunkMesh.cpp \
 			Spline.cpp \
+			Atlas.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -41,7 +42,7 @@ CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
 CFLAGS += -g
 CFLAGS += -std=c++20
-# CFLAGS += -fsanitize=address -g
+CFLAGS += -fsanitize=address -g
 LFLAGS = -lglfw
 
 INC = \

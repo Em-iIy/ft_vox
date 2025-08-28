@@ -38,19 +38,23 @@ void	VoxEngine::run()
 void	VoxEngine::init()
 {
 	rng::seed();
+
 	init_glfw();
 	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
+	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 
+	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
+	_chunkManager.init();
+	if (_atlas.load("./resources/textures/texture_atlas.bmp", 8) == false)
+	{
+		std::cerr << "Uh oh no atlas we lost :/" << std::endl;
+	}
 }
 
 void	VoxEngine::mainLoop()
 {
-	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
-	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
-
-	_chunkManager.init();
 
 	Shader	shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 
@@ -71,7 +75,9 @@ void	VoxEngine::mainLoop()
 		mlm::mat4	view = _camera.getViewMatrix();
 		shader.set_mat4("view", view);
 
-		shader.set_vec3("color", mlm::vec3(0.3f, 0.2f, 0.3f));
+		glActiveTexture(GL_TEXTURE0);
+		_atlas._texture.bind();
+
 		_chunkManager.update();
 		_chunkManager.render(shader);
 
@@ -88,6 +94,7 @@ void	VoxEngine::input()
 void	VoxEngine::cleanup()
 {
 	_chunkManager.cleanup();
+	_atlas.del();
 	glfwTerminate();
 }
 

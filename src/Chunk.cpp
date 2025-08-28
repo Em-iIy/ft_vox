@@ -49,6 +49,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	mlm::vec3	pos(ipos);
 	Block		&block = blocks[index3D(ipos.x, ipos.y, ipos.z)];
 	mlm::vec3	color = block.getTypeColor();
+	const std::vector<mlm::vec2>	&offsets = _manager._engine._atlas.getOffset(block._type);
 	
 	const mlm::ivec3	neighbors[] = {
 		mlm::ivec3(1, 0, 0),
@@ -72,67 +73,67 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	if (_manager.isBlockTransparent(worldPos + neighbors[5]) == false)
 	{
 		mlm::vec3	tempColor = color * 0.7f;
-		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[3], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[0], tempColor, offsets[1]});
+		vertices.push_back({positions[2], tempColor, offsets[1]});
+		vertices.push_back({positions[1], tempColor, offsets[1]});
+		vertices.push_back({positions[1], tempColor, offsets[1]});
+		vertices.push_back({positions[2], tempColor, offsets[1]});
+		vertices.push_back({positions[3], tempColor, offsets[1]});
 	}
 	// front face
 	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
 	{
 		mlm::vec3	tempColor = color * 0.7f;
-		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[4], tempColor, offsets[2]});
+		vertices.push_back({positions[5], tempColor, offsets[2]});
+		vertices.push_back({positions[6], tempColor, offsets[2]});
+		vertices.push_back({positions[5], tempColor, offsets[2]});
+		vertices.push_back({positions[7], tempColor, offsets[2]});
+		vertices.push_back({positions[6], tempColor, offsets[2]});
 	}
 	// left face
 	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
 	{
 		mlm::vec3	tempColor = color * 0.8f;
-		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[0], tempColor, offsets[3]});
+		vertices.push_back({positions[4], tempColor, offsets[3]});
+		vertices.push_back({positions[6], tempColor, offsets[3]});
+		vertices.push_back({positions[0], tempColor, offsets[3]});
+		vertices.push_back({positions[6], tempColor, offsets[3]});
+		vertices.push_back({positions[2], tempColor, offsets[3]});
 	}
 	// right face
 	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
 	{
 		mlm::vec3	tempColor = color * 0.8f;
-		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[3], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[1], tempColor, offsets[4]});
+		vertices.push_back({positions[7], tempColor, offsets[4]});
+		vertices.push_back({positions[5], tempColor, offsets[4]});
+		vertices.push_back({positions[1], tempColor, offsets[4]});
+		vertices.push_back({positions[3], tempColor, offsets[4]});
+		vertices.push_back({positions[7], tempColor, offsets[4]});
 	}
 	// top face
 	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
 	{
 		mlm::vec3	tempColor = color * 0.9f;
-		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[6], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[2], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[7], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[3], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[2], tempColor, offsets[0]});
+		vertices.push_back({positions[6], tempColor, offsets[0]});
+		vertices.push_back({positions[7], tempColor, offsets[0]});
+		vertices.push_back({positions[2], tempColor, offsets[0]});
+		vertices.push_back({positions[7], tempColor, offsets[0]});
+		vertices.push_back({positions[3], tempColor, offsets[0]});
 	}
 	// bottom face
 	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
 	{
 		mlm::vec3	tempColor = color * 0.9f;
-		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[0], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[1], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[5], tempColor, mlm::vec2(0.0f)});
-		vertices.push_back({positions[4], tempColor, mlm::vec2(0.0f)});
+		vertices.push_back({positions[1], tempColor, offsets[5]});
+		vertices.push_back({positions[4], tempColor, offsets[5]});
+		vertices.push_back({positions[0], tempColor, offsets[5]});
+		vertices.push_back({positions[1], tempColor, offsets[5]});
+		vertices.push_back({positions[5], tempColor, offsets[5]});
+		vertices.push_back({positions[4], tempColor, offsets[5]});
 	}
 }
 
