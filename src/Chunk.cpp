@@ -59,6 +59,14 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::ivec3(0, 0, 1),
 		mlm::ivec3(0, 0, -1),
 	};
+	const mlm::vec3	normals[] = {
+		mlm::vec3(0.0f, 1.0f, 0.0f),
+		mlm::vec3(0.0f, 0.0f, -1.0f),
+		mlm::vec3(0.0f, 0.0f, 1.0f),
+		mlm::vec3(-1.0f, 0.0f, 0.0f),
+		mlm::vec3(1.0f, 0.0f, 0.0f),
+		mlm::vec3(0.0f, -1.0f, 0.0f)
+	};
 	const mlm::vec3	positions[] = {
 		mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, // 0 back bottom left
 		mlm::vec3(0.5f, -0.5f, -0.5f) + pos, //  1 back bottom right
@@ -72,68 +80,68 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	// back face
 	if (_manager.isBlockTransparent(worldPos + neighbors[5]) == false)
 	{
-		mlm::vec3	tempColor = color * 0.7f;
-		vertices.push_back({positions[0], tempColor, offsets[1]});
-		vertices.push_back({positions[2], tempColor, offsets[1]});
-		vertices.push_back({positions[1], tempColor, offsets[1]});
-		vertices.push_back({positions[1], tempColor, offsets[1]});
-		vertices.push_back({positions[2], tempColor, offsets[1]});
-		vertices.push_back({positions[3], tempColor, offsets[1]});
+		mlm::vec3	tempColor = normals[1] * 0.7f;
+		vertices.push_back({positions[0], tempColor, offsets[1] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[2], tempColor, offsets[1] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[1], tempColor, offsets[1] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[1], tempColor, offsets[1] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[2], tempColor, offsets[1] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[3], tempColor, offsets[1] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// front face
 	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
 	{
-		mlm::vec3	tempColor = color * 0.7f;
-		vertices.push_back({positions[4], tempColor, offsets[2]});
-		vertices.push_back({positions[5], tempColor, offsets[2]});
-		vertices.push_back({positions[6], tempColor, offsets[2]});
-		vertices.push_back({positions[5], tempColor, offsets[2]});
-		vertices.push_back({positions[7], tempColor, offsets[2]});
-		vertices.push_back({positions[6], tempColor, offsets[2]});
+		mlm::vec3	tempColor = normals[2] * 0.7f;
+		vertices.push_back({positions[4], tempColor, offsets[2] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[5], tempColor, offsets[2] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[6], tempColor, offsets[2] + mlm::vec2(0.0f, 0.125f)});
+		vertices.push_back({positions[5], tempColor, offsets[2] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[7], tempColor, offsets[2] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[6], tempColor, offsets[2] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// left face
 	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
 	{
-		mlm::vec3	tempColor = color * 0.8f;
-		vertices.push_back({positions[0], tempColor, offsets[3]});
-		vertices.push_back({positions[4], tempColor, offsets[3]});
-		vertices.push_back({positions[6], tempColor, offsets[3]});
-		vertices.push_back({positions[0], tempColor, offsets[3]});
-		vertices.push_back({positions[6], tempColor, offsets[3]});
-		vertices.push_back({positions[2], tempColor, offsets[3]});
+		mlm::vec3	tempColor = normals[3] * 0.8f;
+		vertices.push_back({positions[0], tempColor, offsets[3] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[4], tempColor, offsets[3] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[6], tempColor, offsets[3] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[0], tempColor, offsets[3] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[6], tempColor, offsets[3] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[2], tempColor, offsets[3] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// right face
 	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
 	{
-		mlm::vec3	tempColor = color * 0.8f;
-		vertices.push_back({positions[1], tempColor, offsets[4]});
-		vertices.push_back({positions[7], tempColor, offsets[4]});
-		vertices.push_back({positions[5], tempColor, offsets[4]});
-		vertices.push_back({positions[1], tempColor, offsets[4]});
-		vertices.push_back({positions[3], tempColor, offsets[4]});
-		vertices.push_back({positions[7], tempColor, offsets[4]});
+		mlm::vec3	tempColor = normals[4] * 0.8f;
+		vertices.push_back({positions[1], tempColor, offsets[4] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[7], tempColor, offsets[4] + mlm::vec2(0.0f, 0.125f)});
+		vertices.push_back({positions[5], tempColor, offsets[4] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[1], tempColor, offsets[4] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[3], tempColor, offsets[4] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[7], tempColor, offsets[4] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// top face
 	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
 	{
-		mlm::vec3	tempColor = color * 0.9f;
-		vertices.push_back({positions[2], tempColor, offsets[0]});
-		vertices.push_back({positions[6], tempColor, offsets[0]});
-		vertices.push_back({positions[7], tempColor, offsets[0]});
-		vertices.push_back({positions[2], tempColor, offsets[0]});
-		vertices.push_back({positions[7], tempColor, offsets[0]});
-		vertices.push_back({positions[3], tempColor, offsets[0]});
+		mlm::vec3	tempColor = normals[0] * 0.9f;
+		vertices.push_back({positions[2], tempColor, offsets[0] + mlm::vec2(0.0f, 0.125f)});
+		vertices.push_back({positions[6], tempColor, offsets[0] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[7], tempColor, offsets[0] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[2], tempColor, offsets[0] + mlm::vec2(0.0f, 0.125f)});
+		vertices.push_back({positions[7], tempColor, offsets[0] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[3], tempColor, offsets[0] + mlm::vec2(0.125f)});
 	}
 	// bottom face
 	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
 	{
-		mlm::vec3	tempColor = color * 0.9f;
-		vertices.push_back({positions[1], tempColor, offsets[5]});
-		vertices.push_back({positions[4], tempColor, offsets[5]});
-		vertices.push_back({positions[0], tempColor, offsets[5]});
-		vertices.push_back({positions[1], tempColor, offsets[5]});
-		vertices.push_back({positions[5], tempColor, offsets[5]});
-		vertices.push_back({positions[4], tempColor, offsets[5]});
+		mlm::vec3	tempColor = normals[5] * 0.9f;
+		vertices.push_back({positions[1], tempColor, offsets[5] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[4], tempColor, offsets[5] + mlm::vec2(0.0f, 0.125f)});
+		vertices.push_back({positions[0], tempColor, offsets[5] + mlm::vec2(0.0f, 0.0f)});
+		vertices.push_back({positions[1], tempColor, offsets[5] + mlm::vec2(0.125f, 0.0f)});
+		vertices.push_back({positions[5], tempColor, offsets[5] + mlm::vec2(0.125f)});
+		vertices.push_back({positions[4], tempColor, offsets[5] + mlm::vec2(0.0f, 0.125f)});
 	}
 }
 

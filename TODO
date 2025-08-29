@@ -1,13 +1,13 @@
 + Create Camera
 
-- Create Cube
++ Create Cube
 	+ mesh
-	- textures
-		- create texture atlas
-			? class
-		- create texture uvs
-		- add texture uvs to chunk::update()
-		- add texture to shaders
+	+ textures
+		+ create texture atlas
+			+ class
+		+ create texture uvs
+		+ add texture uvs to chunk::update()
+		+ add texture to shaders
 	+ shaders
 
 - Skybox
