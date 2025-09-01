@@ -35,11 +35,6 @@ void	VoxEngine::run()
 	cleanup();
 }
 
-void	prntKey(char c)
-{
-	std::cout << c << std::endl;
-}
-
 void	VoxEngine::init()
 {
 	rng::seed();
@@ -48,7 +43,19 @@ void	VoxEngine::init()
 	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
-	_input.addCallback(GLFW_KEY_0, std::bind(prntKey, '0'));
+
+	// Camera movement (maybe move into separate setup function)
+	_input.addOnDownCallback(GLFW_KEY_W, [this]() {_camera.processKeyboard(Camera::FORWARD, get_delta_time());});
+	_input.addOnDownCallback(GLFW_KEY_S, [this]() {_camera.processKeyboard(Camera::BACKWARD, get_delta_time());});
+	_input.addOnDownCallback(GLFW_KEY_D, [this]() {_camera.processKeyboard(Camera::RIGHT, get_delta_time());});
+	_input.addOnDownCallback(GLFW_KEY_A, [this]() {_camera.processKeyboard(Camera::LEFT, get_delta_time());});
+	_input.addOnDownCallback(GLFW_KEY_SPACE, [this]() {_camera.processKeyboard(Camera::UP, get_delta_time());});
+	_input.addOnDownCallback(GLFW_KEY_LEFT_SHIFT, [this]() {_camera.processKeyboard(Camera::DOWN, get_delta_time());});
+
+	// Random other key inputs
+	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
+	_input.addOnPressCallback(GLFW_KEY_TAB, std::bind(&Input::toggleWireFrame, _input));
+
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));

@@ -27,19 +27,47 @@ bool	KeyState::isReleased() const
 	return (current == GLFW_RELEASE && prev == GLFW_PRESS);
 }
 
-void	Input::addCallback(int key, InputCallback callback)
+void	Input::addOnPressCallback(int key, InputCallback callback)
 {
-	callbacks[key].push_back(callback);
+	if (std::find(monitoredKeys.begin(), monitoredKeys.end(), key) == monitoredKeys.end())
+		monitoredKeys.push_back(key);
+	onPressCallbacks[key].push_back(callback);
 }
 
-void	Input::callKey(int key)
+void	Input::onPress(int key)
 {
-	std::vector<InputCallback>	&cb = callbacks[key];
+	std::vector<InputCallback>	&cb = onPressCallbacks[key];
 	for (InputCallback &callback : cb)
 		callback();
 }
 
+void	Input::addOnReleaseCallback(int key, InputCallback callback)
+{
+	if (std::find(monitoredKeys.begin(), monitoredKeys.end(), key) == monitoredKeys.end())
+		monitoredKeys.push_back(key);
+	onReleaseCallbacks[key].push_back(callback);
+}
 
+void	Input::onRelease(int key)
+{
+	std::vector<InputCallback>	&cb = onReleaseCallbacks[key];
+	for (InputCallback &callback : cb)
+		callback();
+}
+
+void	Input::addOnDownCallback(int key, InputCallback callback)
+{
+	if (std::find(monitoredKeys.begin(), monitoredKeys.end(), key) == monitoredKeys.end())
+		monitoredKeys.push_back(key);
+	onDownCallbacks[key].push_back(callback);
+}
+
+void	Input::onDown(int key)
+{
+	std::vector<InputCallback>	&cb = onDownCallbacks[key];
+	for (InputCallback &callback : cb)
+		callback();
+}
 
 void	Input::init(GLFWwindow *window, const mlm::ivec2 &windowSize)
 {
@@ -100,44 +128,17 @@ void	Input::mouseScrollCallback(GLFWwindow *window, [[maybe_unused]] double xOff
 
 void	Input::handleKeys()
 {
-	void	*ptr = glfwGetWindowUserPointer(_window);
-	if (!ptr)
-		return ;
-	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
-	Camera		&camera = pEngine->getCamera();
-	if (keys[GLFW_KEY_W].isDown())
-		camera.processKeyboard(Camera::FORWARD, pEngine->get_delta_time());
-	if (keys[GLFW_KEY_A].isDown())
-		camera.processKeyboard(Camera::LEFT, pEngine->get_delta_time());
-	if (keys[GLFW_KEY_S].isDown())
-		camera.processKeyboard(Camera::BACKWARD, pEngine->get_delta_time());
-	if (keys[GLFW_KEY_D].isDown())
-		camera.processKeyboard(Camera::RIGHT, pEngine->get_delta_time());
-	if (keys[GLFW_KEY_SPACE].isDown())
-		camera.processKeyboard(Camera::UP, pEngine->get_delta_time());
-	if (keys[GLFW_KEY_LEFT_SHIFT].isDown())
-		camera.processKeyboard(Camera::DOWN, pEngine->get_delta_time());
-	
-	if (keys[GLFW_KEY_TAB].isPressed() && 0)
-	{
-		std::cout << "before: " << std::boolalpha << wireFrameMode << std::noboolalpha << std::endl;
-		wireFrameMode = !wireFrameMode;
-		std::cout << "after: " << std::boolalpha << wireFrameMode << std::noboolalpha << std::endl;
-		if (wireFrameMode)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	if (keys[GLFW_KEY_X].isPressed())
-	{
-		KeyState &key = keys[GLFW_KEY_X];
-		std::cout << key.current << " " << key.prev << std::endl;
-	}
-
-	if (keys[GLFW_KEY_ESCAPE].isPressed())
-		glfwSetWindowShouldClose(_window, GLFW_TRUE);
+	for (int key : monitoredKeys)
+		if (keys[key].isDown())
+			onDown(key);
 }
 
+// Should be in the window or engine...
+void	Input::toggleWireFrame()
+{
+	wireFrameMode = !wireFrameMode;
+	glPolygonMode(GL_FRONT_AND_BACK, wireFrameMode ? GL_LINE : GL_FILL);
+}
 
 void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
 {
@@ -147,15 +148,19 @@ void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scanco
 	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
 
 	Input &input = pEngine->getInput();
-	input.callKey(key);
-	input.keys[key].updateState(action);
-	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+	switch (action)
 	{
-		input.wireFrameMode = !input.wireFrameMode;
-		if (input.wireFrameMode)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	case GLFW_PRESS:
+		input.onPress(key);
+		break;
+	case GLFW_RELEASE:
+		input.onRelease(key);
+		break;
+	case GLFW_REPEAT:
+		break;
+	default:
+		break;
 	}
+	input.keys[key].updateState(action);
 }
 

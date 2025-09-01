@@ -29,15 +29,24 @@ class Input {
 		float	lastY = 0.0f;
 		bool	firstMouse = true;
 	
-		std::array<KeyState, 1024>	keys;
-		std::array<std::vector<InputCallback>, 1024>	callbacks;
+		std::array<KeyState, 1024>						keys;
+		std::vector<int>								monitoredKeys;
+		std::array<std::vector<InputCallback>, 1024>	onPressCallbacks;
+		std::array<std::vector<InputCallback>, 1024>	onReleaseCallbacks;
+		std::array<std::vector<InputCallback>, 1024>	onDownCallbacks;
 
-		void	addCallback(int key, InputCallback callback);
-		void	callKey(int key);
+		void	addOnPressCallback(int key, InputCallback callback);
+		void	onPress(int key);
+		void	addOnReleaseCallback(int key, InputCallback callback);
+		void	onRelease(int key);
+		void	addOnDownCallback(int key, InputCallback callback);
+		void	onDown(int key);
 
 		void	init(GLFWwindow *window, const mlm::ivec2 &windowSize);
 
 		void	handleKeys();
+
+		void	toggleWireFrame();
 
 		/*    Callbacks    */
 		static void	resizeCallback(GLFWwindow *window, int x, int y);
@@ -46,6 +55,6 @@ class Input {
 		static void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 	private:
+		bool		wireFrameMode = false;
 		GLFWwindow *_window;	
-		bool		wireFrameMode = false;	
 };

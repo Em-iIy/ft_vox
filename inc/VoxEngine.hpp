@@ -26,6 +26,7 @@ class VoxEngine: public Window {
 		Input			&getInput();
 
 		Atlas			_atlas; // make private later
+		Camera			_camera;
 
 	private:
 		void			init();
@@ -36,7 +37,6 @@ class VoxEngine: public Window {
 		void			cleanup();
 
 
-		Camera			_camera;
 		Input			_input;
 		ChunkManager	_chunkManager;
 };
