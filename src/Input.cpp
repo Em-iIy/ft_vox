@@ -27,6 +27,20 @@ bool	KeyState::isReleased() const
 	return (current == GLFW_RELEASE && prev == GLFW_PRESS);
 }
 
+void	Input::addCallback(int key, InputCallback callback)
+{
+	callbacks[key].push_back(callback);
+}
+
+void	Input::callKey(int key)
+{
+	std::vector<InputCallback>	&cb = callbacks[key];
+	for (InputCallback &callback : cb)
+		callback();
+}
+
+
+
 void	Input::init(GLFWwindow *window, const mlm::ivec2 &windowSize)
 {
 	lastX = static_cast<float>(windowSize.x) / 2.0f;
@@ -133,6 +147,7 @@ void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scanco
 	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
 
 	Input &input = pEngine->getInput();
+	input.callKey(key);
 	input.keys[key].updateState(action);
 	if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
 	{

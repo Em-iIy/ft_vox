@@ -7,6 +7,8 @@ Created on: 01/08/2025
 
 #include "glu/gl-utils.hpp"
 #include <array>
+#include <vector>
+#include <functional>
 
 struct KeyState {
 	int	current = GLFW_RELEASE;
@@ -20,11 +22,18 @@ struct KeyState {
 
 class Input {
 	public:
+
+		using InputCallback = std::function<void()>;
+
 		float	lastX = 0.0f;
 		float	lastY = 0.0f;
 		bool	firstMouse = true;
 	
 		std::array<KeyState, 1024>	keys;
+		std::array<std::vector<InputCallback>, 1024>	callbacks;
+
+		void	addCallback(int key, InputCallback callback);
+		void	callKey(int key);
 
 		void	init(GLFWwindow *window, const mlm::ivec2 &windowSize);
 
