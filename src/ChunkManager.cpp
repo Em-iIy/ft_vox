@@ -313,9 +313,11 @@ void						ChunkManager::render(Shader &shader)
 {
 	// for (auto &[_, chunk]: chunks)
 	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
-	for (auto chunk : chunkRenderList)
+	// for (auto chunk : std::ranges::reverse_view(chunkRenderList))
+	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
-		chunk->draw(shader);
+		(*it)->draw(shader);
+		// chunk->draw(shader);
 	}
 	chunkRenderList.clear();
 }
@@ -343,5 +345,5 @@ bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 		return (true);
 	}
 	Block	*block = result.value();
-	return (block->getEnabled());
+	return (block->getTransparent());
 }

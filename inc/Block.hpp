@@ -28,4 +28,5 @@ class Block {
 		mlm::vec3	getTypeColor() const;
 		bool		getEnabled() const;
 		void		setEnabled(bool enabled);
+		bool		getTransparent() const;
 };

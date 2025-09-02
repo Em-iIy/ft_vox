@@ -50,7 +50,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	Block		&block = blocks[index3D(ipos.x, ipos.y, ipos.z)];
 	mlm::vec3	color = block.getTypeColor();
 	const std::vector<mlm::vec2>	&offsets = _manager._engine._atlas.getOffset(block._type);
-	
+	// bool needsTransparent = block._type ? 
+
 	const mlm::ivec3	neighbors[] = {
 		mlm::ivec3(1, 0, 0),
 		mlm::ivec3(-1, 0, 0),
@@ -58,6 +59,27 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::ivec3(0, -1, 0),
 		mlm::ivec3(0, 0, 1),
 		mlm::ivec3(0, 0, -1),
+	};
+	std::vector<Expected<Block *, int>> blockNeighbors;
+	for (const mlm::ivec3 &neighbor : neighbors)
+	{
+		auto neighborBlock = _manager.getBlock(worldPos + neighbor);
+		blockNeighbors.push_back(neighborBlock);
+	}
+
+	std::function<bool(Expected<Block *, int> &, Block &)> drawFace = [](Expected<Block *, int> &neighborResult, Block &block) {
+		if (!neighborResult.hasValue())
+		{
+			if (neighborResult.error() == 1)
+				return (false);
+			return (true);
+		}
+		Block &neighbor = *neighborResult.value();
+		if (block._type == Block::WATER && neighbor._type == Block::AIR)
+			return (true);
+		if (block.getTransparent() == false && neighbor.getTransparent() == true)
+			return (true);
+		return (false);
 	};
 	const mlm::vec3	normals[] = {
 		mlm::vec3(0.0f, 1.0f, 0.0f),
@@ -78,7 +100,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::vec3(0.5f, 0.5f, 0.5f) + pos, //    7 front top right
 	};
 	// back face
-	if (_manager.isBlockTransparent(worldPos + neighbors[5]) == false)
+	// if (_manager.isBlockTransparent(worldPos + neighbors[5]) == true)
+	if (drawFace(blockNeighbors[5], block) == true)
 	{
 		mlm::vec3	tempColor = normals[1] * 0.7f;
 		vertices.push_back({positions[0], tempColor, offsets[1] + mlm::vec2(0.125f, 0.0f)});
@@ -89,7 +112,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		vertices.push_back({positions[3], tempColor, offsets[1] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// front face
-	if (_manager.isBlockTransparent(worldPos + neighbors[4]) == false)
+	// if (_manager.isBlockTransparent(worldPos + neighbors[4]) == true)
+	if (drawFace(blockNeighbors[4], block) == true)
 	{
 		mlm::vec3	tempColor = normals[2] * 0.7f;
 		vertices.push_back({positions[4], tempColor, offsets[2] + mlm::vec2(0.0f, 0.0f)});
@@ -100,7 +124,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		vertices.push_back({positions[6], tempColor, offsets[2] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// left face
-	if (_manager.isBlockTransparent(worldPos + neighbors[1]) == false)
+	// if (_manager.isBlockTransparent(worldPos + neighbors[1]) == true)
+	if (drawFace(blockNeighbors[1], block) == true)
 	{
 		mlm::vec3	tempColor = normals[3] * 0.8f;
 		vertices.push_back({positions[0], tempColor, offsets[3] + mlm::vec2(0.0f, 0.0f)});
@@ -111,7 +136,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		vertices.push_back({positions[2], tempColor, offsets[3] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// right face
-	if (_manager.isBlockTransparent(worldPos + neighbors[0]) == false)
+	// if (_manager.isBlockTransparent(worldPos + neighbors[0]) == true)
+	if (drawFace(blockNeighbors[0], block) == true)
 	{
 		mlm::vec3	tempColor = normals[4] * 0.8f;
 		vertices.push_back({positions[1], tempColor, offsets[4] + mlm::vec2(0.125f, 0.0f)});
@@ -122,7 +148,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		vertices.push_back({positions[7], tempColor, offsets[4] + mlm::vec2(0.0f, 0.125f)});
 	}
 	// top face
-	if (_manager.isBlockTransparent(worldPos + neighbors[2]) == false)
+	// if (_manager.isBlockTransparent(worldPos + neighbors[2]) == true)
+	if (drawFace(blockNeighbors[2], block) == true)
 	{
 		mlm::vec3	tempColor = normals[0] * 0.9f;
 		vertices.push_back({positions[2], tempColor, offsets[0] + mlm::vec2(0.0f, 0.125f)});
@@ -133,7 +160,8 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		vertices.push_back({positions[3], tempColor, offsets[0] + mlm::vec2(0.125f)});
 	}
 	// bottom face
-	if (_manager.isBlockTransparent(worldPos + neighbors[3]) == false)
+	// if (_manager.isBlockTransparent(worldPos + neighbors[3]) == true)
+	if (drawFace(blockNeighbors[3], block) == true)
 	{
 		mlm::vec3	tempColor = normals[5] * 0.9f;
 		vertices.push_back({positions[1], tempColor, offsets[5] + mlm::vec2(0.125f, 0.0f)});
@@ -212,18 +240,19 @@ void	Chunk::generate()
 				iPos.y = y;
 				uint64_t	index = index3D(x, y, z);
 				mlm::vec3	color;
+				Block::Type type = Block::STONE;
 				if (iPos.y > tempYMax)
 				{
-					blocks[index] = Block(Block::AIR);
-					blocks[index].setEnabled(false);
+					type = iPos.y < seaLevel ? Block::WATER : Block::AIR;
+					blocks[index] = Block(type);
+					blocks[index].setEnabled(type == Block::AIR ? false : true);
 				}
 				else
 				{
-					Block::Type type = Block::STONE;
 					if (iPos.y == tempYMax)
 					{
 						if (iPos.y < seaLevel)
-							type = Block::WATER;
+							type = Block::DIRT;
 						else
 							type = Block::GRASS;
 					}

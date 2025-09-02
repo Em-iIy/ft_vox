@@ -73,6 +73,8 @@ void	VoxEngine::mainLoop()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable( GL_BLEND );
 	while (!glfwWindowShouldClose(Window::get_window()))
 	{
 		_input.handleKeys();

@@ -9,6 +9,6 @@ in vec2	vert_texUV;
 
 void main()
 {
-	FragColor = vec4(texture(atlas, vert_texUV).rgb * length(vert_normal), 1.0f);
+	FragColor = vec4(texture(atlas, vert_texUV).rgba * length(vert_normal));
 	// FragColor = vec4(vert_normal, 1.0f);
 }

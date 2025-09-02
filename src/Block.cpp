@@ -46,3 +46,10 @@ void		Block::setEnabled(bool enabled)
 {
 	_isEnabled = enabled;
 }
+
+bool		Block::getTransparent() const
+{
+	if (_type == WATER || _type == AIR)
+		return (true);
+	return (false);
+}
