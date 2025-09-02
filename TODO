@@ -52,7 +52,7 @@
 - Setup input
 	+ move camera
 	- make input tied to window
-	- switch to callbacks (std::bind)
+	+ switch to callbacks (std::bind)
 	+ deltaTime (put in glu?)
 
 - Settings
