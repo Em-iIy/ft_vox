@@ -5,6 +5,15 @@
 
 chunk:
 
+states {
+	unloaded,
+	loaded,
+	generated,
+	meshed,
+	drawable,
+	dirty
+}
+
 update chunks {
 	load: load from file the chunk block data {
 		loop through load list until threshold {
