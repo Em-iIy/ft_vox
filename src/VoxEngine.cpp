@@ -5,6 +5,7 @@ Created on: 24/07/2025
 
 #include "VoxEngine.hpp"
 
+#include "Frustum.hpp"
 
 mlm::vec3	randVec3()
 {
@@ -83,12 +84,14 @@ void	VoxEngine::mainLoop()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		mlm::ivec2	size;
 		
-		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), 0.1f, 1000.0f);
+		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), .1f, 1000.0f);
 		shader.use();
 		shader.set_mat4("projection", projection);
 
 		mlm::mat4	view = _camera.getViewMatrix();
 		shader.set_mat4("view", view);
+
+		_frustum.update(projection * view);
 
 		glActiveTexture(GL_TEXTURE0);
 		_atlas._texture.bind();

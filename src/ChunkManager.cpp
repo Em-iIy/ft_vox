@@ -257,13 +257,16 @@ void						ChunkManager::_updateVisibleList()
 
 void						ChunkManager::_updateRenderList()
 {
+	mlm::vec3	cameraPos = _engine.getCamera().getPos();
 	chunkRenderList.clear();
 	for (std::shared_ptr<Chunk> chunk : chunkVisibleList)
 	{
 		if (chunk->isLoaded() && chunk->isBuilt() && chunk->isSetup())
 		{
+			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->_worldPos) - cameraPos;
 			// if in frustum
-			chunkRenderList.push_back(chunk);
+			if (_engine._frustum.isBoxVisible(AABB(chunk->_min + chunkToCamPos, chunk->_max + chunkToCamPos)) == true)
+				chunkRenderList.push_back(chunk);
 		}
 	}
 }

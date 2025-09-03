@@ -14,6 +14,9 @@ FILES_SRCS = \
 			ChunkMesh.cpp \
 			Spline.cpp \
 			Atlas.cpp \
+			Plane.cpp \
+			AABB.cpp \
+			Frustum.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

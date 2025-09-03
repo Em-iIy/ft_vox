@@ -24,6 +24,7 @@ Chunk::Chunk(ChunkManager &manager): _manager(manager)
 
 Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
 {
+	_worldPos = mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 0, CHUNK_SIZE_Z * _chunkPos.y);
 	chunk_count++;
 }
 
@@ -90,14 +91,14 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::vec3(0.0f, -1.0f, 0.0f)
 	};
 	const mlm::vec3	positions[] = {
-		mlm::vec3(-0.5f, -0.5f, -0.5f) + pos, // 0 back bottom left
-		mlm::vec3(0.5f, -0.5f, -0.5f) + pos, //  1 back bottom right
-		mlm::vec3(-0.5f, 0.5f, -0.5f) + pos, //  2 back top left
-		mlm::vec3(0.5f, 0.5f, -0.5f) + pos, //   3 back top right
-		mlm::vec3(-0.5f, -0.5f, 0.5f) + pos, //  4 front bottom left
-		mlm::vec3(0.5f, -0.5f, 0.5f) + pos, //   5 front bottom right
-		mlm::vec3(-0.5f, 0.5f, 0.5f) + pos, //   6 front top left
-		mlm::vec3(0.5f, 0.5f, 0.5f) + pos, //    7 front top right
+		mlm::vec3(0.0f, 0.0f, 0.0f) + pos, // 0 back bottom left
+		mlm::vec3(1.0f, 0.0f, 0.0f) + pos, //  1 back bottom right
+		mlm::vec3(0.0f, 1.0f, 0.0f) + pos, //  2 back top left
+		mlm::vec3(1.0f, 1.0f, 0.0f) + pos, //   3 back top right
+		mlm::vec3(0.0f, 0.0f, 1.0f) + pos, //  4 front bottom left
+		mlm::vec3(1.0f, 0.0f, 1.0f) + pos, //   5 front bottom right
+		mlm::vec3(0.0f, 1.0f, 1.0f) + pos, //   6 front top left
+		mlm::vec3(1.0f, 1.0f, 1.0f) + pos, //    7 front top right
 	};
 	// back face
 	// if (_manager.isBlockTransparent(worldPos + neighbors[5]) == true)
@@ -270,8 +271,7 @@ void	Chunk::generate()
 void	Chunk::draw(Shader &shader)
 {
 	mlm::mat4 model(1.0f);
-	mlm::vec3 pos = _manager._engine.getCamera().getPos();
-	model = mlm::translate(model, static_cast<mlm::vec3>(mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 0, CHUNK_SIZE_Z * _chunkPos.y)) - pos);
+	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager._engine.getCamera().getPos());
 	shader.set_mat4("model", model);
 	_mesh.draw(shader);
 }
@@ -294,6 +294,18 @@ void	Chunk::update()
 			}
 		}
 	}
+	for (const auto &vertex : vertices)
+	{
+		const mlm::vec3 &vec = vertex.pos;
+		_min.x = std::min(_min.x, vec.x);
+		_min.y = std::min(_min.y, vec.y);
+		_min.z = std::min(_min.z, vec.z);
+
+		_max.x = std::max(_max.x, vec.x);
+		_max.y = std::max(_max.y, vec.y);
+		_max.z = std::max(_max.z, vec.z);
+	}
+	mlm::vec3 pos = static_cast<mlm::vec3>(_worldPos) - _manager._engine.getCamera().getPos();
 	_mesh = ChunkMesh(vertices);
 	_built = true;
 }

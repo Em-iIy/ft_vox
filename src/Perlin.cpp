@@ -52,13 +52,13 @@ mlm::vec2	Perlin::_gradient(int x, int y) const
 uint64_t	Perlin::_hash(int x, int y) const
 {
 	uint64_t	ret = _seed;
-    ret ^= static_cast<uint64_t>(x) * 0x9E3779B185EBCA87ULL;
-    ret ^= static_cast<uint64_t>(y) * 0xC2B2AE3D27D4EB4FULL;
-    ret ^= (ret >> 33);
-    ret *= 0xFF51AFD7ED558CCDULL;
-    ret ^= (ret >> 33);
-    ret *= 0xC4CEB9FE1A85EC53ULL;
-    ret ^= (ret >> 33);
-    return (ret);
+	ret ^= static_cast<uint64_t>(x) * 0x9E3779B185EBCA87ULL;
+	ret ^= static_cast<uint64_t>(y) * 0xC2B2AE3D27D4EB4FULL;
+	ret ^= (ret >> 33);
+	ret *= 0xFF51AFD7ED558CCDULL;
+	ret ^= (ret >> 33);
+	ret *= 0xC4CEB9FE1A85EC53ULL;
+	ret ^= (ret >> 33);
+	return (ret);
 }	
 

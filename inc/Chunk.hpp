@@ -9,6 +9,7 @@ Created on: 06/08/2025
 #include "ChunkManager.hpp"
 #include "ChunkMesh.hpp"
 #include <array>
+#include <math.h>
 
 constexpr uint64_t	CHUNK_SIZE_X = 16; // MUST BE POWER OF 2
 constexpr uint64_t	CHUNK_SIZE_Y = 256;
@@ -22,6 +23,10 @@ class Chunk {
 
 		ChunkMesh			_mesh;
 		mlm::ivec2		_chunkPos;
+		mlm::ivec3		_worldPos;
+
+		mlm::vec3		_min = INFINITY;
+		mlm::vec3		_max = -INFINITY;
 
 		ChunkManager	&_manager;
 
