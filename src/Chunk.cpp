@@ -243,7 +243,7 @@ void	Chunk::generate()
 				Block::Type type = Block::STONE;
 				if (iPos.y > tempYMax)
 				{
-					type = iPos.y < seaLevel ? Block::WATER : Block::AIR;
+					type = iPos.y <= seaLevel ? Block::WATER : Block::AIR;
 					blocks[index] = Block(type);
 					blocks[index].setEnabled(type == Block::AIR ? false : true);
 				}
