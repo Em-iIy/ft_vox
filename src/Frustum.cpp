@@ -24,7 +24,7 @@ bool	Frustum::isBoxVisible(const AABB &box) const
 {
 	for (const Plane &plane : _planes)
 	{
-		mlm::vec3 p = box.getPositiveVertex(plane._normal);
+		mlm::vec3 p = box.getPositiveVertex(plane.getNormal());
 		float dist = plane.distance(p);
 		if (dist < 0)
 			return (false);

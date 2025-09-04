@@ -33,3 +33,8 @@ float		Plane::distance(const mlm::vec3 &p) const
 {
 	return (mlm::dot(_normal, p) + _d);
 }
+
+const mlm::vec3	&Plane::getNormal() const
+{
+	return (_normal);
+}

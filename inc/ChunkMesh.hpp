@@ -8,9 +8,7 @@ Created on: 19/08/2025
 #include "glu/gl-utils.hpp"
 
 class ChunkMesh {
-		public:
-		std::vector<Vertex>		_vertices;
-		std::vector<uint32_t>	_indices;
+	public:
 		ChunkMesh();
 		~ChunkMesh();
 		ChunkMesh(const std::vector<Vertex> &vertices);
@@ -20,6 +18,8 @@ class ChunkMesh {
 		void	del();
 	
 	private:
+		std::vector<Vertex>		_vertices;
+		
 		VAO		_vao;
 		VBO		_vbo;
 

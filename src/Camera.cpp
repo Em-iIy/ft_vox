@@ -14,7 +14,6 @@ Camera::Camera(const mlm::vec3 &pos, const mlm::vec3 &up, const float yaw, const
 	_movementSpeed(SPEED),
 	_mouseSensitivity(SENS),
 	_zoom(ZOOM)
-
 {
 	updateVectors();
 }

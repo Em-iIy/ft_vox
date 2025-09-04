@@ -99,6 +99,8 @@ void	Input::mouseMovementCallback(GLFWwindow *window, double inXPos, double inYP
 	if (!ptr)
 		return ;
 	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
+	pEngine->setFrustumUpdate();
+
 
 	Input &input = pEngine->getInput();
 	float xPos = static_cast<float>(inXPos);
@@ -123,6 +125,7 @@ void	Input::mouseScrollCallback(GLFWwindow *window, [[maybe_unused]] double xOff
 	if (!ptr)
 		return ;
 	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
+	pEngine->setFrustumUpdate();
 	pEngine->getCamera().processMouseScroll(yOffset);
 }
 

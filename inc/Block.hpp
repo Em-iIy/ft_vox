@@ -9,7 +9,6 @@ Created on: 06/08/2025
 
 class Block {
 	public:
-
 		enum Type {
 			AIR,
 			DIRT,
@@ -20,13 +19,15 @@ class Block {
 
 		Block();
 		Block(Type type);
-		Block	&operator=(const Block &src);
+		Block		&operator=(const Block &src);
 
-		Type		_type = AIR;
-		bool		_isEnabled = false;
-
-		mlm::vec3	getTypeColor() const;
 		bool		getEnabled() const;
 		void		setEnabled(bool enabled);
 		bool		getTransparent() const;
+		Type		getType() const;
+		void		setType(Type type);
+
+	private:
+		Type		_type = AIR;
+		bool		_isEnabled = false;
 };

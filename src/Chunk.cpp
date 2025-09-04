@@ -13,6 +13,33 @@ Created on: 06/08/2025
 
 int chunk_count = 0;
 
+enum Faces {
+	TOP,
+	BACK,
+	FRONT,
+	LEFT,
+	RIGHT,
+	BOTTOM
+};
+
+enum Corners {
+	BACK_BOTTOM_LEFT,
+	BACK_BOTTOM_RIGHT,
+	BACK_TOP_LEFT,
+	BACK_TOP_RIGHT,
+	FRONT_BOTTOM_LEFT,
+	FRONT_BOTTOM_RIGHT,
+	FRONT_TOP_LEFT,
+	FRONT_TOP_RIGHT,
+};
+
+enum UvCorners {
+	BOTTOM_LEFT,
+	BOTTOM_RIGHT,
+	TOP_LEFT,
+	TOP_RIGHT,
+};
+
 int	getChunkCount()
 {
 	return (chunk_count);
@@ -20,6 +47,7 @@ int	getChunkCount()
 
 Chunk::Chunk(ChunkManager &manager): _manager(manager)
 {
+	std::cout << "default constructor" << std::endl;
 }
 
 Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
@@ -44,52 +72,44 @@ static uint64_t	index3D(const mlm::ivec3 &coord)
 	return (coord.z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + coord.y * CHUNK_SIZE_X + coord.x);
 }
 
+static bool		shouldDrawFace(Expected<Block *, int> &neighborResult, Block &block)
+{
+	if (!neighborResult.hasValue())
+	{
+		if (neighborResult.error() == 1)
+			return (false);
+		return (true);
+	}
+	Block &neighbor = *neighborResult.value();
+	if (block.getType() == Block::WATER && neighbor.getType() == Block::AIR)
+		return (true);
+	if (block.getTransparent() == false && neighbor.getTransparent() == true)
+		return (true);
+	return (false);
+}
+
 void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 {
-	mlm::ivec3	worldPos(_chunkPos.x * CHUNK_SIZE_X + ipos.x, ipos.y, _chunkPos.y * CHUNK_SIZE_Z + ipos.z);
-	mlm::vec3	pos(ipos);
-	Block		&block = blocks[index3D(ipos.x, ipos.y, ipos.z)];
-	mlm::vec3	color = block.getTypeColor();
-	const std::vector<mlm::vec2>	&offsets = _manager._engine._atlas.getOffset(block._type);
-	// bool needsTransparent = block._type ? 
-
-	const mlm::ivec3	neighbors[] = {
-		mlm::ivec3(1, 0, 0),
-		mlm::ivec3(-1, 0, 0),
+	static const mlm::ivec3	neighbors[] = {
 		mlm::ivec3(0, 1, 0),
-		mlm::ivec3(0, -1, 0),
-		mlm::ivec3(0, 0, 1),
 		mlm::ivec3(0, 0, -1),
+		mlm::ivec3(0, 0, 1),
+		mlm::ivec3(-1, 0, 0),
+		mlm::ivec3(1, 0, 0),
+		mlm::ivec3(0, -1, 0),
 	};
-	std::vector<Expected<Block *, int>> blockNeighbors;
-	for (const mlm::ivec3 &neighbor : neighbors)
-	{
-		auto neighborBlock = _manager.getBlock(worldPos + neighbor);
-		blockNeighbors.push_back(neighborBlock);
-	}
 
-	std::function<bool(Expected<Block *, int> &, Block &)> drawFace = [](Expected<Block *, int> &neighborResult, Block &block) {
-		if (!neighborResult.hasValue())
-		{
-			if (neighborResult.error() == 1)
-				return (false);
-			return (true);
-		}
-		Block &neighbor = *neighborResult.value();
-		if (block._type == Block::WATER && neighbor._type == Block::AIR)
-			return (true);
-		if (block.getTransparent() == false && neighbor.getTransparent() == true)
-			return (true);
-		return (false);
-	};
-	const mlm::vec3	normals[] = {
+	static const mlm::vec3	normals[] = {
 		mlm::vec3(0.0f, 1.0f, 0.0f),
 		mlm::vec3(0.0f, 0.0f, -1.0f),
 		mlm::vec3(0.0f, 0.0f, 1.0f),
 		mlm::vec3(-1.0f, 0.0f, 0.0f),
 		mlm::vec3(1.0f, 0.0f, 0.0f),
-		mlm::vec3(0.0f, -1.0f, 0.0f)
+		mlm::vec3(0.0f, -1.0f, 0.0f),
 	};
+
+	mlm::ivec3	worldPos = _worldPos + ipos;
+	mlm::vec3	pos(ipos);
 	const mlm::vec3	positions[] = {
 		mlm::vec3(0.0f, 0.0f, 0.0f) + pos, // 0 back bottom left
 		mlm::vec3(1.0f, 0.0f, 0.0f) + pos, //  1 back bottom right
@@ -100,77 +120,83 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::vec3(0.0f, 1.0f, 1.0f) + pos, //   6 front top left
 		mlm::vec3(1.0f, 1.0f, 1.0f) + pos, //    7 front top right
 	};
-	// back face
-	// if (_manager.isBlockTransparent(worldPos + neighbors[5]) == true)
-	if (drawFace(blockNeighbors[5], block) == true)
+	Block		&block = blocks[index3D(ipos)];
+	Atlas		&atlas = _manager.getEngine().getAtlas();
+	const std::vector<mlm::vec2>	&offsets = atlas.getOffset(block.getType());
+	const std::vector<mlm::vec2>	&uvCorners = atlas.getCorners();
+
+	std::vector<Expected<Block *, int>> blockNeighbors;
+	for (const mlm::ivec3 &neighbor : neighbors)
 	{
-		mlm::vec3	tempColor = normals[1] * 0.7f;
-		vertices.push_back({positions[0], tempColor, offsets[1] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[2], tempColor, offsets[1] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[1], tempColor, offsets[1] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[1], tempColor, offsets[1] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[2], tempColor, offsets[1] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[3], tempColor, offsets[1] + mlm::vec2(0.0f, 0.125f)});
+		auto neighborBlock = _manager.getBlock(worldPos + neighbor);
+		blockNeighbors.push_back(neighborBlock);
+	}
+
+	// top face
+	if (shouldDrawFace(blockNeighbors[TOP], block) == true)
+	{
+		mlm::vec3	normal = normals[TOP] * 0.9f;
+		vertices.push_back({positions[BACK_TOP_LEFT],		normal, offsets[TOP] + uvCorners[TOP_LEFT]});
+		vertices.push_back({positions[FRONT_TOP_LEFT],		normal, offsets[TOP] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[FRONT_TOP_RIGHT],		normal, offsets[TOP] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[BACK_TOP_LEFT],		normal, offsets[TOP] + uvCorners[TOP_LEFT]});
+		vertices.push_back({positions[FRONT_TOP_RIGHT],		normal, offsets[TOP] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[BACK_TOP_RIGHT],		normal, offsets[TOP] + uvCorners[TOP_RIGHT]});
+	}
+	// back face
+	if (shouldDrawFace(blockNeighbors[BACK], block) == true)
+	{
+		mlm::vec3	normal = normals[BACK] * 0.7f;
+		vertices.push_back({positions[BACK_BOTTOM_LEFT],	normal, offsets[BACK] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[BACK_TOP_LEFT],		normal, offsets[BACK] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[BACK_BOTTOM_RIGHT],	normal, offsets[BACK] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[BACK_BOTTOM_RIGHT],	normal, offsets[BACK] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[BACK_TOP_LEFT],		normal, offsets[BACK] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[BACK_TOP_RIGHT],		normal, offsets[BACK] + uvCorners[TOP_LEFT]});
 	}
 	// front face
-	// if (_manager.isBlockTransparent(worldPos + neighbors[4]) == true)
-	if (drawFace(blockNeighbors[4], block) == true)
+	if (shouldDrawFace(blockNeighbors[FRONT], block) == true)
 	{
-		mlm::vec3	tempColor = normals[2] * 0.7f;
-		vertices.push_back({positions[4], tempColor, offsets[2] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[5], tempColor, offsets[2] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[6], tempColor, offsets[2] + mlm::vec2(0.0f, 0.125f)});
-		vertices.push_back({positions[5], tempColor, offsets[2] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[7], tempColor, offsets[2] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[6], tempColor, offsets[2] + mlm::vec2(0.0f, 0.125f)});
+		mlm::vec3	normal = normals[FRONT] * 0.7f;
+		vertices.push_back({positions[FRONT_BOTTOM_LEFT],	normal, offsets[FRONT] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[FRONT_BOTTOM_RIGHT],	normal, offsets[FRONT] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[FRONT_TOP_LEFT],		normal, offsets[FRONT] + uvCorners[TOP_LEFT]});
+		vertices.push_back({positions[FRONT_BOTTOM_RIGHT],	normal, offsets[FRONT] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[FRONT_TOP_RIGHT],		normal, offsets[FRONT] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[FRONT_TOP_LEFT],		normal, offsets[FRONT] + uvCorners[TOP_LEFT]});
 	}
 	// left face
-	// if (_manager.isBlockTransparent(worldPos + neighbors[1]) == true)
-	if (drawFace(blockNeighbors[1], block) == true)
+	if (shouldDrawFace(blockNeighbors[LEFT], block) == true)
 	{
-		mlm::vec3	tempColor = normals[3] * 0.8f;
-		vertices.push_back({positions[0], tempColor, offsets[3] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[4], tempColor, offsets[3] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[6], tempColor, offsets[3] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[0], tempColor, offsets[3] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[6], tempColor, offsets[3] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[2], tempColor, offsets[3] + mlm::vec2(0.0f, 0.125f)});
+		mlm::vec3	normal = normals[LEFT] * 0.8f;
+		vertices.push_back({positions[BACK_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[FRONT_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[FRONT_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[BACK_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[FRONT_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[BACK_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_LEFT]});
 	}
 	// right face
-	// if (_manager.isBlockTransparent(worldPos + neighbors[0]) == true)
-	if (drawFace(blockNeighbors[0], block) == true)
+	if (shouldDrawFace(blockNeighbors[RIGHT], block) == true)
 	{
-		mlm::vec3	tempColor = normals[4] * 0.8f;
-		vertices.push_back({positions[1], tempColor, offsets[4] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[7], tempColor, offsets[4] + mlm::vec2(0.0f, 0.125f)});
-		vertices.push_back({positions[5], tempColor, offsets[4] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[1], tempColor, offsets[4] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[3], tempColor, offsets[4] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[7], tempColor, offsets[4] + mlm::vec2(0.0f, 0.125f)});
-	}
-	// top face
-	// if (_manager.isBlockTransparent(worldPos + neighbors[2]) == true)
-	if (drawFace(blockNeighbors[2], block) == true)
-	{
-		mlm::vec3	tempColor = normals[0] * 0.9f;
-		vertices.push_back({positions[2], tempColor, offsets[0] + mlm::vec2(0.0f, 0.125f)});
-		vertices.push_back({positions[6], tempColor, offsets[0] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[7], tempColor, offsets[0] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[2], tempColor, offsets[0] + mlm::vec2(0.0f, 0.125f)});
-		vertices.push_back({positions[7], tempColor, offsets[0] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[3], tempColor, offsets[0] + mlm::vec2(0.125f)});
+		mlm::vec3	normal = normals[RIGHT] * 0.8f;
+		vertices.push_back({positions[BACK_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[FRONT_TOP_RIGHT],		normal, offsets[RIGHT] + uvCorners[TOP_LEFT]});
+		vertices.push_back({positions[FRONT_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[BACK_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[BACK_TOP_RIGHT],		normal, offsets[RIGHT] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[FRONT_TOP_RIGHT],		normal, offsets[RIGHT] + uvCorners[TOP_LEFT]});
 	}
 	// bottom face
-	// if (_manager.isBlockTransparent(worldPos + neighbors[3]) == true)
-	if (drawFace(blockNeighbors[3], block) == true)
+	if (shouldDrawFace(blockNeighbors[BOTTOM], block) == true)
 	{
-		mlm::vec3	tempColor = normals[5] * 0.9f;
-		vertices.push_back({positions[1], tempColor, offsets[5] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[4], tempColor, offsets[5] + mlm::vec2(0.0f, 0.125f)});
-		vertices.push_back({positions[0], tempColor, offsets[5] + mlm::vec2(0.0f, 0.0f)});
-		vertices.push_back({positions[1], tempColor, offsets[5] + mlm::vec2(0.125f, 0.0f)});
-		vertices.push_back({positions[5], tempColor, offsets[5] + mlm::vec2(0.125f)});
-		vertices.push_back({positions[4], tempColor, offsets[5] + mlm::vec2(0.0f, 0.125f)});
+		mlm::vec3	normal = normals[BOTTOM] * 0.9f;
+		vertices.push_back({positions[BACK_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[FRONT_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[TOP_LEFT]});
+		vertices.push_back({positions[BACK_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_LEFT]});
+		vertices.push_back({positions[BACK_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_RIGHT]});
+		vertices.push_back({positions[FRONT_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[TOP_RIGHT]});
+		vertices.push_back({positions[FRONT_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[TOP_LEFT]});
 	}
 }
 
@@ -194,13 +220,6 @@ float octaves(mlm::vec3 pos, uint64_t depth, float in_step)
 
 float	continentalnessSpline(const float value)
 {
-	// static Spline spline({
-	// 	mlm::vec2(-1.f, 50.0f),
-	// 	mlm::vec2(0.3f, 100.0f),
-	// 	mlm::vec2(0.4f, 150.0f),
-	// 	mlm::vec2(1.0f, 150.0f),
-
-	// });
 	static Spline spline({
 		mlm::vec2(-1.f, 200.0f),
 		mlm::vec2(-0.8f, 45.0f),
@@ -271,7 +290,7 @@ void	Chunk::generate()
 void	Chunk::draw(Shader &shader)
 {
 	mlm::mat4 model(1.0f);
-	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager._engine.getCamera().getPos());
+	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
 	shader.set_mat4("model", model);
 	_mesh.draw(shader);
 }
@@ -305,7 +324,7 @@ void	Chunk::update()
 		_max.y = std::max(_max.y, vec.y);
 		_max.z = std::max(_max.z, vec.z);
 	}
-	mlm::vec3 pos = static_cast<mlm::vec3>(_worldPos) - _manager._engine.getCamera().getPos();
+	mlm::vec3 pos = static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos();
 	_mesh = ChunkMesh(vertices);
 	_built = true;
 }
@@ -313,6 +332,21 @@ void	Chunk::update()
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
 	return (blocks[index3D(blockChunkCoord)]);
+}
+
+std::pair<mlm::vec3 &, mlm::vec3 &>	Chunk::getMinMax()
+{
+	return (std::make_pair(std::reference_wrapper(_min), std::reference_wrapper(_max)));
+}
+
+mlm::ivec2							Chunk::getChunkPos()
+{
+	return (_chunkPos);
+}
+
+mlm::ivec3							Chunk::getWorldPos()
+{
+	return (_worldPos);
 }
 
 bool	Chunk::isLoaded() const

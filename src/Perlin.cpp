@@ -61,4 +61,3 @@ uint64_t	Perlin::_hash(int x, int y) const
 	ret ^= (ret >> 33);
 	return (ret);
 }	
-

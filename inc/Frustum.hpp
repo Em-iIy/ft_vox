@@ -15,8 +15,9 @@ Created on: 03/09/2025
 
 class Frustum {
 	public:
-		std::array<Plane, 6>	_planes;
-
 		void	update(const mlm::mat4 &m);
 		bool	isBoxVisible(const AABB &box) const;
+	
+	private:
+		std::array<Plane, 6>	_planes;
 };

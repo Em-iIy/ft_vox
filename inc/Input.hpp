@@ -25,15 +25,7 @@ class Input {
 
 		using InputCallback = std::function<void()>;
 
-		float	lastX = 0.0f;
-		float	lastY = 0.0f;
-		bool	firstMouse = true;
 	
-		std::array<KeyState, 1024>						keys;
-		std::vector<int>								monitoredKeys;
-		std::array<std::vector<InputCallback>, 1024>	onPressCallbacks;
-		std::array<std::vector<InputCallback>, 1024>	onReleaseCallbacks;
-		std::array<std::vector<InputCallback>, 1024>	onDownCallbacks;
 
 		void	addOnPressCallback(int key, InputCallback callback);
 		void	onPress(int key);
@@ -55,6 +47,16 @@ class Input {
 		static void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 	private:
+		std::array<KeyState, 1024>						keys;
+		std::vector<int>								monitoredKeys;
+		std::array<std::vector<InputCallback>, 1024>	onPressCallbacks;
+		std::array<std::vector<InputCallback>, 1024>	onReleaseCallbacks;
+		std::array<std::vector<InputCallback>, 1024>	onDownCallbacks;
+		
+		float	lastX = 0.0f;
+		float	lastY = 0.0f;
+		bool	firstMouse = true;
+
 		bool		wireFrameMode = false;
 		GLFWwindow *_window;	
 };

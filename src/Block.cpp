@@ -18,24 +18,6 @@ Block	&Block::operator=(const Block &src)
 	return (*this);
 }
 
-mlm::vec3	Block::getTypeColor() const
-{
-	switch (_type)
-	{
-	case AIR:
-		return (mlm::vec3(0.0f));
-	case DIRT:
-		return (mlm::vec3(0.7f, 0.2f, 0.2f));
-	case GRASS:
-		return (mlm::vec3(0.2f, 1.0f, 0.25f));
-	case STONE:
-		return (mlm::vec3(0.5f));
-	case WATER:
-		return (mlm::vec3(0.0f, 0.1f, 1.0f));
-	}
-	return (mlm::vec3(0.0f));
-}
-
 
 bool		Block::getEnabled() const
 {
@@ -49,7 +31,17 @@ void		Block::setEnabled(bool enabled)
 
 bool		Block::getTransparent() const
 {
-	if (_type == WATER || _type == AIR)
-		return (true);
-	return (false);
+	return (_type == WATER || _type == AIR);
+	// 	return (true);
+	// return (false);
+}
+
+Block::Type		Block::getType() const
+{
+	return (_type);
+}
+
+void		Block::setType(Block::Type type)
+{
+	_type = type;
 }

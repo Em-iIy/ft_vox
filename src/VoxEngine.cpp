@@ -21,13 +21,10 @@ mlm::vec3	randVec3()
 }
 
 VoxEngine::VoxEngine(): _chunkManager(*this)
-{
-}
+{}
 
 VoxEngine::~VoxEngine()
-{
-}
-
+{}
 
 void	VoxEngine::run()
 {
@@ -82,19 +79,19 @@ void	VoxEngine::mainLoop()
 		Window::update();
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		mlm::ivec2	size;
+		mlm::vec2	size = static_cast<mlm::vec2>(get_size());
 		
-		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), .1f, 1000.0f);
+		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .1f, 1000.0f);
 		shader.use();
 		shader.set_mat4("projection", projection);
 
 		mlm::mat4	view = _camera.getViewMatrix();
 		shader.set_mat4("view", view);
 
-		_frustum.update(projection * view);
+		updateFrustum(projection, view);
 
 		glActiveTexture(GL_TEXTURE0);
-		_atlas._texture.bind();
+		_atlas.bind();
 
 		_chunkManager.update();
 		_chunkManager.render(shader);
@@ -116,6 +113,14 @@ void	VoxEngine::cleanup()
 	glfwTerminate();
 }
 
+void			VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
+{
+	if (!_updateFrustum)
+		return ;
+	_frustum.update(projection * view);
+	_updateFrustum = false;
+}
+
 Camera	&VoxEngine::getCamera()
 {
 	return (_camera);
@@ -124,4 +129,24 @@ Camera	&VoxEngine::getCamera()
 Input	&VoxEngine::getInput()
 {
 	return (_input);
+}
+
+ChunkManager	&VoxEngine::getManager()
+{
+	return (_chunkManager);
+}
+
+Atlas			&VoxEngine::getAtlas()
+{
+	return (_atlas);
+}
+
+Frustum			&VoxEngine::getFrustum()
+{
+	return (_frustum);
+}
+
+void			VoxEngine::setFrustumUpdate()
+{
+	_updateFrustum = true;
 }

@@ -28,48 +28,52 @@ class VoxEngine;
 
 class ChunkManager {
 	public:
-		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
-		std::vector<mlm::ivec2>					chunkLoadList = {};
-		std::vector<std::shared_ptr<Chunk>>		chunkSetupList = {};
-		std::vector<std::shared_ptr<Chunk>>		chunkRebuildList = {};
-		std::set<std::shared_ptr<Chunk>>		chunkUpdateFlagList = {};
-		std::vector<std::shared_ptr<Chunk>>		chunkUnloadList = {};
-		std::vector<std::shared_ptr<Chunk>>		chunkVisibleList = {};
-		std::vector<std::shared_ptr<Chunk>>		chunkRenderList = {};
 
 		ChunkManager(VoxEngine &engine);
 		~ChunkManager();
 
-		void						cleanup();
-		void						init();
+		void																cleanup();
+		void																init();
 
-		void						update();
+		void																update();
+		void																render(Shader &shader);
 
-		void						render(Shader &shader);
-
-
-		Expected<Block *, int>		getBlock(const mlm::ivec3 &blockCoord);
-		bool						isBlockTransparent(const mlm::ivec3 &blockCoord);
+		Expected<Block *, int>												getBlock(const mlm::ivec3 &blockCoord);
+		bool																isBlockTransparent(const mlm::ivec3 &blockCoord);
 	
-		VoxEngine					&_engine; // move to private later
+		void																setUpdateVisibility();
+
+		VoxEngine															&getEngine();
+
 	private:
-		bool						_updateVisibility = true;
-		mlm::ivec2					_cameraChunkCoord = {2147483647};
-		int							_renderDistance = {};
-		mlm::ivec2					_renderMin = {0};
-		mlm::ivec2					_renderMax = {0};
+		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
+		std::vector<mlm::ivec2>												chunkLoadList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkSetupList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkRebuildList = {};
+		std::set<std::shared_ptr<Chunk>>									chunkUpdateFlagList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkUnloadList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkVisibleList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkRenderList = {};
 
-		void						_updateLoadList();
-		void						_updateSetupList();
-		void						_updateRebuildList();
-		void						_updateUnloadList();
-		void						_updateFlagList();
-		void						_updateVisibleList();
-		void						_updateRenderList();
+		VoxEngine															&_engine; // move to private later
 
-		void						_updateCameraChunkCoord();
+		bool																_updateVisibility = true;
+		mlm::ivec2															_cameraChunkCoord = {2147483647};
+		int																	_renderDistance = {};
+		mlm::ivec2															_renderMin = {0};
+		mlm::ivec2															_renderMax = {0};
 
-		bool						_loadChunk(const mlm::ivec2 &chunkCoord);
-		void						_unloadChunk(std::shared_ptr<Chunk> &chunk);
+		void																_updateLoadList();
+		void																_updateSetupList();
+		void																_updateRebuildList();
+		void																_updateUnloadList();
+		void																_updateFlagList();
+		void																_updateVisibleList();
+		void																_updateRenderList();
+
+		void																_updateCameraChunkCoord();
+		
+		bool																_loadChunk(const mlm::ivec2 &chunkCoord);
+		void																_unloadChunk(std::shared_ptr<Chunk> &chunk);
 
 };

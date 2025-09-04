@@ -13,6 +13,8 @@ const int	MAX_SETUP_PER_FRAME = 2;
 const int	MAX_BUILD_PER_FRAME = 2;
 const int	MAX_UPDATE_PER_FRAME = 5;
 
+const int	RENDER_DISTANCE = 10;
+
 int	getChunkCount();
 
 int	roundUp(int num, int mult)
@@ -41,12 +43,10 @@ mlm::ivec3 getBlockChunkCoord(const mlm::ivec3 &worldCoord)
 }
 
 ChunkManager::ChunkManager(VoxEngine &engine): _engine(engine)
-{
-}
+{}
 
 ChunkManager::~ChunkManager()
-{
-}
+{}
 
 void						ChunkManager::cleanup()
 {
@@ -64,28 +64,9 @@ void						ChunkManager::cleanup()
 
 void						ChunkManager::init()
 {
-	_renderDistance = 10;
+	_renderDistance = RENDER_DISTANCE + 1;
 	_updateCameraChunkCoord();
-	// for (int x = -0; x <= 0; x++)
-	// {
-	// 	for (int y = -0; y <= 0; y++)
-	// 	{
-	// 		mlm::ivec2				pos(x, y);
-	// 		std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(pos, *this);
-	// 		if (chunk)
-	// 		{
-	// 			chunk->generate();
-	// 			chunks[pos] = chunk;
-	// 		}
-	// 	}
-	// }
-	// for (auto &[_, chunk]: chunks)
-	// {
-	// 	if (chunk)
-	// 		chunk->update();
-	// }
 }
-
 
 void						ChunkManager::update()
 {
@@ -150,7 +131,7 @@ void						ChunkManager::_updateRebuildList()
 			uint64_t	neighborSetupCount = 0;
 			for (const mlm::ivec2 &neighbor : neighbors)
 			{
-				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->_chunkPos - neighbor];
+				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
 				if (!chunkNeighbor || !chunkNeighbor->isSetup())
 					break ;
 				// if (chunkNeighbor && chunkNeighbor->isBuilt())
@@ -170,9 +151,6 @@ void						ChunkManager::_updateRebuildList()
 
 void						ChunkManager::_updateUnloadList()
 {
-	// std::cout << chunks[mlm::ivec2(-1)] << std::endl;
-	// if (chunkUnloadList.size() > 0)
-	// 	std::cout << chunkUnloadList.size();
 	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
 	{
 		if (chunk && chunk->isLoaded())
@@ -181,8 +159,6 @@ void						ChunkManager::_updateUnloadList()
 			_updateVisibility = true;
 		}
 	}
-	// if (chunkUnloadList.size() > 0)
-	// 	std::cout << " " << chunkUnloadList.size() << std::endl;
 	if (chunkUnloadList.size() > 0)
 	{
 		chunkUnloadList.clear();
@@ -211,7 +187,6 @@ void						ChunkManager::_updateVisibleList()
 	if (!_updateVisibility)
 		return ;
 	chunkVisibleList.clear();
-	// std::cout << "Updating visibility" << std::endl;
 	// loop through all chunk coordinates within render distance
 	for (int dist = 0; dist <= _renderDistance; ++dist)
 	{
@@ -263,9 +238,9 @@ void						ChunkManager::_updateRenderList()
 	{
 		if (chunk->isLoaded() && chunk->isBuilt() && chunk->isSetup())
 		{
-			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->_worldPos) - cameraPos;
-			// if in frustum
-			if (_engine._frustum.isBoxVisible(AABB(chunk->_min + chunkToCamPos, chunk->_max + chunkToCamPos)) == true)
+			const auto [min, max] = chunk->getMinMax();
+			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
+			if (_engine.getFrustum().isBoxVisible(AABB(min + chunkToCamPos, max + chunkToCamPos)) == true)
 				chunkRenderList.push_back(chunk);
 		}
 	}
@@ -292,7 +267,6 @@ bool						ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 	// else
 	if (chunks[chunkCoord] != nullptr)
 		return (false);
-	// std::cout << "loading chunk " << chunkCoord << std::endl;
 	std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(chunkCoord, *this);
 	chunks[chunkCoord] = std::move(chunk);
 	return (true);
@@ -302,25 +276,16 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 {
 	if (!chunk)
 		return ;
-	const mlm::ivec2	&chunkCoord = chunk->_chunkPos;
-	// std::cout << "unloading " << chunk->_chunkPos << std::endl;
-	// if (chunk.unique() != true)
-	// {
-	// 	std::cerr << "WARNING: Chunk " << chunkCoord << " set for unloading, but isn't unique! found " << chunk.use_count() << " times" << std::endl;
-	// 	std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " v" << chunkRenderList.size() << std::endl;
-	// }
+	const mlm::ivec2	&chunkCoord = chunk->getChunkPos();
 	chunks.erase(chunkCoord);
 }
 
 void						ChunkManager::render(Shader &shader)
 {
-	// for (auto &[_, chunk]: chunks)
 	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
-	// for (auto chunk : std::ranges::reverse_view(chunkRenderList))
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
-		// chunk->draw(shader);
 	}
 	chunkRenderList.clear();
 }
@@ -349,4 +314,14 @@ bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 	}
 	Block	*block = result.value();
 	return (block->getTransparent());
+}
+
+void						ChunkManager::setUpdateVisibility()
+{
+	_updateVisibility = true;
+}
+
+VoxEngine					&ChunkManager::getEngine()
+{
+	return (_engine);
 }

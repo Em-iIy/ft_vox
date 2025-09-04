@@ -5,11 +5,11 @@ Created on: 19/08/2025
 
 #include "ChunkMesh.hpp"
 
-ChunkMesh::ChunkMesh() {}
+ChunkMesh::ChunkMesh()
+{}
 
 ChunkMesh::~ChunkMesh()
-{
-}
+{}
 
 ChunkMesh::ChunkMesh(const std::vector<Vertex> &vertices): _vertices(vertices)
 {
@@ -23,7 +23,6 @@ void	ChunkMesh::draw(Shader &shader)
 	glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
 	_vao.unbind();
 }
-
 
 void	ChunkMesh::setup_mesh()
 {

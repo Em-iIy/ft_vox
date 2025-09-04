@@ -35,6 +35,7 @@
 	+ assure chunk neighbors are setup before building
 	+ pass camera to update visibility
 	+ prioritize generating chunks closer to the player
+	+ frustum culling
 	- save chunk to file
 	- multithreaded
 
@@ -46,6 +47,8 @@
 	- decoration
 		- trees
 		- water
+			+ mesh
+			- opacity
 	- caves1;
 		- 3D perlin noise
 

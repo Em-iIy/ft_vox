@@ -9,11 +9,12 @@ Created on: 03/09/2025
 
 class AABB {
 	public:
-		mlm::vec3	_min;
-		mlm::vec3	_max;
-	
 		AABB();
 		AABB(const mlm::vec3 &min, const mlm::vec3 &max);
 
 		mlm::vec3	getPositiveVertex(const mlm::vec3 &normal) const;
+
+	private:
+		mlm::vec3	_min;
+		mlm::vec3	_max;
 };

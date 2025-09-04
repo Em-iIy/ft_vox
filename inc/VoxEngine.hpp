@@ -25,10 +25,12 @@ class VoxEngine: public Window {
 	
 		Camera			&getCamera();
 		Input			&getInput();
+		ChunkManager	&getManager();
+		Atlas			&getAtlas();
+		Frustum			&getFrustum();
 
-		Atlas			_atlas; // make private later
-		Camera			_camera;
-		Frustum			_frustum;
+		void			setFrustumUpdate();
+
 
 	private:
 		void			init();
@@ -38,7 +40,13 @@ class VoxEngine: public Window {
 
 		void			cleanup();
 
+		void			updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view);
+
+		bool			_updateFrustum = true;
 
 		Input			_input;
 		ChunkManager	_chunkManager;
+		Atlas			_atlas;
+		Camera			_camera;
+		Frustum			_frustum;
 };
