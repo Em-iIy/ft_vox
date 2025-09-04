@@ -79,13 +79,15 @@ submodule:
 # ----------------------------------------Cleaning
 clean:
 	rm -f $(OBJS)
-	$(MAKE) clean -C $(DIR_GLU)
 .PHONY: clean
 
 fclean: clean
 	rm -f $(NAME)
-	$(MAKE) fclean -C $(DIR_GLU)
 .PHONY: fclean
 
 re: fclean all
 .PHONY: re
+
+libs:
+	$(MAKE) re -C $(DIR_GLU)
+.PHONY: libs
