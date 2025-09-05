@@ -287,6 +287,10 @@ void						ChunkManager::render(Shader &shader)
 	{
 		(*it)->draw(shader);
 	}
+	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
+	{
+		(*it)->drawWater(shader);
+	}
 	chunkRenderList.clear();
 }
 

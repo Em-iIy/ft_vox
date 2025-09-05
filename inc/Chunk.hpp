@@ -26,6 +26,7 @@ class Chunk {
 
 		void															generate();
 		void															draw(Shader &shader);
+		void															drawWater(Shader &shader);
 		void															update();
 
 		Block															&getBlock(const mlm::ivec3 &blockChunkCoord);
@@ -45,6 +46,7 @@ class Chunk {
 		
 		std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z>	blocks;
 		ChunkMesh														_mesh;
+		ChunkMesh														_waterMesh;
 		mlm::ivec2														_chunkPos;
 		mlm::ivec3														_worldPos;
 

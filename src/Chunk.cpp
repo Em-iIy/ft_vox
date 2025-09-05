@@ -59,6 +59,7 @@ Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunk
 Chunk::~Chunk()
 {
 	_mesh.del();
+	_waterMesh.del();
 	chunk_count--;
 }
 
@@ -308,9 +309,17 @@ void	Chunk::draw(Shader &shader)
 	_mesh.draw(shader);
 }
 
+void	Chunk::drawWater(Shader &shader)
+{
+	mlm::mat4 model(1.0f);
+	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
+	shader.set_mat4("model", model);
+	_waterMesh.draw(shader);
+}
+
 void	Chunk::update()
 {
-	std::vector<Vertex> vertices;
+	std::vector<Vertex> vertices, waterVertices;
 	vertices.reserve(8 * blocks.size());
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
@@ -322,11 +331,17 @@ void	Chunk::update()
 				mlm::ivec3	pos(x, y, z);
 				Block		&block = blocks[index];
 				if (block.getEnabled())
-					addCube(vertices, pos);
+				{
+					if (block.getType() == Block::WATER)
+						addCube(waterVertices, pos);
+					else
+						addCube(vertices, pos);
+				}
 			}
 		}
 	}
 	_mesh = ChunkMesh(vertices);
+	_waterMesh = ChunkMesh(waterVertices);
 	_built = true;
 }
 
