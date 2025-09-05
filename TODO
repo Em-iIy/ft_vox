@@ -22,7 +22,7 @@
 		- day/night cycle
 	- torches/lightsource
 		? colors
-	- fog
+	+ fog
 
 - Chunk management
 	+ make chunks accessible from other chunks

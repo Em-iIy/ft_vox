@@ -7,6 +7,9 @@ Created on: 24/07/2025
 
 #include "Frustum.hpp"
 
+
+// #define FPS
+
 mlm::vec3	randVec3()
 {
 	static rng::fgen	gen = rng::generator(-1.0f, 1.0f);
@@ -39,6 +42,7 @@ void	VoxEngine::init()
 
 	init_glfw();
 	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
+	glfwSwapInterval(0);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
@@ -72,16 +76,20 @@ void	VoxEngine::mainLoop()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable( GL_BLEND );
+	glEnable(GL_BLEND);
+	#ifdef FPS
+	int frame = 0;
+	float time = glfwGetTime();
+	#endif
 	while (!glfwWindowShouldClose(Window::get_window()))
 	{
 		_input.handleKeys();
 		Window::update();
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.4f, 0.7f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		mlm::vec2	size = static_cast<mlm::vec2>(get_size());
 		
-		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .1f, 1000.0f);
+		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 320.0f);
 		shader.use();
 		shader.set_mat4("projection", projection);
 
@@ -98,6 +106,15 @@ void	VoxEngine::mainLoop()
 
 		glfwSwapBuffers(Window::get_window());
 		glfwPollEvents();
+		#ifdef FPS
+		frame++;
+		if (frame == 120)
+		{
+			std::cout << "fps: " << 1.0f / ((glfwGetTime() - time) / static_cast<float>(frame)) << std::endl;
+			time = glfwGetTime();
+			frame = 0;
+		}
+		#endif
 	}
 }
 
