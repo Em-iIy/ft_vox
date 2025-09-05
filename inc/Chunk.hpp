@@ -40,6 +40,7 @@ class Chunk {
 		void															requireRebuild();
 
 	private:
+		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);
 		void															addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos);
 		
 		std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z>	blocks;
