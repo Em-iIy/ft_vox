@@ -39,6 +39,11 @@ void	ChunkMesh::setup_mesh()
 	_vbo.unbind();
 }
 
+std::vector<Vertex>	&ChunkMesh::get_vertices()
+{
+	return (_vertices);
+}
+
 void	ChunkMesh::del()
 {
 	_vao.del();	

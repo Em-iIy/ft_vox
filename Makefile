@@ -43,7 +43,6 @@ GLU_SM = $(DIR_GLU).git
 CC = c++
 CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
-CFLAGS += -g
 CFLAGS += -std=c++20
 # CFLAGS += -fsanitize=address -g
 LFLAGS = -lglfw

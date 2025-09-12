@@ -48,10 +48,11 @@ class ChunkManager {
 	private:
 		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
 		std::vector<mlm::ivec2>												chunkLoadList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkSetupList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkRebuildList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkGenerateList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkMeshList = {};
 		std::set<std::shared_ptr<Chunk>>									chunkUpdateFlagList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkUnloadList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkUploadList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkVisibleList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkRenderList = {};
 
@@ -64,9 +65,10 @@ class ChunkManager {
 		mlm::ivec2															_renderMax = {0};
 
 		void																_updateLoadList();
-		void																_updateSetupList();
-		void																_updateRebuildList();
+		void																_updateGenerateList();
+		void																_updateMeshList();
 		void																_updateUnloadList();
+		void																_updateUploadList();
 		void																_updateFlagList();
 		void																_updateVisibleList();
 		void																_updateRenderList();

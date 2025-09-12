@@ -15,6 +15,9 @@ class ChunkMesh {
 
 		void	draw(Shader &shader);
 		
+		void	setup_mesh();
+		std::vector<Vertex>	&get_vertices();
+
 		void	del();
 	
 	private:
@@ -23,5 +26,4 @@ class ChunkMesh {
 		VAO		_vao;
 		VBO		_vbo;
 
-		void	setup_mesh();
 };

@@ -19,6 +19,16 @@ class ChunkManager;
 
 class Chunk {
 	public:
+
+		enum State {
+			UNLOADED = 0,
+			LOADED,
+			DIRTY,
+			GENERATED,
+			MESHED,
+			UPLOADED,
+		};
+
 		Chunk(ChunkManager &manager);
 		Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager);
 		~Chunk();
@@ -27,12 +37,14 @@ class Chunk {
 		void															generate();
 		void															draw(Shader &shader);
 		void															drawWater(Shader &shader);
-		void															update();
+		void															mesh();
+		void															upload();
 
 		Block															&getBlock(const mlm::ivec3 &blockChunkCoord);
 		std::pair<mlm::vec3 &, mlm::vec3 &>								getMinMax();
 		mlm::ivec2														getChunkPos();
 		mlm::ivec3														getWorldPos();
+		State															getState() const;
 
 		bool															isLoaded() const;
 		bool															isSetup() const;
@@ -54,6 +66,8 @@ class Chunk {
 
 		mlm::vec3														_min = INFINITY;
 		mlm::vec3														_max = -INFINITY;
+
+		State															_state = UNLOADED;
 
 		bool															_loaded = true;
 		bool															_setup = false;

@@ -53,13 +53,17 @@ Chunk::Chunk(ChunkManager &manager): _manager(manager)
 Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
 {
 	_worldPos = mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 0, CHUNK_SIZE_Z * _chunkPos.y);
+	_state = LOADED;
 	chunk_count++;
 }
 
 Chunk::~Chunk()
 {
-	_mesh.del();
-	_waterMesh.del();
+	if (_state == UPLOADED || _state == DIRTY)
+	{
+		_mesh.del();
+		_waterMesh.del();
+	}
 	chunk_count--;
 }
 
@@ -299,6 +303,7 @@ void	Chunk::generate()
 		}
 	}
 	_setup = true;
+	_state = GENERATED;
 }
 
 void	Chunk::draw(Shader &shader)
@@ -317,9 +322,10 @@ void	Chunk::drawWater(Shader &shader)
 	_waterMesh.draw(shader);
 }
 
-void	Chunk::update()
+void	Chunk::mesh()
 {
-	std::vector<Vertex> vertices, waterVertices;
+	std::vector<Vertex> &vertices = _mesh.get_vertices();
+	std::vector<Vertex> &waterVertices = _waterMesh.get_vertices();
 	vertices.reserve(8 * blocks.size());
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
@@ -340,9 +346,17 @@ void	Chunk::update()
 			}
 		}
 	}
-	_mesh = ChunkMesh(vertices);
-	_waterMesh = ChunkMesh(waterVertices);
 	_built = true;
+	_state = MESHED;
+}
+
+void	Chunk::upload()
+{
+	if (_state != MESHED)
+		return ;
+	_mesh.setup_mesh();
+	_waterMesh.setup_mesh();
+	_state = UPLOADED;
 }
 
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
@@ -363,6 +377,11 @@ mlm::ivec2							Chunk::getChunkPos()
 mlm::ivec3							Chunk::getWorldPos()
 {
 	return (_worldPos);
+}
+
+Chunk::State						Chunk::getState() const
+{
+	return (_state);
 }
 
 bool	Chunk::isLoaded() const

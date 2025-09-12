@@ -9,8 +9,8 @@ Created on: 19/08/2025
 #include <memory>
 
 const int	MAX_LOAD_PER_FRAME = 2;
-const int	MAX_SETUP_PER_FRAME = 2;
-const int	MAX_BUILD_PER_FRAME = 2;
+const int	MAX_GENERATE_PER_FRAME = 2;
+const int	MAX_MESH_PER_FRAME = 2;
 const int	MAX_UPDATE_PER_FRAME = 5;
 
 const int	RENDER_DISTANCE = 10;
@@ -52,8 +52,8 @@ void						ChunkManager::cleanup()
 {
 	// Clear chunk lists before chunk map
 	chunkLoadList.clear();
-	chunkSetupList.clear();
-	chunkRebuildList.clear();
+	chunkGenerateList.clear();
+	chunkMeshList.clear();
 	chunkUpdateFlagList.clear();
 	chunkUnloadList.clear();
 	chunkVisibleList.clear();
@@ -71,9 +71,10 @@ void						ChunkManager::init()
 void						ChunkManager::update()
 {
 	_updateLoadList();
-	_updateSetupList();
-	_updateRebuildList();
+	_updateGenerateList();
+	_updateMeshList();
 	_updateUnloadList();
+	_updateUploadList();
 	_updateFlagList();
 	_updateVisibleList();
 	_updateRenderList();
@@ -96,24 +97,24 @@ void						ChunkManager::_updateLoadList()
 	chunkLoadList.clear();
 }
 
-void						ChunkManager::_updateSetupList()
+void						ChunkManager::_updateGenerateList()
 {
-	int	setupCount = 0;
-	for (std::shared_ptr<Chunk> chunk : chunkSetupList)
+	int	generateCount = 0;
+	for (std::shared_ptr<Chunk> chunk : chunkGenerateList)
 	{
-		if (setupCount >= MAX_SETUP_PER_FRAME)
+		if (generateCount >= MAX_GENERATE_PER_FRAME)
 			break ;
-		if (chunk && chunk->isLoaded() && !chunk->isSetup())
+		if (chunk && chunk->getState() == Chunk::LOADED)
 		{
 			chunk->generate();
-			setupCount++;
+			generateCount++;
 			_updateVisibility = true;
 		}
 	}
-	chunkSetupList.clear();
+	chunkGenerateList.clear();
 }
 
-void						ChunkManager::_updateRebuildList()
+void						ChunkManager::_updateMeshList()
 {
 	const std::vector<mlm::ivec2>	neighbors = {
 		mlm::ivec2(0, 1),
@@ -122,17 +123,17 @@ void						ChunkManager::_updateRebuildList()
 		mlm::ivec2(-1, 0),
 	};
 	int	rebuildCount = 0;
-	for (std::shared_ptr<Chunk> chunk : chunkRebuildList)
+	for (std::shared_ptr<Chunk> chunk : chunkMeshList)
 	{
-		if (rebuildCount >= MAX_BUILD_PER_FRAME)
+		if (rebuildCount >= MAX_MESH_PER_FRAME)
 			break ;
-		if (chunk && chunk->isLoaded() && chunk->isSetup())
+		if (chunk && (chunk->getState() == Chunk::GENERATED || chunk->getState() == Chunk::DIRTY))
 		{
 			uint64_t	neighborSetupCount = 0;
 			for (const mlm::ivec2 &neighbor : neighbors)
 			{
 				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
-				if (!chunkNeighbor || !chunkNeighbor->isSetup())
+				if (!chunkNeighbor || chunk->getState() < Chunk::LOADED) // LOOK AT THIS CASE FOR WATER RENDER
 					break ;
 				// if (chunkNeighbor && chunkNeighbor->isBuilt())
 				// 	chunkUpdateFlagList.insert(chunkNeighbor);
@@ -140,20 +141,20 @@ void						ChunkManager::_updateRebuildList()
 			}
 			if (neighborSetupCount == neighbors.size())
 			{
-				chunk->update();
+				chunk->mesh();
 				rebuildCount++;
 				_updateVisibility = true;
 			}
 		}
 	}
-	chunkRebuildList.clear();
+	chunkMeshList.clear();
 }
 
 void						ChunkManager::_updateUnloadList()
 {
 	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
 	{
-		if (chunk && chunk->isLoaded())
+		if (chunk && chunk->getState() != Chunk::UNLOADED)
 		{
 			_unloadChunk(chunk);
 			_updateVisibility = true;
@@ -165,6 +166,19 @@ void						ChunkManager::_updateUnloadList()
 	}
 }
 
+void						ChunkManager::_updateUploadList()
+{
+	for (std::shared_ptr<Chunk> chunk : chunkUploadList)
+	{
+		if (chunk)
+		{
+			chunk->upload();
+			_updateVisibility = true;
+		}
+	}
+	chunkUploadList.clear();
+}
+
 void						ChunkManager::_updateFlagList()
 {
 	int	updateCount = 0;
@@ -174,7 +188,7 @@ void						ChunkManager::_updateFlagList()
 	{
 		if (updateCount >= MAX_UPDATE_PER_FRAME)
 			break ;
-		chunk->update();
+		chunk->mesh();
 		temp.push_back(chunk);
 		updateCount++;
 	}
@@ -205,12 +219,30 @@ void						ChunkManager::_updateVisibleList()
 				}
 				else
 				{
-					if (chunk->isSetup() == false)
-						chunkSetupList.push_back(chunk);
-					else if (chunk->isBuilt() == false)
-						chunkRebuildList.push_back(chunk);
-					else
+					switch (chunk->getState())
+					{
+					case Chunk::LOADED:
+						chunkGenerateList.push_back(chunk);
+						break ;
+					case Chunk::GENERATED:
+					case Chunk::DIRTY:
+						chunkMeshList.push_back(chunk);
+						break ;
+					case Chunk::MESHED:
+						chunkUploadList.push_back(chunk);
+						break ;
+					case Chunk::UPLOADED:
 						chunkVisibleList.push_back(chunk);
+						break ;
+					default:
+						break;
+					}
+					// if (chunk->isSetup() == false)
+					// 	chunkGenerateList.push_back(chunk);
+					// else if (chunk->isBuilt() == false)
+					// 	chunkMeshList.push_back(chunk);
+					// else
+					// 	chunkVisibleList.push_back(chunk);
 				}
 			}
 		}
@@ -236,7 +268,7 @@ void						ChunkManager::_updateRenderList()
 	chunkRenderList.clear();
 	for (std::shared_ptr<Chunk> chunk : chunkVisibleList)
 	{
-		if (chunk->isLoaded() && chunk->isBuilt() && chunk->isSetup())
+		if (chunk->getState() == Chunk::UPLOADED)
 		{
 			const auto [min, max] = chunk->getMinMax();
 			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
@@ -282,7 +314,7 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 
 void						ChunkManager::render(Shader &shader)
 {
-	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " s" << chunkSetupList.size() << " r" << chunkRebuildList.size() << " u" << chunkUnloadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
+	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
