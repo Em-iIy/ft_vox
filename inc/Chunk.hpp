@@ -33,7 +33,6 @@ class Chunk {
 		Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager);
 		~Chunk();
 
-
 		void															generate();
 		void															draw(Shader &shader);
 		void															drawWater(Shader &shader);
@@ -46,16 +45,10 @@ class Chunk {
 		mlm::ivec3														getWorldPos();
 		State															getState() const;
 
-		bool															isLoaded() const;
-		bool															isSetup() const;
-		bool															isBuilt() const;
-		
-		void															requireRebuild();
-
 	private:
 		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);
 		void															addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos);
-		
+
 		std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z>	blocks;
 		ChunkMesh														_mesh;
 		ChunkMesh														_waterMesh;
@@ -68,8 +61,4 @@ class Chunk {
 		mlm::vec3														_max = -INFINITY;
 
 		State															_state = UNLOADED;
-
-		bool															_loaded = true;
-		bool															_setup = false;
-		bool															_built = false;
 };

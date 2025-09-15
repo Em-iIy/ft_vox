@@ -243,7 +243,6 @@ float	continentalnessSpline(const float value)
 		mlm::vec2(-0.8f, 45.0f),
 		mlm::vec2(-0.2f, 45.0f),
 		mlm::vec2(0.0f, 58.0f),
-		mlm::vec2(0.1f, 65.0f),
 		mlm::vec2(0.25f, 70.0f),
 		mlm::vec2(0.45f, 130.0f),
 		mlm::vec2(1.00f, 150.0f),
@@ -302,7 +301,6 @@ void	Chunk::generate()
 			}
 		}
 	}
-	_setup = true;
 	_state = GENERATED;
 }
 
@@ -346,7 +344,6 @@ void	Chunk::mesh()
 			}
 		}
 	}
-	_built = true;
 	_state = MESHED;
 }
 
@@ -382,24 +379,4 @@ mlm::ivec3							Chunk::getWorldPos()
 Chunk::State						Chunk::getState() const
 {
 	return (_state);
-}
-
-bool	Chunk::isLoaded() const
-{
-	return (_loaded);
-}
-
-bool	Chunk::isSetup() const
-{
-	return (_setup);
-}
-
-bool	Chunk::isBuilt() const
-{
-	return (_built);
-}
-
-void	Chunk::requireRebuild()
-{
-	_built = false;
 }
