@@ -41,6 +41,7 @@ void	VoxEngine::init()
 	rng::seed();
 
 	init_glfw();
+	// Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
 	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
 	glfwSwapInterval(0);
 	glfwSetWindowUserPointer(Window::get_window(), this);
@@ -81,12 +82,12 @@ void	VoxEngine::mainLoop()
 	int frame = 0;
 	float time = glfwGetTime();
 	#endif
+	mlm::vec3	bgColor = mlm::vec3(0.4f, 0.7f, 0.9f);
+	mlm::vec3	tempBgColor = bgColor;
 	while (!glfwWindowShouldClose(Window::get_window()))
 	{
 		_input.handleKeys();
 		Window::update();
-		glClearColor(0.4f, 0.7f, 0.9f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		mlm::vec2	size = static_cast<mlm::vec2>(get_size());
 		
 		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 320.0f);
@@ -96,8 +97,24 @@ void	VoxEngine::mainLoop()
 		mlm::mat4	view = _camera.getViewMatrix();
 		shader.set_mat4("view", view);
 
+		auto block = _chunkManager.getBlock(static_cast<mlm::ivec3>(_camera.getPos()));
+		if (block.hasValue() && block.value()->getType() == Block::WATER)
+		{
+			shader.set_float("uFogNear", 0.0f);
+			tempBgColor = mlm::vec3(0.0f, 0.0f, 0.8f);
+		}
+		else
+		{
+			shader.set_float("uFogNear", 120.0f);
+			tempBgColor = bgColor;
+		}
+
+		shader.set_float("uFogFar", 180.0f);
+		shader.set_vec3("uFogColor", tempBgColor);
 		updateFrustum(projection, view);
 
+		glClearColor(tempBgColor.x, tempBgColor.y, tempBgColor.z, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glActiveTexture(GL_TEXTURE0);
 		_atlas.bind();
 

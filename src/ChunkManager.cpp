@@ -315,10 +315,12 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 void						ChunkManager::render(Shader &shader)
 {
 	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
+	glEnable(GL_CULL_FACE);
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
 	}
+	glDisable(GL_CULL_FACE);
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->drawWater(shader);
