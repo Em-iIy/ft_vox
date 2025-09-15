@@ -46,10 +46,10 @@
 	- biomes
 	- decoration
 		- trees
-		- water
+		+ water
 			+ mesh
-			- opacity
-	- caves1;
+			+ opacity
+	- caves
 		- 3D perlin noise
 
 - Setup input
