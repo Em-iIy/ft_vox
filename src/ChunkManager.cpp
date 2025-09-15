@@ -133,7 +133,7 @@ void						ChunkManager::_updateMeshList()
 			for (const mlm::ivec2 &neighbor : neighbors)
 			{
 				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
-				if (!chunkNeighbor || chunk->getState() < Chunk::LOADED) // LOOK AT THIS CASE FOR WATER RENDER
+				if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::GENERATED)
 					break ;
 				// if (chunkNeighbor && chunkNeighbor->isBuilt())
 				// 	chunkUpdateFlagList.insert(chunkNeighbor);
