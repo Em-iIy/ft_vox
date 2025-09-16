@@ -43,6 +43,7 @@ class Chunk {
 		std::pair<mlm::vec3 &, mlm::vec3 &>								getMinMax();
 		mlm::ivec2														getChunkPos();
 		mlm::ivec3														getWorldPos();
+		void															setState(const State state);
 		State															getState() const;
 
 	private:

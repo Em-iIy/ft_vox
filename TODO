@@ -49,8 +49,8 @@
 		+ water
 			+ mesh
 			+ opacity
-	- caves
-		- 3D perlin noise
+	+ caves
+		+ 3D perlin noise
 
 - Setup input
 	+ move camera

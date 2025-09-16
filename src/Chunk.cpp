@@ -236,6 +236,24 @@ float octaves(mlm::vec3 pos, uint64_t depth, float in_step)
 	return (ret);
 }
 
+float octaves3(mlm::vec3 pos, uint64_t depth, float in_step)
+{
+	Perlin perlin;
+	perlin.setSeed(1);
+	float ret = 0.0f;
+	float step = 1.0f;
+	for (; depth > 0; --depth)
+	{
+		float temp = perlin.getValue(pos.x * step, pos.y * step, pos.z * step) / step;
+		if (std::abs(temp) > std::numeric_limits<float>::epsilon())
+			ret += temp;
+		else
+			break ;
+		step *= in_step;
+	}
+	return (ret);
+}
+
 float	continentalnessSpline(const float value)
 {
 	static Spline spline({
@@ -256,12 +274,46 @@ float temp(const mlm::ivec3 &pos)
 	return ((octaves(static_cast<mlm::vec3>(pos) / 400.0f, 5, 2.0f)));
 }
 
+float temp3(const mlm::ivec3 &pos)
+{
+	return ((octaves3(static_cast<mlm::vec3>(pos) / 80.0f, 2, 2.0f)));
+}
+
 int	heightRand(const mlm::ivec3 &pos)
 {
 	int	ret = 0;
 	ret += static_cast<int>(continentalnessSpline(temp(pos)));
 	return (ret);
 }
+
+// void	Chunk::generate()
+// {
+// 	Perlin perlin;
+// 	perlin.setSeed(1);
+// 	// const int	seaLevel = 60;
+// 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
+// 	{
+// 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
+// 		{
+// 			mlm::ivec3	iPos(x, 0, z);
+// 			// int			tempYMax = heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
+// 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
+// 			{
+// 				iPos.y = y;
+// 				mlm::vec3	pos = static_cast<mlm::vec3>(iPos + _worldPos);
+// 				uint64_t	index = index3D(x, y, z);
+// 				float		value = temp3(pos);
+// 				// std::cout << pos << " " << value << std::endl;
+// 				Block::Type	type = Block::STONE;
+// 				if (value < 0.3f)
+// 					type = Block::AIR;
+// 				blocks[index] = Block(type);
+// 				blocks[index].setEnabled(type == Block::AIR ? false : true);
+// 			}
+// 		}
+// 	}
+// 	_state = GENERATED;
+// }
 
 void	Chunk::generate()
 {
@@ -271,10 +323,12 @@ void	Chunk::generate()
 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
 		{
 			mlm::ivec3	iPos(x, 0, z);
-			int			tempYMax = heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
+			int			tempYMax = heightRand(iPos + _worldPos);
+			// int			tempYMax = heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				iPos.y = y;
+				mlm::ivec3	pos = iPos + _worldPos;
 				uint64_t	index = index3D(x, y, z);
 				mlm::vec3	color;
 				Block::Type type = Block::STONE;
@@ -297,6 +351,15 @@ void	Chunk::generate()
 						type = Block::DIRT;
 					blocks[index] = Block(type);
 					blocks[index].setEnabled(true);
+					float value = temp3(pos);
+					// std::cout << value << std::endl;
+					// if (iPos.y > 20 && iPos.y < 25 && ((iPos.x < 5 || iPos.x > 12) || (iPos.z < 5 || iPos.z > 12)))
+					if (iPos.y != 0 && (std::abs(value) < 0.05f || value < -0.8f))
+					{
+						type = tempYMax <= seaLevel ? Block::WATER : Block::AIR;
+						blocks[index] = Block(type);
+						blocks[index].setEnabled(type == Block::AIR ? false : true);
+					}
 				}
 			}
 		}
@@ -324,6 +387,8 @@ void	Chunk::mesh()
 {
 	std::vector<Vertex> &vertices = _mesh.get_vertices();
 	std::vector<Vertex> &waterVertices = _waterMesh.get_vertices();
+	vertices.clear();
+	waterVertices.clear();
 	vertices.reserve(8 * blocks.size());
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
@@ -374,6 +439,11 @@ mlm::ivec2							Chunk::getChunkPos()
 mlm::ivec3							Chunk::getWorldPos()
 {
 	return (_worldPos);
+}
+
+void								Chunk::setState(const Chunk::State state)
+{
+	_state = state;
 }
 
 Chunk::State						Chunk::getState() const

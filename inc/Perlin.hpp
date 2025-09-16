@@ -11,11 +11,14 @@ class Perlin {
 	public:
 		void		setSeed(uint64_t seed);
 		float		getValue(float x, float y) const;
+		float		getValue(float x, float y, float z) const;
 		
 	private:
 		uint64_t	_seed = 1;
 
 		float		_smoothStep(float t) const;
 		mlm::vec2	_gradient(int x, int y) const;
+		mlm::vec3	_gradient(int x, int y, int z) const;
 		uint64_t	_hash(int x, int y) const;
+		uint64_t	_hash(int x, int y, int z) const;
 };

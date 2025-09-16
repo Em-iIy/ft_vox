@@ -11,7 +11,7 @@ Created on: 19/08/2025
 const int	MAX_LOAD_PER_FRAME = 2;
 const int	MAX_GENERATE_PER_FRAME = 2;
 const int	MAX_MESH_PER_FRAME = 2;
-const int	MAX_UPDATE_PER_FRAME = 5;
+const int	MAX_UPDATE_PER_FRAME = 8;
 
 const int	RENDER_DISTANCE = 10;
 
@@ -106,7 +106,9 @@ void						ChunkManager::_updateGenerateList()
 			break ;
 		if (chunk && chunk->getState() == Chunk::LOADED)
 		{
+			// float start = glfwGetTime();
 			chunk->generate();
+			// std::cout << glfwGetTime() - start << std::endl;
 			generateCount++;
 			_updateVisibility = true;
 		}
@@ -133,10 +135,13 @@ void						ChunkManager::_updateMeshList()
 			for (const mlm::ivec2 &neighbor : neighbors)
 			{
 				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
-				if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::GENERATED)
+				if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::DIRTY)
 					break ;
-				// if (chunkNeighbor && chunkNeighbor->isBuilt())
-				// 	chunkUpdateFlagList.insert(chunkNeighbor);
+				if (chunk->getState() != Chunk::DIRTY && false)
+				{
+					if (chunkNeighbor && chunkNeighbor->getState() >= Chunk::MESHED)
+						chunkUpdateFlagList.insert(chunkNeighbor);
+				}
 				neighborSetupCount++;
 			}
 			if (neighborSetupCount == neighbors.size())
@@ -188,7 +193,7 @@ void						ChunkManager::_updateFlagList()
 	{
 		if (updateCount >= MAX_UPDATE_PER_FRAME)
 			break ;
-		chunk->mesh();
+		chunk->setState(Chunk::DIRTY);
 		temp.push_back(chunk);
 		updateCount++;
 	}
@@ -315,12 +320,12 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 void						ChunkManager::render(Shader &shader)
 {
 	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
-	glEnable(GL_CULL_FACE);
+	// glEnable(GL_CULL_FACE);
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
 	}
-	glDisable(GL_CULL_FACE);
+	// glDisable(GL_CULL_FACE);
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->drawWater(shader);
