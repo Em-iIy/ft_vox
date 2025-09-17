@@ -8,7 +8,9 @@ Created on: 06/08/2025
 #include "Block.hpp"
 #include "ChunkManager.hpp"
 #include "ChunkMesh.hpp"
+
 #include <array>
+#include <atomic>
 #include <math.h>
 
 constexpr uint64_t	CHUNK_SIZE_X = 16; // MUST BE POWER OF 2
@@ -45,6 +47,8 @@ class Chunk {
 		mlm::ivec3														getWorldPos();
 		void															setState(const State state);
 		State															getState() const;
+
+		std::atomic<bool>													_busy = false;
 
 	private:
 		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);

@@ -365,6 +365,7 @@ void	Chunk::generate()
 		}
 	}
 	_state = GENERATED;
+	_busy = false;
 }
 
 void	Chunk::draw(Shader &shader)
@@ -410,6 +411,7 @@ void	Chunk::mesh()
 		}
 	}
 	_state = MESHED;
+	_busy = false;
 }
 
 void	Chunk::upload()

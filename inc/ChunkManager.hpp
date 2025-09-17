@@ -12,6 +12,10 @@ Created on: 19/08/2025
 #include <unordered_map>
 #include <set>
 #include <memory>
+#include <thread>
+#include <atomic>
+#include <queue>
+#include <functional>
 
 struct ivec2Hash {
 	size_t	operator()(const mlm::ivec2 &v) const
@@ -28,6 +32,7 @@ class VoxEngine;
 
 class ChunkManager {
 	public:
+		using ChunkCallback = std::function<void()>;
 
 		ChunkManager(VoxEngine &engine);
 		~ChunkManager();
@@ -56,6 +61,12 @@ class ChunkManager {
 		std::vector<std::shared_ptr<Chunk>>									chunkVisibleList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkRenderList = {};
 
+		// Multithreading stuff
+		std::deque<ChunkCallback>											_queue;
+		std::mutex															_queueMtx;
+		std::vector<std::thread>											_threads;
+		std::atomic<bool>													_running = true;
+
 		VoxEngine															&_engine; // move to private later
 
 		bool																_updateVisibility = true;
@@ -77,5 +88,9 @@ class ChunkManager {
 		
 		bool																_loadChunk(const mlm::ivec2 &chunkCoord);
 		void																_unloadChunk(std::shared_ptr<Chunk> &chunk);
+
+		void																_ThreadRoutine();
+		void																_addToQueue(ChunkManager::ChunkCallback callback);
+		ChunkCallback														_popFromQueue();
 
 };

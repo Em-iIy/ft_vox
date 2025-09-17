@@ -8,10 +8,12 @@ Created on: 19/08/2025
 
 #include <memory>
 
-const int	MAX_LOAD_PER_FRAME = 2;
-const int	MAX_GENERATE_PER_FRAME = 2;
-const int	MAX_MESH_PER_FRAME = 2;
+const int	MAX_LOAD_PER_FRAME = 10;
+const int	MAX_GENERATE_PER_FRAME = 10;
+const int	MAX_MESH_PER_FRAME = 10;
 const int	MAX_UPDATE_PER_FRAME = 8;
+
+const int	THREAD_COUNT = 8;
 
 const int	RENDER_DISTANCE = 10;
 
@@ -50,6 +52,10 @@ ChunkManager::~ChunkManager()
 
 void						ChunkManager::cleanup()
 {
+	// Join threads before clearing chunks to avoid heap-use-after-free on chunks
+	_running = false;
+	for (auto &thread : _threads)
+		thread.join();
 	// Clear chunk lists before chunk map
 	chunkLoadList.clear();
 	chunkGenerateList.clear();
@@ -66,6 +72,9 @@ void						ChunkManager::init()
 {
 	_renderDistance = RENDER_DISTANCE + 1;
 	_updateCameraChunkCoord();
+	_threads.reserve(THREAD_COUNT);
+	for (int i = 0; i < THREAD_COUNT; ++i)
+		_threads.emplace_back(&ChunkManager::_ThreadRoutine, this);
 }
 
 void						ChunkManager::update()
@@ -106,8 +115,13 @@ void						ChunkManager::_updateGenerateList()
 			break ;
 		if (chunk && chunk->getState() == Chunk::LOADED)
 		{
+			if (chunk->_busy == false)
+			{
+				chunk->_busy = true;
+				_addToQueue(std::bind(&Chunk::generate, chunk));
+			}
 			// float start = glfwGetTime();
-			chunk->generate();
+			// chunk->generate();
 			// std::cout << glfwGetTime() - start << std::endl;
 			generateCount++;
 			_updateVisibility = true;
@@ -146,7 +160,12 @@ void						ChunkManager::_updateMeshList()
 			}
 			if (neighborSetupCount == neighbors.size())
 			{
-				chunk->mesh();
+				if (chunk->_busy == false)
+				{
+					chunk->_busy = true;
+					_addToQueue(std::bind(&Chunk::mesh, chunk));
+				}
+				// chunk->mesh();
 				rebuildCount++;
 				_updateVisibility = true;
 			}
@@ -159,7 +178,7 @@ void						ChunkManager::_updateUnloadList()
 {
 	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
 	{
-		if (chunk && chunk->getState() != Chunk::UNLOADED)
+		if (chunk && chunk->getState() != Chunk::UNLOADED && chunk->_busy == false)
 		{
 			_unloadChunk(chunk);
 			_updateVisibility = true;
@@ -317,9 +336,56 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 	chunks.erase(chunkCoord);
 }
 
+
+bool	checkEmpty(std::deque<ChunkManager::ChunkCallback> &queue, std::mutex &mtx)
+{
+	bool ret;
+	mtx.lock();
+	ret = queue.empty();
+	mtx.unlock();
+	return (ret);
+}
+
+void	ChunkManager::_ThreadRoutine()
+{
+	std::cout << "starting thread" << std::endl;
+	while(_running)
+	{
+		_queueMtx.lock();
+		if (_queue.empty() == false)
+		{
+			auto func = _popFromQueue();
+			_queueMtx.unlock();
+			func();
+		}
+		else
+		{
+			_queueMtx.unlock();
+			usleep(100);
+		}
+	}
+}
+
+void	ChunkManager::_addToQueue(ChunkManager::ChunkCallback callback)
+{
+	_queueMtx.lock();
+	_queue.push_back(callback);
+	_queueMtx.unlock();
+}
+
+ChunkManager::ChunkCallback	ChunkManager::_popFromQueue()
+{
+	ChunkManager::ChunkCallback ret = _queue.front();
+	_queue.pop_front();
+	return (ret);
+}
+
 void						ChunkManager::render(Shader &shader)
 {
-	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
+	std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
+	_queueMtx.lock();
+	std::cerr << "queue size: " << _queue.size() << std::endl;
+	_queueMtx.unlock();
 	// glEnable(GL_CULL_FACE);
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
