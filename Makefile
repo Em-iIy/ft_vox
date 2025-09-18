@@ -45,7 +45,11 @@ CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
 CFLAGS += -std=c++20
 # CFLAGS += -fsanitize=address -g
+# CFLAGS += -fsanitize=thread -g
 LFLAGS = -lglfw
+
+TSAN_OPTIONS="suppressions=tsan-suppression"
+# TSAN_OPTIONS="suppressions=tsan-suppression history_size=7"
 
 INC = \
 	-Iinc \
@@ -74,6 +78,12 @@ submodule:
 	@echo "fetching submodules..."
 	git submodule init
 	git submodule update
+.PHONY: submodule
+
+run-tsan:
+	export TSAN_OPTIONS=$(TSAN_OPTIONS); \
+	./$(NAME)
+.PHONY: run-tsan
 
 # ----------------------------------------Cleaning
 clean:

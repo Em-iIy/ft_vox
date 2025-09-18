@@ -53,17 +53,19 @@ Chunk::Chunk(ChunkManager &manager): _manager(manager)
 Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
 {
 	_worldPos = mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 0, CHUNK_SIZE_Z * _chunkPos.y);
-	_state = LOADED;
+	setState(LOADED);
 	chunk_count++;
 }
 
 Chunk::~Chunk()
 {
-	if (_state == UPLOADED || _state == DIRTY)
+	_busyMtx.lock();
+	if (getState() == UPLOADED || getState() == DIRTY)
 	{
 		_mesh.del();
 		_waterMesh.del();
 	}
+	_busyMtx.unlock();
 	chunk_count--;
 }
 
@@ -138,7 +140,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::vec3(0.0f, 1.0f, 1.0f) + pos, //   6 front top left
 		mlm::vec3(1.0f, 1.0f, 1.0f) + pos, //    7 front top right
 	};
-	Block		&block = blocks[index3D(ipos)];
+	Block		&block = getBlock(ipos);
 	Atlas		&atlas = _manager.getEngine().getAtlas();
 	const std::vector<mlm::vec2>	&offsets = atlas.getOffset(block.getType());
 	const std::vector<mlm::vec2>	&uvCorners = atlas.getCorners();
@@ -146,8 +148,16 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	std::vector<Expected<Block *, int>> blockNeighbors;
 	for (const mlm::ivec3 &neighbor : neighbors)
 	{
-		auto neighborBlock = _manager.getBlock(worldPos + neighbor);
-		blockNeighbors.push_back(neighborBlock);
+		mlm::ivec3	neighborIpos = ipos + neighbor;
+		// Check wether neighbor is within chunk or not
+		if (
+			neighborIpos.x < 0 || neighborIpos.x >= static_cast<int>(CHUNK_SIZE_X) ||
+			neighborIpos.y < 0 || neighborIpos.y >= static_cast<int>(CHUNK_SIZE_Y) ||
+			neighborIpos.z < 0 || neighborIpos.z >= static_cast<int>(CHUNK_SIZE_Z)
+		)
+			blockNeighbors.push_back(_manager.getBlock(worldPos + neighbor));
+		else
+			blockNeighbors.push_back(&getBlock(neighborIpos));
 	}
 
 	// top face
@@ -286,37 +296,9 @@ int	heightRand(const mlm::ivec3 &pos)
 	return (ret);
 }
 
-// void	Chunk::generate()
-// {
-// 	Perlin perlin;
-// 	perlin.setSeed(1);
-// 	// const int	seaLevel = 60;
-// 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
-// 	{
-// 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
-// 		{
-// 			mlm::ivec3	iPos(x, 0, z);
-// 			// int			tempYMax = heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
-// 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
-// 			{
-// 				iPos.y = y;
-// 				mlm::vec3	pos = static_cast<mlm::vec3>(iPos + _worldPos);
-// 				uint64_t	index = index3D(x, y, z);
-// 				float		value = temp3(pos);
-// 				// std::cout << pos << " " << value << std::endl;
-// 				Block::Type	type = Block::STONE;
-// 				if (value < 0.3f)
-// 					type = Block::AIR;
-// 				blocks[index] = Block(type);
-// 				blocks[index].setEnabled(type == Block::AIR ? false : true);
-// 			}
-// 		}
-// 	}
-// 	_state = GENERATED;
-// }
-
 void	Chunk::generate()
 {
+	_busyMtx.lock();
 	const int	seaLevel = 60;
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
@@ -324,7 +306,6 @@ void	Chunk::generate()
 		{
 			mlm::ivec3	iPos(x, 0, z);
 			int			tempYMax = heightRand(iPos + _worldPos);
-			// int			tempYMax = heightRand(iPos + mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 1, CHUNK_SIZE_Z * _chunkPos.y));
 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				iPos.y = y;
@@ -335,8 +316,10 @@ void	Chunk::generate()
 				if (iPos.y > tempYMax)
 				{
 					type = iPos.y <= seaLevel ? Block::WATER : Block::AIR;
-					blocks[index] = Block(type);
+					_blockMtx.lock();
+					blocks[index].setType(type);
 					blocks[index].setEnabled(type == Block::AIR ? false : true);
+					_blockMtx.unlock();
 				}
 				else
 				{
@@ -349,22 +332,26 @@ void	Chunk::generate()
 					}
 					else if (iPos.y < tempYMax && iPos.y > tempYMax - 4)
 						type = Block::DIRT;
-					blocks[index] = Block(type);
+					_blockMtx.lock();
+					blocks[index].setType(type);
 					blocks[index].setEnabled(true);
+					_blockMtx.unlock();
 					float value = temp3(pos);
-					// std::cout << value << std::endl;
-					// if (iPos.y > 20 && iPos.y < 25 && ((iPos.x < 5 || iPos.x > 12) || (iPos.z < 5 || iPos.z > 12)))
 					if (iPos.y != 0 && (std::abs(value) < 0.05f || value < -0.8f))
 					{
 						type = tempYMax <= seaLevel ? Block::WATER : Block::AIR;
-						blocks[index] = Block(type);
+						_blockMtx.lock();
+						blocks[index].setType(type);
 						blocks[index].setEnabled(type == Block::AIR ? false : true);
+						_blockMtx.unlock();
 					}
 				}
 			}
 		}
 	}
-	_state = GENERATED;
+	setState(GENERATED);
+	_busyMtx.unlock();
+	_busy = false;
 }
 
 void	Chunk::draw(Shader &shader)
@@ -372,7 +359,9 @@ void	Chunk::draw(Shader &shader)
 	mlm::mat4 model(1.0f);
 	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
 	shader.set_mat4("model", model);
+	_busyMtx.lock();
 	_mesh.draw(shader);
+	_busyMtx.unlock();
 }
 
 void	Chunk::drawWater(Shader &shader)
@@ -380,11 +369,15 @@ void	Chunk::drawWater(Shader &shader)
 	mlm::mat4 model(1.0f);
 	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
 	shader.set_mat4("model", model);
+	_busyMtx.lock();
 	_waterMesh.draw(shader);
+	_busyMtx.unlock();
 }
 
 void	Chunk::mesh()
 {
+	// float start = glfwGetTime();
+	_busyMtx.lock();
 	std::vector<Vertex> &vertices = _mesh.get_vertices();
 	std::vector<Vertex> &waterVertices = _waterMesh.get_vertices();
 	vertices.clear();
@@ -398,7 +391,9 @@ void	Chunk::mesh()
 			{
 				uint64_t	index = index3D(x, y, z);
 				mlm::ivec3	pos(x, y, z);
+				_blockMtx.lock();
 				Block		&block = blocks[index];
+				_blockMtx.unlock();
 				if (block.getEnabled())
 				{
 					if (block.getType() == Block::WATER)
@@ -409,21 +404,37 @@ void	Chunk::mesh()
 			}
 		}
 	}
-	_state = MESHED;
+	setState(MESHED);
+	_busyMtx.unlock();
+	_busy = false;
+	// std::cout << glfwGetTime() - start << std::endl;
 }
 
 void	Chunk::upload()
 {
-	if (_state != MESHED)
+	if (getState() != MESHED)
 		return ;
+	_busyMtx.lock();
 	_mesh.setup_mesh();
 	_waterMesh.setup_mesh();
-	_state = UPLOADED;
+	_busyMtx.unlock();
+	setState(UPLOADED);
 }
 
 Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
-	return (blocks[index3D(blockChunkCoord)]);
+	_blockMtx.lock();
+	Block &ret = blocks[index3D(blockChunkCoord)];
+	_blockMtx.unlock();
+	return (ret);
+}
+
+Block::Type	Chunk::getBlockType(const mlm::ivec3 &blockChunkCoord)
+{
+	_blockMtx.lock();
+	Block::Type ret = blocks[index3D(blockChunkCoord)].getType();
+	_blockMtx.unlock();
+	return (ret);
 }
 
 std::pair<mlm::vec3 &, mlm::vec3 &>	Chunk::getMinMax()
@@ -443,10 +454,15 @@ mlm::ivec3							Chunk::getWorldPos()
 
 void								Chunk::setState(const Chunk::State state)
 {
+	_stateMtx.lock();
 	_state = state;
+	_stateMtx.unlock();
 }
 
-Chunk::State						Chunk::getState() const
+Chunk::State						Chunk::getState()
 {
-	return (_state);
+	_stateMtx.lock();
+	State ret = _state;
+	_stateMtx.unlock();
+	return (ret);
 }

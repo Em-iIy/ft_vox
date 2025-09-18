@@ -8,7 +8,10 @@ Created on: 06/08/2025
 #include "Block.hpp"
 #include "ChunkManager.hpp"
 #include "ChunkMesh.hpp"
+
 #include <array>
+#include <atomic>
+#include <mutex>
 #include <math.h>
 
 constexpr uint64_t	CHUNK_SIZE_X = 16; // MUST BE POWER OF 2
@@ -40,17 +43,22 @@ class Chunk {
 		void															upload();
 
 		Block															&getBlock(const mlm::ivec3 &blockChunkCoord);
+		Block::Type														getBlockType(const mlm::ivec3 &blockChunkCoord);
 		std::pair<mlm::vec3 &, mlm::vec3 &>								getMinMax();
 		mlm::ivec2														getChunkPos();
 		mlm::ivec3														getWorldPos();
 		void															setState(const State state);
-		State															getState() const;
+		State															getState();
+
+		std::atomic<bool>												_busy = false;
 
 	private:
 		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);
 		void															addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos);
 
+		std::mutex														_busyMtx;
 		std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z>	blocks;
+		std::mutex														_blockMtx;
 		ChunkMesh														_mesh;
 		ChunkMesh														_waterMesh;
 		mlm::ivec2														_chunkPos;
@@ -62,4 +70,5 @@ class Chunk {
 		mlm::vec3														_max = -INFINITY;
 
 		State															_state = UNLOADED;
+		std::mutex														_stateMtx;
 };
