@@ -97,8 +97,8 @@ void	VoxEngine::mainLoop()
 		mlm::mat4	view = _camera.getViewMatrix();
 		shader.set_mat4("view", view);
 
-		auto block = _chunkManager.getBlock(static_cast<mlm::ivec3>(_camera.getPos()));
-		if (block.hasValue() && block.value()->getType() == Block::WATER)
+		auto block = _chunkManager.getBlockType(static_cast<mlm::ivec3>(_camera.getPos()));
+		if (block.hasValue() && block.value() == Block::WATER)
 		{
 			shader.set_float("uFogNear", 0.0f);
 			tempBgColor = mlm::vec3(0.0f, 0.0f, 0.8f);
@@ -109,7 +109,7 @@ void	VoxEngine::mainLoop()
 			tempBgColor = bgColor;
 		}
 
-		shader.set_float("uFogFar", 180.0f);
+		shader.set_float("uFogFar", 160.0f);
 		shader.set_vec3("uFogColor", tempBgColor);
 		updateFrustum(projection, view);
 

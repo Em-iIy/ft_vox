@@ -33,6 +33,11 @@ class VoxEngine;
 class ChunkManager {
 	public:
 		using ChunkCallback = std::function<void()>;
+		struct ChunkTask
+		{
+			std::weak_ptr<Chunk>				ptr;
+			enum class Type {GENERATE, MESH}	type;
+		};
 
 		ChunkManager(VoxEngine &engine);
 		~ChunkManager();
@@ -44,6 +49,7 @@ class ChunkManager {
 		void																render(Shader &shader);
 
 		Expected<Block *, int>												getBlock(const mlm::ivec3 &blockCoord);
+		Expected<Block::Type, int>											getBlockType(const mlm::ivec3 &blockCoord);
 		bool																isBlockTransparent(const mlm::ivec3 &blockCoord);
 	
 		void																setUpdateVisibility();
@@ -52,6 +58,7 @@ class ChunkManager {
 
 	private:
 		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
+		std::mutex															chunksMtx;
 		std::vector<mlm::ivec2>												chunkLoadList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkGenerateList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkMeshList = {};
@@ -62,12 +69,12 @@ class ChunkManager {
 		std::vector<std::shared_ptr<Chunk>>									chunkRenderList = {};
 
 		// Multithreading stuff
-		std::deque<ChunkCallback>											_queue;
+		std::deque<ChunkTask>												_queue;
 		std::mutex															_queueMtx;
 		std::vector<std::thread>											_threads;
 		std::atomic<bool>													_running = true;
 
-		VoxEngine															&_engine; // move to private later
+		VoxEngine															&_engine;
 
 		bool																_updateVisibility = true;
 		mlm::ivec2															_cameraChunkCoord = {2147483647};
@@ -90,7 +97,7 @@ class ChunkManager {
 		void																_unloadChunk(std::shared_ptr<Chunk> &chunk);
 
 		void																_ThreadRoutine();
-		void																_addToQueue(ChunkManager::ChunkCallback callback);
-		ChunkCallback														_popFromQueue();
+		void																_addToQueue(std::shared_ptr<Chunk> &chunk, ChunkTask::Type type);
+		ChunkTask															_popFromQueue();
 
 };
