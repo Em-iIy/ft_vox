@@ -84,8 +84,8 @@ static bool		shouldDrawFace(Expected<Block *, int> &neighborResult, Block &block
 	if (!neighborResult.hasValue())
 	{
 		if (neighborResult.error() == 1)
-			return (false);
-		return (true);
+			return (true);
+		return (false);
 	}
 	Block &neighbor = *neighborResult.value();
 	if (block.getType() == Block::WATER && neighbor.getType() == Block::AIR)
