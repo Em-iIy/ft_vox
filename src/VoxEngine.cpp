@@ -90,7 +90,7 @@ void	VoxEngine::mainLoop()
 		Window::update();
 		mlm::vec2	size = static_cast<mlm::vec2>(get_size());
 		
-		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 320.0f);
+		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 640.0f);
 		shader.use();
 		shader.set_mat4("projection", projection);
 

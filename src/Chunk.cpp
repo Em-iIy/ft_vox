@@ -12,6 +12,7 @@ Created on: 06/08/2025
 #include "VoxEngine.hpp"
 
 int chunk_count = 0;
+const int g_seed = 1212;
 
 enum Faces {
 	TOP,
@@ -228,10 +229,10 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	}
 }
 
-float octaves(mlm::vec3 pos, uint64_t depth, float in_step)
+float octaves(uint64_t seed, mlm::vec3 pos, uint64_t depth, float in_step)
 {
 	Perlin perlin;
-	perlin.setSeed(4);
+	perlin.setSeed(seed);
 	float ret = 0.0f;
 	float step = 1.0f;
 	for (; depth > 0; --depth)
@@ -246,15 +247,15 @@ float octaves(mlm::vec3 pos, uint64_t depth, float in_step)
 	return (ret);
 }
 
-float octaves3(mlm::vec3 pos, uint64_t depth, float in_step)
+float octaves3(uint64_t seed, mlm::vec3 pos, uint64_t depth, float in_step)
 {
 	Perlin perlin;
-	perlin.setSeed(1);
+	perlin.setSeed(seed);
 	float ret = 0.0f;
 	float step = 1.0f;
 	for (; depth > 0; --depth)
 	{
-		float temp = perlin.getValue(pos.x * step, pos.y * step, pos.z * step) / step;
+		float temp = perlin.getValue(pos.x, pos.y * step, pos.z) / step;
 		if (std::abs(temp) > std::numeric_limits<float>::epsilon())
 			ret += temp;
 		else
@@ -267,51 +268,57 @@ float octaves3(mlm::vec3 pos, uint64_t depth, float in_step)
 float	continentalnessSpline(const float value)
 {
 	static Spline spline({
-		mlm::vec2(-1.f, 200.0f),
-		mlm::vec2(-0.8f, 45.0f),
-		mlm::vec2(-0.2f, 45.0f),
-		mlm::vec2(0.0f, 58.0f),
-		mlm::vec2(0.25f, 70.0f),
-		mlm::vec2(0.45f, 130.0f),
-		mlm::vec2(1.00f, 150.0f),
+		mlm::vec2(-1.f, 250.0f),
+		mlm::vec2(-0.8f, 95.0f),
+		mlm::vec2(-0.2f, 95.0f),
+		mlm::vec2(0.0f, 108.0f),
+		mlm::vec2(0.25f, 120.0f),
+		mlm::vec2(0.45f, 180.0f),
+		mlm::vec2(1.00f, 200.0f),
 	});
 	float ret = spline.evaluate(value);
 	return (ret);
 }
 
-float temp(const mlm::ivec3 &pos)
+float temp(uint64_t seed, const mlm::ivec3 &pos)
 {
-	return ((octaves(static_cast<mlm::vec3>(pos) / 400.0f, 5, 2.0f)));
+	return ((octaves(seed, static_cast<mlm::vec3>(pos) / 400.0f, 5, 2.0f)));
 }
 
-float temp3(const mlm::ivec3 &pos)
+float temp3(uint64_t seed, const mlm::ivec3 &pos)
 {
-	return ((octaves3(static_cast<mlm::vec3>(pos) / 80.0f, 2, 2.0f)));
+	return ((octaves3(seed, static_cast<mlm::vec3>(pos) / 160.0f, 1, 1.0f)));
+	// return ((octaves3(static_cast<mlm::vec3>(pos) / 80.0f, 3, 1.5f)));
 }
 
-int	heightRand(const mlm::ivec3 &pos)
+float temp4(uint64_t seed, const mlm::ivec3 &pos)
+{
+	return ((octaves3(seed, static_cast<mlm::vec3>(pos) / 160.0f, 1, 1.0f)));
+	// return ((octaves3(static_cast<mlm::vec3>(pos) / 80.0f, 3, 1.5f)));
+}
+
+int	heightRand(uint64_t seed, const mlm::ivec3 &pos)
 {
 	int	ret = 0;
-	ret += static_cast<int>(continentalnessSpline(temp(pos)));
+	ret += static_cast<int>(continentalnessSpline(temp(seed, pos)));
 	return (ret);
 }
 
 void	Chunk::generate()
 {
 	_busyMtx.lock();
-	const int	seaLevel = 60;
+	const int	seaLevel = 110;
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
 		{
 			mlm::ivec3	iPos(x, 0, z);
-			int			tempYMax = heightRand(iPos + _worldPos);
+			int			tempYMax = heightRand(g_seed, iPos + _worldPos);
 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				iPos.y = y;
 				mlm::ivec3	pos = iPos + _worldPos;
 				uint64_t	index = index3D(x, y, z);
-				mlm::vec3	color;
 				Block::Type type = Block::STONE;
 				if (iPos.y > tempYMax)
 				{
@@ -336,8 +343,9 @@ void	Chunk::generate()
 					blocks[index].setType(type);
 					blocks[index].setEnabled(true);
 					_blockMtx.unlock();
-					float value = temp3(pos);
-					if (iPos.y != 0 && (std::abs(value) < 0.05f || value < -0.8f))
+					float value = temp3(g_seed, pos);
+					float value2 = temp3(g_seed + 1, pos);
+					if ((iPos.y != 0 && (std::abs(value) < 0.02f && std::abs(value2) < 0.02f)))
 					{
 						type = tempYMax <= seaLevel ? Block::WATER : Block::AIR;
 						_blockMtx.lock();
