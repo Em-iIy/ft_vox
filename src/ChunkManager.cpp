@@ -135,12 +135,12 @@ void						ChunkManager::_updateMeshList()
 		mlm::ivec2(1, 0),
 		mlm::ivec2(-1, 0),
 	};
-	int	rebuildCount = 0;
+	int	remeshCount = 0;
 	for (std::shared_ptr<Chunk> chunk : chunkMeshList)
 	{
-		if (rebuildCount >= MAX_MESH_PER_FRAME)
+		if (remeshCount >= MAX_MESH_PER_FRAME)
 			break ;
-		if (chunk && (chunk->getState() == Chunk::GENERATED || chunk->getState() == Chunk::DIRTY))
+		if (chunk && (chunk->getState() == Chunk::GENERATED || chunk->_dirty == true))
 		{
 			uint64_t	neighborSetupCount = 0;
 			for (const mlm::ivec2 &neighbor : neighbors)
@@ -164,7 +164,7 @@ void						ChunkManager::_updateMeshList()
 					chunk->_busy = true;
 					_addToQueue(chunk, ChunkTask::Type::MESH);
 				}
-				rebuildCount++;
+				remeshCount++;
 				_updateVisibility = true;
 			}
 		}
@@ -266,7 +266,6 @@ void						ChunkManager::_updateVisibleList()
 						chunkGenerateList.push_back(chunk);
 						break ;
 					case Chunk::GENERATED:
-					case Chunk::DIRTY:
 						chunkMeshList.push_back(chunk);
 						break ;
 					case Chunk::MESHED:
@@ -278,6 +277,8 @@ void						ChunkManager::_updateVisibleList()
 					default:
 						break;
 					}
+					if (chunk->_dirty == true)
+						chunkMeshList.push_back(chunk);
 				}
 			}
 		}
@@ -380,6 +381,7 @@ void	ChunkManager::_ThreadRoutine()
 				chunk->mesh();
 				break;
 		}
+		_updateVisibility = true;
 	}
 }
 
@@ -430,6 +432,52 @@ Expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 	Block					&block = chunk->getBlock(blockChunkCoord);
 	return (&block);
 }
+
+void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
+{
+	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
+		return ;
+	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
+	chunksMtx.lock();
+	std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
+	chunksMtx.unlock();
+	if (!chunk)
+		return ;
+	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
+
+
+	bool updated = chunk->setBlock(blockChunkCoord, block);
+	if (updated == false)
+		return ;
+	// std::cout << "set block: " << blockCoord << " " << blockCoord << std::endl;
+	if (blockChunkCoord.x == 0)
+	{
+		chunksMtx.lock();
+		chunks[chunkCoord - mlm::ivec2(-1, 0)]->_dirty = true;
+		chunksMtx.unlock();
+	}
+	if (blockChunkCoord.z == 0)
+	{
+		chunksMtx.lock();
+		chunks[chunkCoord - mlm::ivec2(0, -1)]->_dirty = true;
+		chunksMtx.unlock();
+	}
+	if (blockChunkCoord.x == CHUNK_SIZE_X - 1)
+	{
+		chunksMtx.lock();
+		chunks[chunkCoord - mlm::ivec2(1, 0)]->_dirty = true;
+		chunksMtx.unlock();
+	}
+	if (blockChunkCoord.z == CHUNK_SIZE_Z - 1)
+	{
+		chunksMtx.lock();
+		chunks[chunkCoord - mlm::ivec2(0, 1)]->_dirty = true;
+		chunksMtx.unlock();
+	}
+	chunk->_dirty = true;
+	_updateVisibility = true;
+}
+
 
 Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::ivec3 &blockCoord)
 {

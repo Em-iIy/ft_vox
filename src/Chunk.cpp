@@ -12,7 +12,7 @@ Created on: 06/08/2025
 #include "VoxEngine.hpp"
 
 int chunk_count = 0;
-const int g_seed = 1212;
+const int g_seed = 4242;
 
 enum Faces {
 	TOP,
@@ -415,6 +415,7 @@ void	Chunk::mesh()
 	setState(MESHED);
 	_busyMtx.unlock();
 	_busy = false;
+	_dirty = false;
 	// std::cout << glfwGetTime() - start << std::endl;
 }
 
@@ -433,6 +434,18 @@ Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
 	_blockMtx.lock();
 	Block &ret = blocks[index3D(blockChunkCoord)];
+	_blockMtx.unlock();
+	return (ret);
+}
+
+bool	Chunk::setBlock(const mlm::ivec3 &blockChunkCoord, Block block)
+{
+	bool ret = true;
+	_blockMtx.lock();
+	Block &target = blocks[index3D(blockChunkCoord)];
+	if (target.getType() == block.getType())
+		ret = false;
+	target = block;
 	_blockMtx.unlock();
 	return (ret);
 }

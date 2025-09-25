@@ -43,6 +43,7 @@ class Chunk {
 		void															upload();
 
 		Block															&getBlock(const mlm::ivec3 &blockChunkCoord);
+		bool															setBlock(const mlm::ivec3 &blockChunkCoord, Block block);
 		Block::Type														getBlockType(const mlm::ivec3 &blockChunkCoord);
 		std::pair<mlm::vec3 &, mlm::vec3 &>								getMinMax();
 		mlm::ivec2														getChunkPos();
@@ -51,6 +52,7 @@ class Chunk {
 		State															getState();
 
 		std::atomic<bool>												_busy = false;
+		std::atomic<bool>												_dirty = false;
 
 	private:
 		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);

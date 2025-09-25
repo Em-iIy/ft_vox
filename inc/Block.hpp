@@ -19,6 +19,8 @@ class Block {
 
 		Block();
 		Block(Type type);
+		Block(const Block &src);
+
 		Block		&operator=(const Block &src);
 
 		bool		getEnabled() const;

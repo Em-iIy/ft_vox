@@ -37,11 +37,13 @@
 	+ prioritize generating chunks closer to the player
 	+ frustum culling
 	- save chunk to file
-	- multithreaded
+	+ multithreaded
+	- placing blocks
+		- update neighboring chunks
 
 - Terrain generation
 	- move generation to separate class
-	- different noise values per block
+	+ different noise values per block
 	+ splines
 	- biomes
 	- decoration

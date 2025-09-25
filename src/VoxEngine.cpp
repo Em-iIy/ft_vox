@@ -55,6 +55,9 @@ void	VoxEngine::init()
 	_input.addOnDownCallback(GLFW_KEY_SPACE, [this]() {_camera.processKeyboard(Camera::UP, get_delta_time());});
 	_input.addOnDownCallback(GLFW_KEY_LEFT_SHIFT, [this]() {_camera.processKeyboard(Camera::DOWN, get_delta_time());});
 
+	_input.addOnDownCallback(GLFW_KEY_1, [this]() {_chunkManager.setBlock(static_cast<mlm::ivec3>(_camera.getPos()), Block::STONE);});
+	_input.addOnDownCallback(GLFW_KEY_2, [this]() {_chunkManager.setBlock(static_cast<mlm::ivec3>(_camera.getPos()), Block::AIR);});
+
 	// Random other key inputs
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
 	_input.addOnPressCallback(GLFW_KEY_TAB, std::bind(&Input::toggleWireFrame, _input));
