@@ -85,6 +85,10 @@ run-tsan:
 	./$(NAME)
 .PHONY: run-tsan
 
+lines:
+	wc -l src/*.cpp inc/*.hpp
+# 	wc -l src/*.cpp inc/*.hpp lib/glu/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
+.PHONY: lines
 # ----------------------------------------Cleaning
 clean:
 	rm -f $(OBJS)
