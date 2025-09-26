@@ -44,6 +44,7 @@ class Input {
 		static void	resizeCallback(GLFWwindow *window, int x, int y);
 		static void	mouseMovementCallback(GLFWwindow *window, double inXPos, double inYPos);
 		static void	mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
+		static void	mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 		static void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 	private:

@@ -83,6 +83,7 @@ void	Input::init(GLFWwindow *window, const mlm::ivec2 &windowSize)
 	glfwSetCursorPosCallback(window, mouseMovementCallback);
 	glfwSetScrollCallback(window, mouseScrollCallback);
 	glfwSetKeyCallback(window, keyCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 }
 
 
@@ -143,6 +144,30 @@ void	Input::toggleWireFrame()
 {
 	wireFrameMode = !wireFrameMode;
 	glPolygonMode(GL_FRONT_AND_BACK, wireFrameMode ? GL_LINE : GL_FILL);
+}
+
+void	Input::mouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods)
+{
+	void	*ptr = glfwGetWindowUserPointer(window);
+	if (!ptr)
+		return ;
+	VoxEngine *pEngine = static_cast<VoxEngine *>(ptr);
+
+	Input &input = pEngine->getInput();
+	switch (action)
+	{
+	case GLFW_PRESS:
+		input.onPress(button);
+		break;
+	case GLFW_RELEASE:
+		input.onRelease(button);
+		break;
+	case GLFW_REPEAT:
+		break;
+	default:
+		break;
+	}
+	input.keys[button].updateState(action);
 }
 
 void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
