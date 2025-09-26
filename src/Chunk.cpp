@@ -413,6 +413,8 @@ void	Chunk::mesh()
 	_waterMesh.get_vertices() = waterVertices;
 	if (getState() < MESHED)
 		setState(MESHED);
+	// if (_dirty == true)
+	// 	std::cout << "remeshed: " << _chunkPos << std::endl;
 	_dirty = false;
 	_readyToUpload = true;
 	_busyMtx.unlock();

@@ -451,29 +451,29 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 	bool updated = chunk->setBlock(blockChunkCoord, block);
 	if (updated == false)
 		return ;
-	// std::cout << "set block: " << blockCoord << " " << blockCoord << std::endl;
+	// std::cout << "set block: " << blockCoord << " " << blockChunkCoord << std::endl;
 	if (blockChunkCoord.x == 0)
 	{
 		chunksMtx.lock();
-		chunks[chunkCoord - mlm::ivec2(-1, 0)]->_dirty = true;
+		chunks[chunkCoord + mlm::ivec2(-1, 0)]->_dirty = true;
 		chunksMtx.unlock();
 	}
 	if (blockChunkCoord.z == 0)
 	{
 		chunksMtx.lock();
-		chunks[chunkCoord - mlm::ivec2(0, -1)]->_dirty = true;
+		chunks[chunkCoord + mlm::ivec2(0, -1)]->_dirty = true;
 		chunksMtx.unlock();
 	}
 	if (blockChunkCoord.x == CHUNK_SIZE_X - 1)
 	{
 		chunksMtx.lock();
-		chunks[chunkCoord - mlm::ivec2(1, 0)]->_dirty = true;
+		chunks[chunkCoord + mlm::ivec2(1, 0)]->_dirty = true;
 		chunksMtx.unlock();
 	}
 	if (blockChunkCoord.z == CHUNK_SIZE_Z - 1)
 	{
 		chunksMtx.lock();
-		chunks[chunkCoord - mlm::ivec2(0, 1)]->_dirty = true;
+		chunks[chunkCoord + mlm::ivec2(0, 1)]->_dirty = true;
 		chunksMtx.unlock();
 	}
 	chunk->_dirty = true;
