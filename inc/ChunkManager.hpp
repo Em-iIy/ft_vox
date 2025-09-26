@@ -77,7 +77,7 @@ class ChunkManager {
 
 		VoxEngine															&_engine;
 
-		bool																_updateVisibility = true;
+		std::atomic<bool>													_updateVisibility = true;
 		mlm::ivec2															_cameraChunkCoord = {2147483647};
 		int																	_renderDistance = {};
 		mlm::ivec2															_renderMin = {0};
