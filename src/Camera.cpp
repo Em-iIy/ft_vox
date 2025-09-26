@@ -26,6 +26,8 @@ mlm::mat4	Camera::getViewMatrix() const
 void		Camera::processKeyboard(Direction dir, float deltaTime)
 {
 	float	velocity = _movementSpeed * deltaTime;
+	if (_sprinting)
+		velocity *= SPRINT_MULTIPLIER;
 	mlm::vec3	worldFront;
 	switch (dir)
 	{
@@ -81,6 +83,11 @@ void		Camera::processMouseScroll(float yOffset)
 	else if (_zoom < 1.0f)
 		_zoom = 1.0f;
 	std::cout << _zoom << std::endl;
+}
+
+void		Camera::toggleSprint()
+{
+	_sprinting = !_sprinting;
 }
 
 void		Camera::updateVectors()

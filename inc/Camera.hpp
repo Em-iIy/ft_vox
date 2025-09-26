@@ -9,9 +9,10 @@ Created on: 25/07/2025
 
 const float	YAW 	= -90.0f;
 const float	PITCH 	= 0.0f;
-const float	SPEED 	= 100.0f;
+const float	SPEED 	= 1.0f;
 const float	SENS 	= 0.03f;
 const float	ZOOM 	= 60.0f;
+const float	SPRINT_MULTIPLIER = 20.0f;
 
 class Camera {
 	public:
@@ -35,6 +36,8 @@ class Camera {
 		void			processKeyboard(Direction dir, float deltaTime);
 		void			processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
 		void			processMouseScroll(float yOffset);
+
+		void			toggleSprint();
 	
 	private:
 		mlm::vec3		_pos;
@@ -49,6 +52,8 @@ class Camera {
 		float			_movementSpeed;
 		float			_mouseSensitivity;
 		float			_zoom;
+
+		bool			_sprinting = false;
 
 		void			updateVectors();
 };
