@@ -279,6 +279,8 @@ void						ChunkManager::_updateVisibleList()
 					}
 					if (chunk->_dirty == true)
 						chunkMeshList.push_back(chunk);
+					if (chunk->_readyToUpload == true)
+						chunkUploadList.push_back(chunk);
 				}
 			}
 		}

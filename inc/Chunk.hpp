@@ -53,6 +53,7 @@ class Chunk {
 
 		std::atomic<bool>												_busy = false;
 		std::atomic<bool>												_dirty = false;
+		std::atomic<bool>												_readyToUpload = false;
 
 	private:
 		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);

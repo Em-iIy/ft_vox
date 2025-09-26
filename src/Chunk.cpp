@@ -386,11 +386,8 @@ void	Chunk::mesh()
 {
 	// float start = glfwGetTime();
 	_busyMtx.lock();
-	std::vector<Vertex> &vertices = _mesh.get_vertices();
-	std::vector<Vertex> &waterVertices = _waterMesh.get_vertices();
-	vertices.clear();
-	waterVertices.clear();
-	vertices.reserve(8 * blocks.size());
+	std::vector<Vertex> vertices;
+	std::vector<Vertex> waterVertices;
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
@@ -412,21 +409,26 @@ void	Chunk::mesh()
 			}
 		}
 	}
-	setState(MESHED);
+	_mesh.get_vertices() = vertices;
+	_waterMesh.get_vertices() = waterVertices;
+	if (getState() < MESHED)
+		setState(MESHED);
+	_dirty = false;
+	_readyToUpload = true;
 	_busyMtx.unlock();
 	_busy = false;
-	_dirty = false;
 	// std::cout << glfwGetTime() - start << std::endl;
 }
 
 void	Chunk::upload()
 {
-	if (getState() != MESHED)
+	if (_readyToUpload == false)
 		return ;
 	_busyMtx.lock();
 	_mesh.setup_mesh();
 	_waterMesh.setup_mesh();
 	_busyMtx.unlock();
+	_readyToUpload = false;
 	setState(UPLOADED);
 }
 
