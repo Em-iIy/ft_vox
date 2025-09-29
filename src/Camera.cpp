@@ -114,6 +114,11 @@ const mlm::vec3	&Camera::getPos() const
 	return (_pos);
 }
 
+const mlm::vec3	&Camera::getViewDir() const
+{
+	return (_front);
+}
+
 void		Camera::setPos(const mlm::vec3 &pos)
 {
 	_pos = pos;

@@ -60,6 +60,11 @@ class ChunkManager {
 		bool																isBlockTransparent(const mlm::vec3 &blockCoord);
 		bool																isBlockTransparent(const mlm::ivec3 &blockCoord);
 	
+		Expected<mlm::ivec3, bool>											castRayIncluding();
+		Expected<mlm::ivec3, bool>											castRayExcluding();
+		void																placeBlock(Block block);
+		void																deleteBlock();
+
 		void																setUpdateVisibility();
 
 		VoxEngine															&getEngine();

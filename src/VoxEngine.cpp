@@ -23,6 +23,8 @@ mlm::vec3	randVec3()
 	);
 }
 
+mlm::ivec3	getWorldCoord(const mlm::vec3 &coord);
+
 VoxEngine::VoxEngine(): _chunkManager(*this)
 {}
 
@@ -61,8 +63,8 @@ void	VoxEngine::init()
 
 	_input.addOnDownCallback(GLFW_KEY_1, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::STONE);});
 	_input.addOnDownCallback(GLFW_KEY_2, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::WATER);});
-	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::GRASS);});
-	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_RIGHT, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::AIR);});
+	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.placeBlock(Block::GRASS);});
+	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_RIGHT, [this]() {_chunkManager.deleteBlock();});
 
 	// Random other key inputs
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
@@ -81,7 +83,34 @@ void	VoxEngine::init()
 void	VoxEngine::mainLoop()
 {
 
-	Shader	shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
+	Shader	chunkShader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
+	Shader	cubeShader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
+
+	std::vector<Vertex>		vertices = {
+		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+	};
+	std::vector<uint32_t>	indices = {
+		0, 2, 1,
+		1, 2, 3,
+		4, 5, 6,
+		5, 7, 6,
+		0, 4, 6,
+		0, 6, 2,
+		1, 7, 5,
+		1, 3, 7,
+		2, 6, 7,
+		2, 7, 3,
+		1, 4, 0,
+		1, 5, 4,
+	};
+	Mesh	cubeMesh(vertices, indices);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -100,26 +129,26 @@ void	VoxEngine::mainLoop()
 		mlm::vec2	size = static_cast<mlm::vec2>(get_size());
 		
 		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 640.0f);
-		shader.use();
-		shader.set_mat4("projection", projection);
+		chunkShader.use();
+		chunkShader.set_mat4("projection", projection);
 
 		mlm::mat4	view = _camera.getViewMatrix();
-		shader.set_mat4("view", view);
+		chunkShader.set_mat4("view", view);
 
 		auto block = _chunkManager.getBlockType(_camera.getPos());
 		if (block.hasValue() && block.value() == Block::WATER)
 		{
-			shader.set_float("uFogNear", 0.0f);
+			chunkShader.set_float("uFogNear", 0.0f);
 			tempBgColor = mlm::vec3(0.0f, 0.0f, 0.8f);
 		}
 		else
 		{
-			shader.set_float("uFogNear", 120.0f);
+			chunkShader.set_float("uFogNear", 120.0f);
 			tempBgColor = bgColor;
 		}
 
-		shader.set_float("uFogFar", 160.0f);
-		shader.set_vec3("uFogColor", tempBgColor);
+		chunkShader.set_float("uFogFar", 160.0f);
+		chunkShader.set_vec3("uFogColor", tempBgColor);
 		updateFrustum(projection, view);
 
 		glClearColor(tempBgColor.x, tempBgColor.y, tempBgColor.z, 1.0f);
@@ -128,7 +157,20 @@ void	VoxEngine::mainLoop()
 		_atlas.bind();
 
 		_chunkManager.update();
-		_chunkManager.render(shader);
+		_chunkManager.render(chunkShader);
+
+		Expected<mlm::ivec3, bool>	rayWorldCoord = _chunkManager.castRayIncluding();
+		if (rayWorldCoord.hasValue())
+		{
+			cubeShader.use();
+			cubeShader.set_mat4("projection", projection);
+			cubeShader.set_mat4("view", view);
+			mlm::mat4	model(1.0f);
+			mlm::vec3 pos = static_cast<mlm::vec3>(rayWorldCoord.value()) - _camera.getPos();
+			model = mlm::translate(model, pos);
+			cubeShader.set_mat4("model", model);
+			cubeMesh.draw(cubeShader);
+		}
 
 		glfwSwapBuffers(Window::get_window());
 		glfwPollEvents();

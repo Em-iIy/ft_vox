@@ -537,6 +537,61 @@ bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 	return (block->getTransparent());
 }
 
+Expected<mlm::ivec3, bool>	ChunkManager::castRayIncluding()
+{
+	const float	stepSize = 0.25f;
+	const int	stepDepth = 50;
+
+	mlm::vec3	cameraPos = _engine.getCamera().getPos();
+	mlm::vec3	cameraViewDir = _engine.getCamera().getViewDir();
+
+	for (int step = 0; step < stepDepth; ++step)
+	{
+		mlm::vec3	rayWorldPos = cameraPos + cameraViewDir * (step * stepSize);
+		mlm::ivec3	rayWorldCoord = getWorldCoord(rayWorldPos);
+		if (!isBlockTransparent(rayWorldCoord))
+			return (rayWorldCoord);
+	}
+	return (false);
+}
+
+Expected<mlm::ivec3, bool>	ChunkManager::castRayExcluding()
+{
+	const float	stepSize = 0.25f;
+	const int	stepDepth = 50;
+
+	mlm::vec3	cameraPos = _engine.getCamera().getPos();
+	mlm::vec3	cameraViewDir = _engine.getCamera().getViewDir();
+	mlm::ivec3	ret = getWorldCoord(cameraPos);
+	for (int step = 0; step < stepDepth; ++step)
+	{
+		mlm::vec3	rayWorldPos = cameraPos + cameraViewDir * (step * stepSize);
+		mlm::ivec3	rayWorldCoord = getWorldCoord(rayWorldPos);
+		if (!isBlockTransparent(rayWorldCoord))
+			return (ret);
+		ret = rayWorldCoord;
+	}
+	return (false);
+}
+
+void	ChunkManager::placeBlock(Block block)
+{
+	Expected<mlm::ivec3, bool>	rayWorldCoord = castRayExcluding();
+	if (rayWorldCoord.hasValue() && rayWorldCoord.value() != getWorldCoord(_engine.getCamera().getPos()))
+	{
+		setBlock(rayWorldCoord.value(), block);
+	}
+}
+
+void	ChunkManager::deleteBlock()
+{
+	Expected<mlm::ivec3, bool>	rayWorldCoord = castRayIncluding();
+	if (rayWorldCoord.hasValue())
+	{
+		setBlock(rayWorldCoord.value(), Block::AIR);
+	}
+}
+
 void						ChunkManager::setUpdateVisibility()
 {
 	_updateVisibility = true;

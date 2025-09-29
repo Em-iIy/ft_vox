@@ -30,6 +30,7 @@ class Camera {
 		mlm::mat4		getViewMatrix() const;
 		float			getZoom() const;
 		const mlm::vec3	&getPos() const;
+		const mlm::vec3	&getViewDir() const;
 
 		void			setPos(const mlm::vec3 &pos);
 

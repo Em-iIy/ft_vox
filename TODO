@@ -39,8 +39,9 @@
 	- save chunk to file
 	+ multithreaded
 	- placing blocks
+		+ switch block types
 		+ update neighboring chunks
-		- ray casting from camera
+		+ ray casting from camera
 
 - Terrain generation
 	- move generation to separate class
