@@ -9,9 +9,15 @@ Created on: 29/09/2025
 const mlm::vec3	SKY_COLOR(0.4f, 0.7f, 0.9f);
 const mlm::vec3	WATER_COLOR(0.0f, 0.0f, 0.8f);
 
+const float		FOG_WATER_NEAR = 0.0f;
+const float		FOG_NEAR = 120.0f;
+const float		FOG_FAR = 160.0f;
+
+const float		CLIPPING_NEAR = 0.25f;
+const float		CLIPPING_FAR = 640.0f;
+
 Renderer::Renderer(VoxEngine &engine, ChunkManager &manager, Camera &camera): _engine(engine), _manager(manager), _camera(camera)
-{
-}
+{}
 
 Renderer::~Renderer()
 {}
@@ -79,11 +85,11 @@ void	Renderer::renderChunks()
 	_chunkShader.set_mat4("view", _view);
 
 	if (_isUnderwater)
-		_chunkShader.set_float("uFogNear", 0.0f);
+		_chunkShader.set_float("uFogNear", FOG_WATER_NEAR);
 	else
-		_chunkShader.set_float("uFogNear", 120.0f);
+		_chunkShader.set_float("uFogNear", FOG_NEAR);
 
-	_chunkShader.set_float("uFogFar", 160.0f);
+	_chunkShader.set_float("uFogFar", FOG_FAR);
 	_chunkShader.set_vec3("uFogColor", _bgColor);
 
 	_engine.getAtlas().bind();
@@ -100,7 +106,7 @@ void	Renderer::renderUI()
 		_cubeShader.set_mat4("projection", _projection);
 		_cubeShader.set_mat4("view", _view);
 		mlm::mat4	model(1.0f);
-		mlm::vec3 pos = static_cast<mlm::vec3>(rayWorldCoord.value()) - _camera.getPos();
+		mlm::vec3	pos = static_cast<mlm::vec3>(rayWorldCoord.value()) - _camera.getPos();
 		model = mlm::translate(model, pos);
 		_cubeShader.set_mat4("model", model);
 		_cubeMesh.draw(_cubeShader);
@@ -110,7 +116,7 @@ void	Renderer::renderUI()
 void			Renderer::updateProjection()
 {
 	mlm::vec2	size = static_cast<mlm::vec2>(_engine.get_size());
-	_projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 640.0f);
+	_projection = mlm::perspective(_camera.getZoom(), size.x / size.y, CLIPPING_NEAR, CLIPPING_FAR);
 }
 
 void			Renderer::updateView()
