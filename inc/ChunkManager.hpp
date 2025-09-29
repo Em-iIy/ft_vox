@@ -48,9 +48,16 @@ class ChunkManager {
 		void																update();
 		void																render(Shader &shader);
 
+		Expected<Block *, int>												getBlock(const mlm::vec3 &blockCoord);
 		Expected<Block *, int>												getBlock(const mlm::ivec3 &blockCoord);
+
+		void																setBlock(const mlm::vec3 &blockCoord, Block block);
 		void																setBlock(const mlm::ivec3 &blockCoord, Block block);
+
+		Expected<Block::Type, int>											getBlockType(const mlm::vec3 &blockCoord);
 		Expected<Block::Type, int>											getBlockType(const mlm::ivec3 &blockCoord);
+
+		bool																isBlockTransparent(const mlm::vec3 &blockCoord);
 		bool																isBlockTransparent(const mlm::ivec3 &blockCoord);
 	
 		void																setUpdateVisibility();

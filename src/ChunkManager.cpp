@@ -27,7 +27,7 @@ int	roundUp(int num, int mult)
 constexpr int LOG2_CHUNK_SIZE_X = std::bit_width(CHUNK_SIZE_X) - 1;
 constexpr int LOG2_CHUNK_SIZE_Z = std::bit_width(CHUNK_SIZE_Z) - 1;
 
-mlm::ivec2 getChunkCoord(const mlm::ivec3 &worldCoord)
+mlm::ivec2	getChunkCoord(const mlm::ivec3 &worldCoord)
 {
 	return mlm::ivec2(
 		worldCoord.x >> LOG2_CHUNK_SIZE_X,
@@ -35,12 +35,21 @@ mlm::ivec2 getChunkCoord(const mlm::ivec3 &worldCoord)
 	);
 }
 
-mlm::ivec3 getBlockChunkCoord(const mlm::ivec3 &worldCoord)
+mlm::ivec3	getBlockChunkCoord(const mlm::ivec3 &worldCoord)
 {
 	return mlm::ivec3(
 		worldCoord.x & (CHUNK_SIZE_X - 1),
 		worldCoord.y,
 		worldCoord.z & (CHUNK_SIZE_Z - 1)
+	);
+}
+
+mlm::ivec3	getWorldCoord(const mlm::vec3 &coord)
+{
+	return mlm::ivec3(
+		static_cast<int>(std::floor(coord.x)),
+		static_cast<int>(std::floor(coord.y)),
+		static_cast<int>(std::floor(coord.z))
 	);
 }
 
@@ -420,6 +429,11 @@ void						ChunkManager::render(Shader &shader)
 	chunkRenderList.clear();
 }
 
+Expected<Block *, int>	ChunkManager::getBlock(const mlm::vec3 &blockCoord)
+{
+	return (getBlock(getWorldCoord(blockCoord)));
+}
+
 Expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 {
 	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
@@ -433,6 +447,11 @@ Expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
 	Block					&block = chunk->getBlock(blockChunkCoord);
 	return (&block);
+}
+
+void	ChunkManager::setBlock(const mlm::vec3 &blockCoord, Block block)
+{
+	setBlock(getWorldCoord(blockCoord), block);
 }
 
 void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
@@ -480,6 +499,10 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 	_updateVisibility = true;
 }
 
+Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::vec3 &blockCoord)
+{
+	return (getBlockType(getWorldCoord(blockCoord)));
+}
 
 Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::ivec3 &blockCoord)
 {
@@ -494,6 +517,11 @@ Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::ivec3 &blockCoo
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
 	Block::Type				blockType = chunk->getBlockType(blockChunkCoord);
 	return (blockType);
+}
+
+bool						ChunkManager::isBlockTransparent(const mlm::vec3 &blockCoord)
+{
+	return (isBlockTransparent(getWorldCoord(blockCoord)));
 }
 
 bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)

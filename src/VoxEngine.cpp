@@ -59,10 +59,10 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_LEFT_CONTROL, [this]() {_camera.toggleSprint();});
 	_input.addOnReleaseCallback(GLFW_KEY_LEFT_CONTROL, [this]() {_camera.toggleSprint();});
 
-	_input.addOnDownCallback(GLFW_KEY_1, [this]() {_chunkManager.setBlock(static_cast<mlm::ivec3>(_camera.getPos()), Block::STONE);});
-	_input.addOnDownCallback(GLFW_KEY_2, [this]() {_chunkManager.setBlock(static_cast<mlm::ivec3>(_camera.getPos()), Block::WATER);});
-	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.setBlock(static_cast<mlm::ivec3>(_camera.getPos()), Block::GRASS);});
-	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_RIGHT, [this]() {_chunkManager.setBlock(static_cast<mlm::ivec3>(_camera.getPos()), Block::AIR);});
+	_input.addOnDownCallback(GLFW_KEY_1, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::STONE);});
+	_input.addOnDownCallback(GLFW_KEY_2, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::WATER);});
+	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::GRASS);});
+	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_RIGHT, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::AIR);});
 
 	// Random other key inputs
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
@@ -106,7 +106,7 @@ void	VoxEngine::mainLoop()
 		mlm::mat4	view = _camera.getViewMatrix();
 		shader.set_mat4("view", view);
 
-		auto block = _chunkManager.getBlockType(static_cast<mlm::ivec3>(_camera.getPos()));
+		auto block = _chunkManager.getBlockType(_camera.getPos());
 		if (block.hasValue() && block.value() == Block::WATER)
 		{
 			shader.set_float("uFogNear", 0.0f);
