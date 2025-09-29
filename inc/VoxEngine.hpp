@@ -13,6 +13,7 @@ Created on: 24/07/2025
 #include "ChunkManager.hpp"
 #include "Atlas.hpp"
 #include "Frustum.hpp"
+#include "Renderer.hpp"
 
 const mlm::ivec2	WINDOW_SIZE(1000, 1000);
 
@@ -49,4 +50,5 @@ class VoxEngine: public Window {
 		Atlas			_atlas;
 		Camera			_camera;
 		Frustum			_frustum;
+		Renderer		_renderer;
 };

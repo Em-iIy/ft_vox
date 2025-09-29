@@ -17,6 +17,7 @@ FILES_SRCS = \
 			Plane.cpp \
 			AABB.cpp \
 			Frustum.cpp \
+			Renderer.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

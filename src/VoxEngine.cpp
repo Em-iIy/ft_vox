@@ -25,7 +25,7 @@ mlm::vec3	randVec3()
 
 mlm::ivec3	getWorldCoord(const mlm::vec3 &coord);
 
-VoxEngine::VoxEngine(): _chunkManager(*this)
+VoxEngine::VoxEngine(): _chunkManager(*this), _renderer(*this, _chunkManager, _camera)
 {}
 
 VoxEngine::~VoxEngine()
@@ -78,99 +78,23 @@ void	VoxEngine::init()
 	{
 		std::cerr << "Uh oh no atlas we lost :/" << std::endl;
 	}
+	_renderer.init();
 }
 
 void	VoxEngine::mainLoop()
 {
 
 	Shader	chunkShader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
-	Shader	cubeShader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
-
-	std::vector<Vertex>		vertices = {
-		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(0.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(0.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(0.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-	};
-	std::vector<uint32_t>	indices = {
-		0, 2, 1,
-		1, 2, 3,
-		4, 5, 6,
-		5, 7, 6,
-		0, 4, 6,
-		0, 6, 2,
-		1, 7, 5,
-		1, 3, 7,
-		2, 6, 7,
-		2, 7, 3,
-		1, 4, 0,
-		1, 5, 4,
-	};
-	Mesh	cubeMesh(vertices, indices);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
 	#ifdef FPS
 	int frame = 0;
 	float time = glfwGetTime();
 	#endif
-	mlm::vec3	bgColor = mlm::vec3(0.4f, 0.7f, 0.9f);
-	mlm::vec3	tempBgColor = bgColor;
 	while (!glfwWindowShouldClose(Window::get_window()))
 	{
 		_input.handleKeys();
 		Window::update();
-		mlm::vec2	size = static_cast<mlm::vec2>(get_size());
-		
-		mlm::mat4	projection = mlm::perspective(_camera.getZoom(), size.x / size.y, .5f, 640.0f);
-		chunkShader.use();
-		chunkShader.set_mat4("projection", projection);
-
-		mlm::mat4	view = _camera.getViewMatrix();
-		chunkShader.set_mat4("view", view);
-
-		auto block = _chunkManager.getBlockType(_camera.getPos());
-		if (block.hasValue() && block.value() == Block::WATER)
-		{
-			chunkShader.set_float("uFogNear", 0.0f);
-			tempBgColor = mlm::vec3(0.0f, 0.0f, 0.8f);
-		}
-		else
-		{
-			chunkShader.set_float("uFogNear", 120.0f);
-			tempBgColor = bgColor;
-		}
-
-		chunkShader.set_float("uFogFar", 160.0f);
-		chunkShader.set_vec3("uFogColor", tempBgColor);
-		updateFrustum(projection, view);
-
-		glClearColor(tempBgColor.x, tempBgColor.y, tempBgColor.z, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glActiveTexture(GL_TEXTURE0);
-		_atlas.bind();
-
-		_chunkManager.update();
-		_chunkManager.render(chunkShader);
-
-		Expected<mlm::ivec3, bool>	rayWorldCoord = _chunkManager.castRayIncluding();
-		if (rayWorldCoord.hasValue())
-		{
-			cubeShader.use();
-			cubeShader.set_mat4("projection", projection);
-			cubeShader.set_mat4("view", view);
-			mlm::mat4	model(1.0f);
-			mlm::vec3 pos = static_cast<mlm::vec3>(rayWorldCoord.value()) - _camera.getPos();
-			model = mlm::translate(model, pos);
-			cubeShader.set_mat4("model", model);
-			cubeMesh.draw(cubeShader);
-		}
+		_renderer.update();
+		_renderer.render();
 
 		glfwSwapBuffers(Window::get_window());
 		glfwPollEvents();
