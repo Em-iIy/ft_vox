@@ -61,9 +61,12 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_LEFT_CONTROL, [this]() {_camera.toggleSprint();});
 	_input.addOnReleaseCallback(GLFW_KEY_LEFT_CONTROL, [this]() {_camera.toggleSprint();});
 
-	_input.addOnDownCallback(GLFW_KEY_1, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::STONE);});
-	_input.addOnDownCallback(GLFW_KEY_2, [this]() {_chunkManager.setBlock(_camera.getPos(), Block::WATER);});
-	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.placeBlock(Block::GRASS);});
+	_input.addOnPressCallback(GLFW_KEY_1, [this]() {_player.setActiveBlock(Block::DIRT);});
+	_input.addOnPressCallback(GLFW_KEY_2, [this]() {_player.setActiveBlock(Block::GRASS);});
+	_input.addOnPressCallback(GLFW_KEY_3, [this]() {_player.setActiveBlock(Block::STONE);});
+	_input.addOnPressCallback(GLFW_KEY_4, [this]() {_player.setActiveBlock(Block::WATER);});
+	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.placeBlock(_player.getActiveBlock());});
+	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_MIDDLE, [this]() {_chunkManager.setBlock(_camera.getPos(), _player.getActiveBlock());});
 	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_RIGHT, [this]() {_chunkManager.deleteBlock();});
 
 	// Random other key inputs

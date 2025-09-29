@@ -18,6 +18,7 @@ FILES_SRCS = \
 			AABB.cpp \
 			Frustum.cpp \
 			Renderer.cpp \
+			Player.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

@@ -14,6 +14,7 @@ Created on: 24/07/2025
 #include "Atlas.hpp"
 #include "Frustum.hpp"
 #include "Renderer.hpp"
+#include "Player.hpp"
 
 const mlm::ivec2	WINDOW_SIZE(1000, 1000);
 
@@ -51,4 +52,5 @@ class VoxEngine: public Window {
 		Camera			_camera;
 		Frustum			_frustum;
 		Renderer		_renderer;
+		Player			_player;
 };
