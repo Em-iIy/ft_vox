@@ -38,7 +38,7 @@
 	+ frustum culling
 	- save chunk to file
 	+ multithreaded
-	- placing blocks
+	+ placing blocks
 		+ switch block types
 		+ update neighboring chunks
 		+ ray casting from camera
@@ -53,6 +53,7 @@
 		+ water
 			+ mesh
 			+ opacity
+				- render to separate framebuffer
 	+ caves
 		+ 3D perlin noise
 
