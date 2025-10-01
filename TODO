@@ -53,7 +53,7 @@
 		+ water
 			+ mesh
 			+ opacity
-				- render to separate framebuffer
+				+ render to separate framebuffer
 	+ caves
 		+ 3D perlin noise
 

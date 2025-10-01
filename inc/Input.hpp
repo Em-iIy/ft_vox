@@ -39,6 +39,7 @@ class Input {
 		void	handleKeys();
 
 		void	toggleWireFrame();
+		bool	getWireFrameMode();
 
 		/*    Callbacks    */
 		static void	resizeCallback(GLFWwindow *window, int x, int y);

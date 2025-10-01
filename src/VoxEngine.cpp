@@ -71,7 +71,7 @@ void	VoxEngine::init()
 
 	// Random other key inputs
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
-	_input.addOnPressCallback(GLFW_KEY_TAB, std::bind(&Input::toggleWireFrame, _input));
+	_input.addOnPressCallback(GLFW_KEY_TAB, [this]() {_input.toggleWireFrame();});
 
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 

@@ -18,6 +18,7 @@ void main()
 	
 	vec4	texColor = texture(atlas, vert_texUV);
 	texColor.rgb = texColor.rgb * length(vert_normal);
-	FragColor = vec4(texColor.rgb, texColor.a);
+	FragColor = vec4(texColor.rgb, 1.0);
+	// FragColor = vec4(texColor.rgb, texColor.a);
 	FragColor.rgb = mix(texColor.rgb, uFogColor, fogFactor);
 }

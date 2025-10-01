@@ -26,8 +26,9 @@ void	Renderer::init()
 {
 	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
+	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
 
-	std::vector<Vertex>		vertices = {
+	std::vector<Vertex>		cubeVertices = {
 		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(0.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
@@ -37,7 +38,7 @@ void	Renderer::init()
 		{mlm::vec3(0.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 	};
-	std::vector<uint32_t>	indices = {
+	std::vector<uint32_t>	cubeIndices = {
 		0, 2, 1,
 		1, 2, 3,
 		4, 5, 6,
@@ -51,7 +52,24 @@ void	Renderer::init()
 		1, 4, 0,
 		1, 5, 4,
 	};
-	_cubeMesh = Mesh(vertices, indices);
+	_cubeMesh = Mesh(cubeVertices, cubeIndices);
+
+	std::vector<Vertex>		quadVertices = {
+		{mlm::vec3(-1.0f, -1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f, 0.0f)},
+		{mlm::vec3(1.0f, -1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(1.0f, 0.0f)},
+		{mlm::vec3(-1.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f, 1.0f)},
+		{mlm::vec3(1.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(1.0f, 1.0f)}
+	};
+	std::vector<uint32_t>	quadIndices = {
+		0, 1, 3,
+		0, 3, 2
+	};
+	_quadMesh = Mesh(quadVertices, quadIndices);
+	
+	mlm::ivec2	size = _engine.get_size();
+	_waterFrameBuffer.generate(size.x, size.y);
+	_waterFrameBuffer.unbind();
+
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -94,11 +112,48 @@ void	Renderer::renderChunks()
 
 	_engine.getAtlas().bind();
 	_manager.update();
-	_manager.render(_chunkShader);
+	_manager.renderChunks(_chunkShader);
+
+	_waterFrameBuffer.bind();
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _waterFrameBuffer.id);
+	int width = _waterFrameBuffer.width;
+	int height = _waterFrameBuffer.height;
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+
+	glEnable(GL_DEPTH_TEST);
+
+	_manager.renderWater(_chunkShader);
+	_waterFrameBuffer.unbind();
+
+	_manager.renderClear();
+
+
+	// glDisable(GL_DEPTH_TEST);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	_waterShader.use();
+	_waterShader.set_float("uWaterOpacity", 0.7f);
+	_waterFrameBuffer.render_texture.bind();
+	_quadMesh.draw(_waterShader);
+
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::renderUI()
 {
+	return ;
 	Expected<mlm::ivec3, bool>	rayWorldCoord = _manager.castRayIncluding();
 	if (rayWorldCoord.hasValue())
 	{

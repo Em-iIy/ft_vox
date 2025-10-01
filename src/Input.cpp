@@ -146,6 +146,11 @@ void	Input::toggleWireFrame()
 	glPolygonMode(GL_FRONT_AND_BACK, wireFrameMode ? GL_LINE : GL_FILL);
 }
 
+bool	Input::getWireFrameMode()
+{
+	return (wireFrameMode);
+}
+
 void	Input::mouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods)
 {
 	void	*ptr = glfwGetWindowUserPointer(window);

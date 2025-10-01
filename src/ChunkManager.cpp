@@ -410,7 +410,7 @@ ChunkManager::ChunkTask	ChunkManager::_popFromQueue()
 	return (ret);
 }
 
-void						ChunkManager::render(Shader &shader)
+void						ChunkManager::renderChunks(Shader &shader)
 {
 	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
 	// _queueMtx.lock();
@@ -422,10 +422,18 @@ void						ChunkManager::render(Shader &shader)
 		(*it)->draw(shader);
 	}
 	// glDisable(GL_CULL_FACE);
+}
+
+void						ChunkManager::renderWater(Shader &shader)
+{
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->drawWater(shader);
 	}
+}
+
+void						ChunkManager::renderClear()
+{
 	chunkRenderList.clear();
 }
 

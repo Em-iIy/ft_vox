@@ -33,12 +33,16 @@ class Renderer {
 
 		Shader			_chunkShader;
 		Shader			_cubeShader;
+		Shader			_waterShader;
+		Shader			_quadShader;
 
 		Mesh			_cubeMesh;
+		Mesh			_quadMesh;
 
 		VoxEngine		&_engine;
 		ChunkManager	&_manager;
 		Camera			&_camera;
+		FrameBuffer		_waterFrameBuffer;
 
 		mlm::mat4		_projection;
 		mlm::mat4		_view;
