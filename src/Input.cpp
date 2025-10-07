@@ -177,6 +177,8 @@ void	Input::mouseButtonCallback(GLFWwindow* window, int button, int action, [[ma
 
 void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
 {
+	if (key == GLFW_KEY_UNKNOWN)
+		return ;
 	void	*ptr = glfwGetWindowUserPointer(window);
 	if (!ptr)
 		return ;
