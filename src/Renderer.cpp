@@ -67,7 +67,12 @@ void	Renderer::init()
 	_quadMesh = Mesh(quadVertices, quadIndices);
 	
 	mlm::ivec2	size = _engine.get_size();
-	_waterFrameBuffer.generate(size.x, size.y);
+	_waterFrameBuffer.create(size.x, size.y);
+	_waterFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
+	_waterFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
+	_waterFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
+	if (_waterFrameBuffer.checkStatus() == true)
+		std::cout << "Water framebuffer ready!" << std::endl;
 	_waterFrameBuffer.unbind();
 
 
@@ -76,6 +81,11 @@ void	Renderer::init()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
+}
+
+void	Renderer::cleanup()
+{
+	_waterFrameBuffer.destroy();
 }
 
 void	Renderer::update()
@@ -87,6 +97,7 @@ void	Renderer::update()
 
 void	Renderer::render()
 {
+
 	glClearColor(_bgColor.x, _bgColor.y, _bgColor.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glActiveTexture(GL_TEXTURE0);
@@ -114,25 +125,18 @@ void	Renderer::renderChunks()
 	_manager.update();
 	_manager.renderChunks(_chunkShader);
 
-	_waterFrameBuffer.bind();
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _waterFrameBuffer.id);
-	int width = _waterFrameBuffer.width;
-	int height = _waterFrameBuffer.height;
-	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
+	_waterFrameBuffer.clear(true, true, mlm::vec4(0.0f));
+	mlm::ivec2	size = _engine.get_size();
+	_waterFrameBuffer.blitDepthFrom(0, size.x, size.y);
 
 	glEnable(GL_DEPTH_TEST);
 
+	_waterFrameBuffer.bind();
 	_manager.renderWater(_chunkShader);
 	_waterFrameBuffer.unbind();
 
 	_manager.renderClear();
-
-
-	// glDisable(GL_DEPTH_TEST);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -143,12 +147,11 @@ void	Renderer::renderChunks()
 
 	_waterShader.use();
 	_waterShader.set_float("uWaterOpacity", 0.7f);
-	_waterFrameBuffer.render_texture.bind();
+	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(0));
 	_quadMesh.draw(_waterShader);
 
 	if (wireFrameMode)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	// glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::renderUI()

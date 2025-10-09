@@ -18,6 +18,7 @@ class Renderer {
 		~Renderer();
 
 		void			init();
+		void			cleanup();
 		void			update();
 		void			render();
 

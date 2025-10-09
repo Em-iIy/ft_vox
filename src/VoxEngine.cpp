@@ -121,6 +121,7 @@ void	VoxEngine::input()
 void	VoxEngine::cleanup()
 {
 	_chunkManager.cleanup();
+	_renderer.cleanup();
 	_atlas.del();
 	glfwTerminate();
 }
