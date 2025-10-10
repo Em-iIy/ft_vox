@@ -26,7 +26,19 @@ class Renderer {
 		mlm::mat4		&getView();
 	
 	private:
+		void			initShaders();
+		void			initMeshes();
+		void			initFrameBuffers();
+
+		void			cleanShaders();
+		void			cleanMeshes();
+		void			cleanFrameBuffers();
+
 		void			renderChunks();
+		void			updateChunkShader();
+		void			renderTerrain();
+		void			renderWater();
+		
 		void			renderUI();
 
 		mlm::vec3		_bgColor;

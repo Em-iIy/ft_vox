@@ -24,10 +24,26 @@ Renderer::~Renderer()
 
 void	Renderer::init()
 {
+	initShaders();
+	initMeshes();
+	initFrameBuffers();
+	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+}
+
+void	Renderer::initShaders()
+{
 	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
+}
 
+void	Renderer::initMeshes()
+{
 	std::vector<Vertex>		cubeVertices = {
 		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
@@ -65,27 +81,46 @@ void	Renderer::init()
 		0, 3, 2
 	};
 	_quadMesh = Mesh(quadVertices, quadIndices);
-	
+}
+
+void	Renderer::initFrameBuffers()
+{
 	mlm::ivec2	size = _engine.get_size();
 	_waterFrameBuffer.create(size.x, size.y);
+	_waterFrameBuffer.bind();
 	_waterFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
 	_waterFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
 	_waterFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
-	if (_waterFrameBuffer.checkStatus() == true)
-		std::cout << "Water framebuffer ready!" << std::endl;
 	_waterFrameBuffer.unbind();
-
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-
+	if (_waterFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Water Framebuffer missing");
 }
 
 void	Renderer::cleanup()
 {
+	cleanShaders();
+	cleanMeshes();
+	cleanFrameBuffers();
+}
+
+void	Renderer::cleanShaders()
+{
+	_chunkShader.del();
+	_cubeShader.del();
+	_waterShader.del();
+	_quadShader.del();
+}
+
+void	Renderer::cleanMeshes()
+{
+	// _cubeMesh.del()
+	// _quadMesh.del()
+}
+
+void	Renderer::cleanFrameBuffers()
+{
 	_waterFrameBuffer.destroy();
+
 }
 
 void	Renderer::update()
@@ -97,19 +132,23 @@ void	Renderer::update()
 
 void	Renderer::render()
 {
-
-	glClearColor(_bgColor.x, _bgColor.y, _bgColor.z, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
 	glActiveTexture(GL_TEXTURE0);
 
 	renderChunks();
 	renderUI();
-
 }
 
 void	Renderer::renderChunks()
 {
 	_chunkShader.use();
+	updateChunkShader();
+	renderTerrain();
+	renderWater();
+}
+
+void	Renderer::updateChunkShader()
+{
 	_chunkShader.set_mat4("projection", _projection);
 	_chunkShader.set_mat4("view", _view);
 
@@ -122,24 +161,26 @@ void	Renderer::renderChunks()
 	_chunkShader.set_vec3("uFogColor", _bgColor);
 
 	_engine.getAtlas().bind();
-	_manager.update();
+}
+
+void	Renderer::renderTerrain()
+{
 	_manager.renderChunks(_chunkShader);
+}
 
-
+void	Renderer::renderWater()
+{
+	_waterFrameBuffer.bind();
 	_waterFrameBuffer.clear(true, true, mlm::vec4(0.0f));
+
 	mlm::ivec2	size = _engine.get_size();
 	_waterFrameBuffer.blitDepthFrom(0, size.x, size.y);
-
-	glEnable(GL_DEPTH_TEST);
-
 	_waterFrameBuffer.bind();
+	
 	_manager.renderWater(_chunkShader);
 	_waterFrameBuffer.unbind();
 
 	_manager.renderClear();
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	bool wireFrameMode = _engine.getInput().getWireFrameMode();
 	if (wireFrameMode)
@@ -156,7 +197,6 @@ void	Renderer::renderChunks()
 
 void	Renderer::renderUI()
 {
-	return ;
 	Expected<mlm::ivec3, bool>	rayWorldCoord = _manager.castRayIncluding();
 	if (rayWorldCoord.hasValue())
 	{

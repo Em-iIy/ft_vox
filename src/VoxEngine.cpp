@@ -96,6 +96,7 @@ void	VoxEngine::mainLoop()
 	{
 		_input.handleKeys();
 		Window::update();
+		_chunkManager.update();
 		_renderer.update();
 		_renderer.render();
 
