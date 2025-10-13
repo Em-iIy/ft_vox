@@ -80,7 +80,7 @@ static uint64_t	index3D(const mlm::ivec3 &coord)
 	return (coord.z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + coord.y * CHUNK_SIZE_X + coord.x);
 }
 
-static bool		shouldDrawFace(Expected<Block *, int> &neighborResult, Block &block)
+static bool		shouldDrawFace(Expected<Block, int> &neighborResult, Block &block)
 {
 	if (!neighborResult.hasValue())
 	{
@@ -88,7 +88,7 @@ static bool		shouldDrawFace(Expected<Block *, int> &neighborResult, Block &block
 			return (true);
 		return (false);
 	}
-	Block &neighbor = *neighborResult.value();
+	Block neighbor = neighborResult.value();
 	if (block.getType() == Block::WATER && neighbor.getType() == Block::AIR)
 		return (true);
 	if (block.getTransparent() == false && neighbor.getTransparent() == true)
@@ -141,12 +141,12 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		mlm::vec3(0.0f, 1.0f, 1.0f) + pos, //   6 front top left
 		mlm::vec3(1.0f, 1.0f, 1.0f) + pos, //    7 front top right
 	};
-	Block		&block = getBlock(ipos);
+	Block		block = getBlock(ipos);
 	Atlas		&atlas = _manager.getEngine().getAtlas();
 	const std::vector<mlm::vec2>	&offsets = atlas.getOffset(block.getType());
 	const std::vector<mlm::vec2>	&uvCorners = atlas.getCorners();
 
-	std::vector<Expected<Block *, int>> blockNeighbors;
+	std::vector<Expected<Block, int>> blockNeighbors;
 	for (const mlm::ivec3 &neighbor : neighbors)
 	{
 		mlm::ivec3	neighborIpos = ipos + neighbor;
@@ -158,7 +158,7 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 		)
 			blockNeighbors.push_back(_manager.getBlock(worldPos + neighbor));
 		else
-			blockNeighbors.push_back(&getBlock(neighborIpos));
+			blockNeighbors.push_back(getBlock(neighborIpos));
 	}
 
 	// top face
@@ -434,10 +434,10 @@ void	Chunk::upload()
 	setState(UPLOADED);
 }
 
-Block	&Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
+Block	Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
 	_blockMtx.lock();
-	Block &ret = blocks[index3D(blockChunkCoord)];
+	Block ret = blocks[index3D(blockChunkCoord)];
 	_blockMtx.unlock();
 	return (ret);
 }

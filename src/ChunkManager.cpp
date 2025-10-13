@@ -437,12 +437,12 @@ void						ChunkManager::renderClear()
 	chunkRenderList.clear();
 }
 
-Expected<Block *, int>	ChunkManager::getBlock(const mlm::vec3 &blockCoord)
+Expected<Block, int>	ChunkManager::getBlock(const mlm::vec3 &blockCoord)
 {
 	return (getBlock(getWorldCoord(blockCoord)));
 }
 
-Expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
+Expected<Block, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 {
 	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
 		return (1);
@@ -453,8 +453,8 @@ Expected<Block *, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 	if (!chunk)
 		return (0);
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
-	Block					&block = chunk->getBlock(blockChunkCoord);
-	return (&block);
+	Block					block = chunk->getBlock(blockChunkCoord);
+	return (block);
 }
 
 void	ChunkManager::setBlock(const mlm::vec3 &blockCoord, Block block)
@@ -541,8 +541,8 @@ bool						ChunkManager::isBlockTransparent(const mlm::ivec3 &blockCoord)
 			return (false);
 		return (true);
 	}
-	Block	*block = result.value();
-	return (block->getTransparent());
+	Block	block = result.value();
+	return (block.getTransparent());
 }
 
 Expected<mlm::ivec3, bool>	ChunkManager::castRayIncluding()

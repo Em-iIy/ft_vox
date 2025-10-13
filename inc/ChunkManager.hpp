@@ -50,8 +50,8 @@ class ChunkManager {
 		void																renderWater(Shader &shader);
 		void																renderClear();
 
-		Expected<Block *, int>												getBlock(const mlm::vec3 &blockCoord);
-		Expected<Block *, int>												getBlock(const mlm::ivec3 &blockCoord);
+		Expected<Block, int>												getBlock(const mlm::vec3 &blockCoord);
+		Expected<Block, int>												getBlock(const mlm::ivec3 &blockCoord);
 
 		void																setBlock(const mlm::vec3 &blockCoord, Block block);
 		void																setBlock(const mlm::ivec3 &blockCoord, Block block);

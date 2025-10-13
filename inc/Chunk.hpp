@@ -42,7 +42,7 @@ class Chunk {
 		void															mesh();
 		void															upload();
 
-		Block															&getBlock(const mlm::ivec3 &blockChunkCoord);
+		Block															getBlock(const mlm::ivec3 &blockChunkCoord);
 		bool															setBlock(const mlm::ivec3 &blockChunkCoord, Block block);
 		Block::Type														getBlockType(const mlm::ivec3 &blockChunkCoord);
 		std::pair<mlm::vec3 &, mlm::vec3 &>								getMinMax();
