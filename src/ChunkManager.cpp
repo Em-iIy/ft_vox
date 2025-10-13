@@ -5,6 +5,7 @@ Created on: 19/08/2025
 
 #include "ChunkManager.hpp"
 #include "VoxEngine.hpp"
+#include "Coords.hpp"
 
 #include <memory>
 
@@ -18,40 +19,6 @@ const int	THREAD_COUNT = 8;
 const int	RENDER_DISTANCE = 10;
 
 int	getChunkCount();
-
-int	roundUp(int num, int mult)
-{
-	return ((num + mult - 1) & -mult);
-}
-
-constexpr int LOG2_CHUNK_SIZE_X = std::bit_width(CHUNK_SIZE_X) - 1;
-constexpr int LOG2_CHUNK_SIZE_Z = std::bit_width(CHUNK_SIZE_Z) - 1;
-
-mlm::ivec2	getChunkCoord(const mlm::ivec3 &worldCoord)
-{
-	return mlm::ivec2(
-		worldCoord.x >> LOG2_CHUNK_SIZE_X,
-		worldCoord.z >> LOG2_CHUNK_SIZE_Z
-	);
-}
-
-mlm::ivec3	getBlockChunkCoord(const mlm::ivec3 &worldCoord)
-{
-	return mlm::ivec3(
-		worldCoord.x & (CHUNK_SIZE_X - 1),
-		worldCoord.y,
-		worldCoord.z & (CHUNK_SIZE_Z - 1)
-	);
-}
-
-mlm::ivec3	getWorldCoord(const mlm::vec3 &coord)
-{
-	return mlm::ivec3(
-		static_cast<int>(std::floor(coord.x)),
-		static_cast<int>(std::floor(coord.y)),
-		static_cast<int>(std::floor(coord.z))
-	);
-}
 
 ChunkManager::ChunkManager(VoxEngine &engine): _engine(engine)
 {}
@@ -326,7 +293,6 @@ void						ChunkManager::_updateCameraChunkCoord()
 	}
 }
 
-
 bool						ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 {
 	// if loadable from file
@@ -351,16 +317,6 @@ void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 	chunksMtx.lock();
 	chunks.erase(chunkCoord);
 	chunksMtx.unlock();
-}
-
-
-bool	checkEmpty(std::deque<ChunkManager::ChunkCallback> &queue, std::mutex &mtx)
-{
-	bool ret;
-	mtx.lock();
-	ret = queue.empty();
-	mtx.unlock();
-	return (ret);
 }
 
 void	ChunkManager::_ThreadRoutine()
@@ -473,7 +429,6 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 	if (!chunk)
 		return ;
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
-
 
 	bool updated = chunk->setBlock(blockChunkCoord, block);
 	if (updated == false)

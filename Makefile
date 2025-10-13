@@ -19,6 +19,7 @@ FILES_SRCS = \
 			Frustum.cpp \
 			Renderer.cpp \
 			Player.cpp \
+			Coords.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 

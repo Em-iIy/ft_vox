@@ -11,6 +11,8 @@ Created on: 06/08/2025
 
 #include "VoxEngine.hpp"
 
+#include "Coords.hpp"
+
 int chunk_count = 0;
 const int g_seed = 4242;
 
@@ -68,16 +70,6 @@ Chunk::~Chunk()
 	}
 	_busyMtx.unlock();
 	chunk_count--;
-}
-
-static uint64_t	index3D(uint64_t x, uint64_t y, uint64_t z)
-{
-	return (z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + y * CHUNK_SIZE_X + x);
-}
-
-static uint64_t	index3D(const mlm::ivec3 &coord)
-{
-	return (coord.z * (CHUNK_SIZE_Y * CHUNK_SIZE_X) + coord.y * CHUNK_SIZE_X + coord.x);
 }
 
 static bool		shouldDrawFace(Expected<Block, int> &neighborResult, Block &block)
