@@ -393,6 +393,13 @@ void						ChunkManager::renderClear()
 	chunkRenderList.clear();
 }
 
+void						ChunkManager::unloadAll()
+{
+	chunksMtx.lock();
+	chunks.clear();
+	chunksMtx.unlock();
+}
+
 Expected<Block, int>	ChunkManager::getBlock(const mlm::vec3 &blockCoord)
 {
 	return (getBlock(getWorldCoord(blockCoord)));

@@ -13,7 +13,7 @@ Created on: 06/08/2025
 
 #include "Coords.hpp"
 
-int chunk_count = 0;
+std::atomic<int> chunk_count = 0;
 const int g_seed = 4242;
 
 enum Faces {

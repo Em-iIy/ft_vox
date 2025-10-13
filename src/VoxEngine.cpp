@@ -49,6 +49,9 @@ void	VoxEngine::init()
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
+	// Reload all chunks?
+	_input.addOnPressCallback(GLFW_KEY_R, [this]() {_chunkManager.unloadAll();});
+
 	// Camera movement (maybe move into separate setup function)
 	_input.addOnDownCallback(GLFW_KEY_W, [this]() {_camera.processKeyboard(Camera::FORWARD, get_delta_time());});
 	_input.addOnDownCallback(GLFW_KEY_S, [this]() {_camera.processKeyboard(Camera::BACKWARD, get_delta_time());});
