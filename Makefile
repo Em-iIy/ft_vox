@@ -28,6 +28,7 @@ DIR_SRCS = ./src/
 DIR_OBJS = ./obj/
 DIR_LIB = ./lib/
 DIR_GLU = $(DIR_LIB)glu/
+DIR_JSP = $(DIR_LIB)json-parser/
 
 vpath %.cpp \
 	$(DIR_SRCS) \
@@ -41,6 +42,9 @@ OBJS = $(FILES_OBJS:%=$(DIR_OBJS)%)
 # ----------------------------------------Libs
 GLU = $(DIR_GLU)libgl-utils.a
 GLU_SM = $(DIR_GLU).git
+
+JSP = $(DIR_JSP)libjson-parser.a
+JSP_SM = $(DIR_JSP).git
 
 # ----------------------------------------Flags
 CC = c++
@@ -75,6 +79,12 @@ $(GLU): $(GLU_SM)
 	$(MAKE) -C $(DIR_GLU)
 
 $(GLU_SM):
+	@$(MAKE) submodule
+
+$(JSP): $(JSP_SM)
+	$(MAKE) -C $(DIR_JSP)
+
+$(JSP_SM):
 	@$(MAKE) submodule
 
 submodule:
