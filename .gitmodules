@@ -1,3 +1,6 @@
 [submodule "lib/glu"]
 	path = lib/glu
 	url = https://github.com/em-iiy/gl-utils.git
+[submodule "lib/json-parser"]
+	path = lib/json-parser
+	url = https://github.com/Em-iIy/JSON-parser.git
