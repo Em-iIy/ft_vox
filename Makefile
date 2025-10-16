@@ -66,8 +66,8 @@ all:
 	@$(MAKE) $(NAME) -j4
 .PHONY: all
 
-$(NAME): $(GLU) $(DIR_OBJS) $(OBJS)
-	$(CC) -o $(NAME) $(OBJS) $(GLU) $(CFLAGS) $(LFLAGS)
+$(NAME): $(GLU) $(JSP) $(DIR_OBJS) $(OBJS)
+	$(CC) -o $(NAME) $(OBJS) $(GLU) $(JSP) $(CFLAGS) $(LFLAGS)
 
 $(DIR_OBJS)%.o : %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
@@ -116,4 +116,5 @@ re: fclean all
 
 libs:
 	$(MAKE) re -C $(DIR_GLU)
+	$(MAKE) re -C $(DIR_JSP)
 .PHONY: libs

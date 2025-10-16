@@ -6,6 +6,7 @@ Created on: 24/07/2025
 #pragma once
 
 #include "glu/gl-utils.hpp"
+#include "json-parser/json-parser.hpp"
 #include "Camera.hpp"
 #include "Input.hpp"
 #include "Block.hpp"
