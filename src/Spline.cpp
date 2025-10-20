@@ -7,7 +7,20 @@ Created on: 24/08/2025
 
 #include <algorithm>
 
+Spline::Spline()
+{
+}
+
 Spline::Spline(const std::vector<mlm::vec2> &points)
+{
+	setPoints(points);
+}
+
+Spline::~Spline()
+{
+}
+
+void	Spline::setPoints(const std::vector<mlm::vec2> &points)
 {
 	if (points.size() < 2)
 		throw std::runtime_error("Spline must contain at least 2 points");
@@ -21,10 +34,6 @@ Spline::Spline(const std::vector<mlm::vec2> &points)
 			return (a.x < b.x);
 		}
 	);
-}
-
-Spline::~Spline()
-{
 }
 
 float	Spline::evaluate(float t) const
@@ -47,6 +56,13 @@ float	Spline::evaluate(float t) const
 	const float	localT = (t - p1.x) / (p2.x - p1.x);
 
 	return (catmullRom(p0.y, p1.y, p2.y, p3.y, localT));
+}
+
+bool	Spline::isReady()
+{
+	if (_points.size() < 2)
+		return (false);
+	return (true);
 }
 
 // https://www.mvps.org/directx/articles/catmull/

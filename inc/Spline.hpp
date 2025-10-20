@@ -12,10 +12,15 @@ Created on: 24/08/2025
 class Spline
 {
 	public:
+		Spline();
 		Spline(const std::vector<mlm::vec2> &points);
 		~Spline();
 		
+		void	setPoints(const std::vector<mlm::vec2> &points);
+
 		float	evaluate(float t) const;
+		
+		bool	isReady();
 	private:
 		std::vector<mlm::vec2>	_points;
 
