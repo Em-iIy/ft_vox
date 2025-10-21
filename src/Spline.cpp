@@ -16,6 +16,17 @@ Spline::Spline(const std::vector<mlm::vec2> &points)
 	setPoints(points);
 }
 
+Spline::Spline(const Spline &src)
+{
+	setPoints(src._points);
+}
+
+Spline	&Spline::operator=(const Spline &src)
+{
+	setPoints(src._points);
+	return (*this);
+}
+
 Spline::~Spline()
 {
 }

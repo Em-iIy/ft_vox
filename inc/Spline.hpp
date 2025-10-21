@@ -14,6 +14,8 @@ class Spline
 	public:
 		Spline();
 		Spline(const std::vector<mlm::vec2> &points);
+		Spline(const Spline &src);
+		Spline	&operator=(const Spline &src);
 		~Spline();
 		
 		void	setPoints(const std::vector<mlm::vec2> &points);
