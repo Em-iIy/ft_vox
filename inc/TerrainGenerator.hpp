@@ -3,6 +3,8 @@ Created by: Emily (Em_iIy) Winnink
 Created on: 13/10/2025
 */
 
+#pragma once
+
 #include "Spline.hpp"
 #include "Block.hpp"
 

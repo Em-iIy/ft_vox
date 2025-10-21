@@ -1,0 +1,11 @@
+{
+	"terrainGenerator": {
+		"path": "terrain.json"
+	},
+	"renderer": {
+		"path": null
+	},
+	"atlas": {
+		"path": null
+	}
+}
