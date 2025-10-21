@@ -64,48 +64,50 @@ void	Settings::ensurePaths()
 	}
 }
 
+static void	loadSpline(Spline &target, JSON::NodePtr node)
+{
+	JSON::ListPtr			array = node->getList();
+	std::size_t				len = array->size();
+	std::vector<mlm::vec2>	points;
+
+	points.reserve(len / 2);
+	for (std::size_t i = 0; i + 1 < len; i += 2)
+	{
+		mlm::vec2 temp = mlm::vec2((*array)[i]->getNumber(), (*array)[i + 1]->getNumber());
+		points.push_back(temp);
+	}
+	target.setPoints(points);
+}
+
+static void	loadNoiseSettings(NoiseSettings &target, JSON::NodePtr node)
+{
+	loadSpline(target.spline, node->get("spline"));
+	target.depth = node->get("depth")->getNumber();
+	target.step = node->get("step")->getNumber();
+	target.zoom = node->get("zoom")->getNumber();
+	target.dimensions = node->get("dimensions")->getNumber();
+}
+
 TerrainGeneratorDTO	Settings::loadTerrainGenerator()
 {
+	TerrainGeneratorDTO terrainDto;
 	try
 	{
 		JSON::Parser	terrainGeneratorJSON(_paths.at("terrainGenerator"));
 
-		std::cout << terrainGeneratorJSON.getRoot()->stringify() << std::endl;
+		JSON::NodePtr	root = terrainGeneratorJSON.getRoot();
+		terrainDto.seed = root->get("seed")->getNumber();
+		terrainDto.seaLevel = root->get("seaLevel")->getNumber();
+		terrainDto.caveDiameter = root->get("caveDiameter")->getNumber();
+
+		JSON::NodePtr	NoiseSettings = root->get("noiseSettings");
+		loadNoiseSettings(terrainDto.continentalness, NoiseSettings->get("continentalness"));
+		loadNoiseSettings(terrainDto.cave, NoiseSettings->get("cave"));
+		// std::cout << root->stringify() << std::endl;
+		return (terrainDto);
 	}
 	catch(const std::exception& e)
 	{
 		throw std::runtime_error("Settings: " + std::string(e.what()));
 	}
-	
-	TerrainGeneratorDTO terrainDto = {
-		.seed = 4242,
-		.seaLevel = 110,
-		.caveDiameter = 0.02f,
-		.continentalness = {
-			.spline = Spline({
-				mlm::vec2(-1.0f, 250.0f),
-				mlm::vec2(-0.8f, 95.0f),
-				mlm::vec2(-0.2f, 95.0f),
-				mlm::vec2(0.0f, 108.0f),
-				mlm::vec2(0.25f, 120.0f),
-				mlm::vec2(0.45f, 180.0f),
-				mlm::vec2(1.00f, 200.0f)
-			}),
-			.depth = 5,
-			.step = 2.0,
-			.zoom = 400,
-			.dimensions = 2,
-		},
-		.cave = {
-			.spline = Spline({
-				mlm::vec2(-1.0f, -1.0f),
-				mlm::vec2(1.0f, 1.0f),
-			}),
-			.depth = 1,
-			.step = 1.0,
-			.zoom = 160,
-			.dimensions = 3,
-		},
-	};
-	return (terrainDto);
 }
