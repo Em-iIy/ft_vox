@@ -16,6 +16,7 @@ Created on: 24/07/2025
 #include "Frustum.hpp"
 #include "Renderer.hpp"
 #include "Player.hpp"
+#include "TerrainGenerator.hpp"
 
 const mlm::ivec2	WINDOW_SIZE(1000, 1000);
 

@@ -20,6 +20,7 @@ FILES_SRCS = \
 			Renderer.cpp \
 			Player.cpp \
 			Coords.cpp \
+			TerrainGenerator.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
