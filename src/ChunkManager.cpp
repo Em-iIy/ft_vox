@@ -399,6 +399,7 @@ void						ChunkManager::unloadAll()
 {
 	chunksMtx.lock();
 	chunks.clear();
+	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
 	chunksMtx.unlock();
 }
 
