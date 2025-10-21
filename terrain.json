@@ -1,7 +1,7 @@
 {
 	"seed": 4242,
 	"seaLevel": 110,
-	"caveDiameter": 0.2,
+	"caveDiameter": 0.02,
 	"noiseSettings": {
 		"continentalness": {
 			"spline": [
