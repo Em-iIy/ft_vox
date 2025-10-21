@@ -11,8 +11,15 @@ int main(int argc, char **argv)
 {
 	VoxEngine	engine;
 
-	Settings::loadPaths(argc, argv);
+	try
+	{
+		Settings::loadPaths(argc, argv);
+		engine.run();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 
-	engine.run();
 	return (0);
 }

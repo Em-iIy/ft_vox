@@ -49,10 +49,10 @@ void						ChunkManager::init()
 	_renderDistance = RENDER_DISTANCE + 1;
 	_updateCameraChunkCoord();
 	_threads.reserve(THREAD_COUNT);
+	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
 	for (int i = 0; i < THREAD_COUNT; ++i)
 		_threads.emplace_back(&ChunkManager::_ThreadRoutine, this);
 	
-	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
 }
 
 void						ChunkManager::update()
@@ -399,7 +399,16 @@ void						ChunkManager::unloadAll()
 {
 	chunksMtx.lock();
 	chunks.clear();
-	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
+	try
+	{
+		TerrainGeneratorPtr newGenerator = std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator());
+		_generator.store(newGenerator);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
 	chunksMtx.unlock();
 	_updateVisibility = true;
 }
