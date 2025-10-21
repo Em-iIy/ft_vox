@@ -8,6 +8,8 @@ Created on: 19/08/2025
 #include "glu/gl-utils.hpp"
 #include "Chunk.hpp"
 #include "Expected.hpp"
+#include "TerrainGenerator.hpp"
+#include "Settings.hpp"
 
 #include <unordered_map>
 #include <set>
@@ -92,6 +94,8 @@ class ChunkManager {
 		std::atomic<bool>													_running = true;
 
 		VoxEngine															&_engine;
+
+		std::atomic<TerrainGeneratorPtr>									_generator;
 
 		std::atomic<bool>													_updateVisibility = true;
 		mlm::ivec2															_cameraChunkCoord = {2147483647};

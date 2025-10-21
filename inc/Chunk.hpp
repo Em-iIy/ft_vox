@@ -8,6 +8,7 @@ Created on: 06/08/2025
 #include "Block.hpp"
 #include "ChunkManager.hpp"
 #include "ChunkMesh.hpp"
+#include "TerrainGenerator.hpp"
 
 #include <array>
 #include <atomic>
@@ -36,7 +37,7 @@ class Chunk {
 		Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager);
 		~Chunk();
 
-		void															generate();
+		void															generate(TerrainGeneratorPtr generator);
 		void															draw(Shader &shader);
 		void															drawWater(Shader &shader);
 		void															mesh();

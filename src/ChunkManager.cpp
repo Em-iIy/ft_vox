@@ -51,6 +51,8 @@ void						ChunkManager::init()
 	_threads.reserve(THREAD_COUNT);
 	for (int i = 0; i < THREAD_COUNT; ++i)
 		_threads.emplace_back(&ChunkManager::_ThreadRoutine, this);
+	
+	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
 }
 
 void						ChunkManager::update()
@@ -342,7 +344,7 @@ void	ChunkManager::_ThreadRoutine()
 		switch (task.type)
 		{
 			case ChunkTask::Type::GENERATE:
-				chunk->generate();
+				chunk->generate(std::atomic_load(&_generator));
 				break;
 			case ChunkTask::Type::MESH:
 				chunk->mesh();

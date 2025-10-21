@@ -4,17 +4,12 @@ Created on: 06/08/2025
 */
 
 #include "Chunk.hpp"
-
 #include "Perlin.hpp"
-
 #include "Spline.hpp"
-
 #include "VoxEngine.hpp"
-
 #include "Coords.hpp"
 
 std::atomic<int> chunk_count = 0;
-const int g_seed = 4242;
 
 enum Faces {
 	TOP,
@@ -296,56 +291,22 @@ int	heightRand(uint64_t seed, const mlm::ivec3 &pos)
 	return (ret);
 }
 
-void	Chunk::generate()
+void	Chunk::generate(TerrainGeneratorPtr generator)
 {
 	_busyMtx.lock();
-	const int	seaLevel = 110;
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
 		{
-			mlm::ivec3	iPos(x, 0, z);
-			int			tempYMax = heightRand(g_seed, iPos + _worldPos);
+			int	terrainHeight = generator->getTerrainHeight(mlm::ivec2(x + _worldPos.x, z + _worldPos.z));
 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
-				iPos.y = y;
-				mlm::ivec3	pos = iPos + _worldPos;
+				mlm::ivec3	pos = _worldPos + mlm::ivec3(x, y, z);
 				uint64_t	index = index3D(x, y, z);
-				Block::Type type = Block::STONE;
-				if (iPos.y > tempYMax)
-				{
-					type = iPos.y <= seaLevel ? Block::WATER : Block::AIR;
-					_blockMtx.lock();
-					blocks[index].setType(type);
-					blocks[index].setEnabled(type == Block::AIR ? false : true);
-					_blockMtx.unlock();
-				}
-				else
-				{
-					if (iPos.y == tempYMax)
-					{
-						if (iPos.y < seaLevel)
-							type = Block::DIRT;
-						else
-							type = Block::GRASS;
-					}
-					else if (iPos.y < tempYMax && iPos.y > tempYMax - 4)
-						type = Block::DIRT;
-					_blockMtx.lock();
-					blocks[index].setType(type);
-					blocks[index].setEnabled(true);
-					_blockMtx.unlock();
-					float value = temp3(g_seed, pos);
-					float value2 = temp3(g_seed + 1, pos);
-					if ((iPos.y != 0 && (std::abs(value) < 0.02f && std::abs(value2) < 0.02f)))
-					{
-						type = tempYMax <= seaLevel ? Block::WATER : Block::AIR;
-						_blockMtx.lock();
-						blocks[index].setType(type);
-						blocks[index].setEnabled(type == Block::AIR ? false : true);
-						_blockMtx.unlock();
-					}
-				}
+				Block		block = generator->getBlock(pos, terrainHeight);
+				_blockMtx.lock();
+				blocks[index] = block;
+				_blockMtx.unlock();
 			}
 		}
 	}

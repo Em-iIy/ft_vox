@@ -5,6 +5,8 @@ Created on: 13/10/2025
 
 #pragma once
 
+#include <memory>
+
 #include "Spline.hpp"
 #include "Block.hpp"
 
@@ -57,3 +59,5 @@ class TerrainGenerator {
 		static float	_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t depth, float step);
 		static float	_octaves3D(uint64_t seed, const mlm::vec3 &pos, uint64_t depth, float step);
 };
+
+using TerrainGeneratorPtr = std::shared_ptr<TerrainGenerator>;
