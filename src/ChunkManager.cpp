@@ -401,6 +401,7 @@ void						ChunkManager::unloadAll()
 	chunks.clear();
 	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
 	chunksMtx.unlock();
+	_updateVisibility = true;
 }
 
 Expected<Block, int>	ChunkManager::getBlock(const mlm::vec3 &blockCoord)
