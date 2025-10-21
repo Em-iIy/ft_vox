@@ -13,8 +13,6 @@ int main(int argc, char **argv)
 
 	Settings::loadPaths(argc, argv);
 
-	TerrainGenerator	terrain(Settings::loadTerrainGenerator());
-
 	engine.run();
 	return (0);
 }
