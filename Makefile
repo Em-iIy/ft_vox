@@ -97,7 +97,7 @@ submodule:
 
 run-tsan:
 	export TSAN_OPTIONS=$(TSAN_OPTIONS); \
-	./$(NAME)
+	./$(NAME) settings.json
 .PHONY: run-tsan
 
 lines:
