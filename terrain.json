@@ -1,0 +1,32 @@
+{
+	"seed": 4242,
+	"seaLevel": 110,
+	"caveDiameter": 0.2,
+	"noiseSettings": {
+		"continentalness": {
+			"spline": [
+				-1.0, 250.0,
+				-0.8, 95.0,
+				-0.2, 95.0,
+				0.0, 108.0,
+				0.25, 120.0,
+				0.45, 180.0,
+				1.00, 200.0
+			],
+			"depth": 5,
+			"step": 2.0,
+			"zoom": 400.0,
+			"dimensions": 2
+		},
+		"cave": {
+			"spline": [
+				-1.0, -1.0,
+				1.0, 1.0
+			],
+			"depth": 1,
+			"step": 1.0,
+			"zoom": 160.0,
+			"dimensions": 3
+		}
+	}
+}
