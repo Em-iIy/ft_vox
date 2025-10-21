@@ -3,9 +3,9 @@
 		"path": "terrain.json"
 	},
 	"renderer": {
-		"path": null
+		"path": ""
 	},
 	"atlas": {
-		"path": null
+		"path": ""
 	}
 }

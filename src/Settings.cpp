@@ -5,7 +5,19 @@ Created on: 21/10/2025
 
 #include "Settings.hpp"
 
-Settings::Settings(int argc, char **argv)
+#include <vector>
+
+std::map<std::string, std::string>	Settings::_paths;
+
+const std::vector<std::string>			requiredPaths = {
+	"terrainGenerator",
+	"renderer",
+	"atlas",
+};
+
+Settings::Settings() {}
+
+void	Settings::loadPaths(int argc, char **argv)
 {
 	if (argc != 2)
 		throw std::runtime_error("Settings: Missing settings file");
@@ -14,30 +26,49 @@ Settings::Settings(int argc, char **argv)
 		JSON::Parser	settingsJSON(argv[1]);
 
 		JSON::NodePtr	settingsRoot = settingsJSON.getRoot();
-		_terrainGenerator = settingsRoot->get("terrainGenerator")->get("path")->getString();
+		JSON::ObjectPtr	rootObj = settingsRoot->getObject();
+		for (auto &[key, val] : *rootObj)
+		{
+			_paths[key] = val->get("path")->getString();
+		}
+		ensurePaths();
 	}
 	catch(const std::exception& e)
 	{
 		throw std::runtime_error("Settings: " + std::string(e.what()));
 	}
-	
 }
 
-Settings::~Settings()
+void	Settings::ensurePaths()
 {
-
+	bool	complete = true;
+	if (_paths.size() < requiredPaths.size())
+		complete = false;
+	else
+	{
+		for (const std::string &path : requiredPaths)
+		{
+			if (!_paths.contains(path))
+			{
+				complete = false;
+				break ;
+			}
+		}
+	}
+	if (!complete)
+	{
+		std::string msg = "Missing paths - Make sure to include: ";
+		for (const std::string &path : requiredPaths)
+			msg += "`" + path + "` ";
+		throw std::runtime_error(msg);
+	}
 }
 
-const std::string	&Settings::getTerrainGeneratorFilename() const
-{
-	return (_terrainGenerator);
-}
-
-TerrainGeneratorDTO	Settings::loadTerrainGenerator(const std::string &filename)
+TerrainGeneratorDTO	Settings::loadTerrainGenerator()
 {
 	try
 	{
-		JSON::Parser	terrainGeneratorJSON(filename);
+		JSON::Parser	terrainGeneratorJSON(_paths.at("terrainGenerator"));
 
 		std::cout << terrainGeneratorJSON.getRoot()->stringify() << std::endl;
 	}

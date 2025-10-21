@@ -8,17 +8,20 @@ Created on: 21/10/2025
 #include "TerrainGenerator.hpp"
 #include "json-parser/json-parser.hpp"
 
+#include <map>
+
 class Settings {
 	public:
-		Settings(int argc, char **argv);
-		~Settings();
+		Settings();
 
-		const std::string			&getTerrainGeneratorFilename() const;
+		static void					loadPaths(int argc, char **argv);
 
-		static TerrainGeneratorDTO	loadTerrainGenerator(const std::string &filename);
+		static void					ensurePaths();
+
+		static TerrainGeneratorDTO	loadTerrainGenerator();
 
 	private:
 		// Setting filenames
-		std::string					_terrainGenerator;
+		static	std::map<std::string, std::string>	_paths;
 
 };

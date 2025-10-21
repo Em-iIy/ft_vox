@@ -11,9 +11,9 @@ int main(int argc, char **argv)
 {
 	VoxEngine	engine;
 
-	Settings	settings(argc, argv);
+	Settings::loadPaths(argc, argv);
 
-	TerrainGenerator	terrain(Settings::loadTerrainGenerator(settings.getTerrainGeneratorFilename()));
+	TerrainGenerator	terrain(Settings::loadTerrainGenerator());
 
 	engine.run();
 	return (0);
