@@ -80,7 +80,7 @@ TerrainGeneratorDTO	Settings::loadTerrainGenerator()
 	TerrainGeneratorDTO terrainDto = {
 		.seed = 4242,
 		.seaLevel = 110,
-		.caveDiameter = 0.2f,
+		.caveDiameter = 0.02f,
 		.continentalness = {
 			.spline = Spline({
 				mlm::vec2(-1.0f, 250.0f),

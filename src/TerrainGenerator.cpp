@@ -39,7 +39,7 @@ Block	TerrainGenerator::getBlock(const mlm::ivec3 &pos, int terrainHeight)
 	if (pos.y > terrainHeight)
 		type = Block::AIR;
 
-	if (terrainHeight <= _seaLevel)
+	if (pos.y <= _seaLevel && terrainHeight < _seaLevel)
 		underwater = true;
 	
 	if (pos.y == terrainHeight)
@@ -48,9 +48,12 @@ Block	TerrainGenerator::getBlock(const mlm::ivec3 &pos, int terrainHeight)
 		type = Block::DIRT;
 
 	// Only check for caves if block type is solid
-	if (type != Block::AIR)
-		if (isCave(pos))
-			type = Block::AIR;
+	// if (type != Block::AIR)
+	if (isCave(pos))
+		type = Block::AIR;
+
+	if (type == Block::AIR && underwater)
+		type = Block::WATER;
 
 	Block ret(type);
 	return (ret);
