@@ -44,7 +44,7 @@
 		+ ray casting from camera
 
 - Terrain generation
-	- move generation to separate class
+	+ move generation to separate class
 	+ different noise values per block
 	+ splines
 	- biomes
@@ -66,21 +66,21 @@
 - Settings
 	- create configs
 		- input verification
-		- chunk dimensions
+		x chunk dimensions
 		- render distance
-		- terrain generation
-			- spline settings
-			- noise settings
-				- octaves
-				- amplitude
-				- frequency
-		- seed
+		+ terrain generation
+			+ spline settings
+			+ noise settings
+				+ octaves
+				+ amplitude
+				+ frequency
+		+ seed
 		- load map
-	? reload
+	+ reload
 
 
 general
 	+ make alternative for std::expected :(
 	+ clean up helper functions in chunk and chunk management (static in class etc)
 
-- follow voxel engine tutorial (https://sites.google.com/site/letsmakeavoxelengine/home/basic-block-rendering)
++ follow voxel engine tutorial (https://sites.google.com/site/letsmakeavoxelengine/home/basic-block-rendering)
