@@ -19,6 +19,12 @@ ChunkManagerDTO	Settings::loadChunkManager()
 		chunkManagerDto.maxGenerate = root->get("maxGenerate")->getNumber();
 		chunkManagerDto.maxMesh = root->get("maxMesh")->getNumber();
 
+		if ((chunkManagerDto.maxMesh < 1)
+			|| (chunkManagerDto.maxGenerate < 1)
+			|| (chunkManagerDto.maxLoad < 1)
+			|| (chunkManagerDto.threadCount < 1)
+			|| (chunkManagerDto.renderDistance < 1))
+			throw std::runtime_error("chunkManager settings can't be smaller than 1");
 		return (chunkManagerDto);
 	}
 	catch(const std::exception& e)
