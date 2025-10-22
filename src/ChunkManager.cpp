@@ -3,19 +3,12 @@ Created by: Emily (Em_iIy) Winnink
 Created on: 19/08/2025
 */
 
+#include "Settings.hpp"
 #include "ChunkManager.hpp"
 #include "VoxEngine.hpp"
 #include "Coords.hpp"
 
 #include <memory>
-
-const int	MAX_LOAD_PER_FRAME = 8;
-const int	MAX_GENERATE_PER_FRAME = 8;
-const int	MAX_MESH_PER_FRAME = 8;
-
-const int	THREAD_COUNT = 8;
-
-const int	RENDER_DISTANCE = 10;
 
 int	getChunkCount();
 
@@ -42,13 +35,18 @@ void						ChunkManager::cleanup()
 	chunks.clear();
 }
 
-void						ChunkManager::init()
+void						ChunkManager::init(const ChunkManagerDTO &dto)
 {
-	_renderDistance = RENDER_DISTANCE + 1;
+	_renderDistance = dto.renderDistance + 1;
+	_threadCount = dto.threadCount;
+	_maxLoad = dto.maxLoad;
+	_maxGenerate = dto.maxGenerate;
+	_maxMesh = dto.maxMesh;
+
 	_updateCameraChunkCoord();
-	_threads.reserve(THREAD_COUNT);
+	_threads.reserve(_threadCount);
 	_generator.store(std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator()));
-	for (int i = 0; i < THREAD_COUNT; ++i)
+	for (int i = 0; i < _threadCount; ++i)
 		_threads.emplace_back(&ChunkManager::_ThreadRoutine, this);
 	
 }
@@ -70,7 +68,7 @@ void						ChunkManager::_updateLoadList()
 	int	loadCount = 0;
 	for (const mlm::ivec2 &pos : chunkLoadList)
 	{
-		if (loadCount >= MAX_LOAD_PER_FRAME)
+		if (loadCount >= _maxLoad)
 			break ;
 		if (_loadChunk(pos) == true)
 		{
@@ -86,7 +84,7 @@ void						ChunkManager::_updateGenerateList()
 	int	generateCount = 0;
 	for (std::shared_ptr<Chunk> chunk : chunkGenerateList)
 	{
-		if (generateCount >= MAX_GENERATE_PER_FRAME)
+		if (generateCount >= _maxGenerate)
 			break ;
 		if (chunk && chunk->getState() == Chunk::LOADED)
 		{
@@ -113,7 +111,7 @@ void						ChunkManager::_updateMeshList()
 	int	remeshCount = 0;
 	for (std::shared_ptr<Chunk> chunk : chunkMeshList)
 	{
-		if (remeshCount >= MAX_MESH_PER_FRAME)
+		if (remeshCount >= _maxMesh)
 			break ;
 		if (chunk && (chunk->getState() == Chunk::GENERATED || chunk->_dirty == true))
 		{

@@ -11,6 +11,7 @@ FILES_SRCS = \
 			Chunk.cpp \
 			Perlin.cpp \
 			ChunkManager.cpp \
+			loadChunkManager.cpp \
 			ChunkMesh.cpp \
 			Spline.cpp \
 			Atlas.cpp \

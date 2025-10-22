@@ -6,6 +6,7 @@ Created on: 21/10/2025
 #pragma once
 
 #include "TerrainGenerator.hpp"
+#include "ChunkManager.hpp"
 #include "json-parser/json-parser.hpp"
 
 #include <map>
@@ -19,6 +20,7 @@ class Settings {
 		static void					ensurePaths();
 
 		static TerrainGeneratorDTO	loadTerrainGenerator();
+		static ChunkManagerDTO		loadChunkManager();
 
 	private:
 		// Setting filenames

@@ -9,7 +9,6 @@ Created on: 19/08/2025
 #include "Chunk.hpp"
 #include "Expected.hpp"
 #include "TerrainGenerator.hpp"
-#include "Settings.hpp"
 
 #include <unordered_map>
 #include <set>
@@ -32,6 +31,14 @@ struct ivec2Hash {
 class Chunk;
 class VoxEngine;
 
+struct ChunkManagerDTO {
+	int	renderDistance;
+	int	threadCount;
+	int	maxLoad;
+	int	maxGenerate;
+	int	maxMesh;
+};
+
 class ChunkManager {
 	public:
 		using ChunkCallback = std::function<void()>;
@@ -45,7 +52,7 @@ class ChunkManager {
 		~ChunkManager();
 
 		void																cleanup();
-		void																init();
+		void																init(const ChunkManagerDTO &dto);
 
 		void																update();
 		void																renderChunks(Shader &shader);
@@ -90,6 +97,7 @@ class ChunkManager {
 		std::deque<ChunkTask>												_queue;
 		std::mutex															_queueMtx;
 		std::vector<std::thread>											_threads;
+		int																	_threadCount = {};
 		std::atomic<bool>													_running = true;
 
 		VoxEngine															&_engine;
@@ -101,6 +109,10 @@ class ChunkManager {
 		int																	_renderDistance = {};
 		mlm::ivec2															_renderMin = {0};
 		mlm::ivec2															_renderMax = {0};
+
+		int																	_maxLoad;
+		int																	_maxGenerate;
+		int																	_maxMesh;
 
 		void																_updateLoadList();
 		void																_updateGenerateList();

@@ -4,6 +4,7 @@ Created on: 24/07/2025
 */
 
 #include "VoxEngine.hpp"
+#include "Settings.hpp"
 
 #include "Frustum.hpp"
 
@@ -79,7 +80,7 @@ void	VoxEngine::init()
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
-	_chunkManager.init();
+	_chunkManager.init(Settings::loadChunkManager());
 	if (_atlas.load("./resources/textures/texture_atlas.bmp", 8) == false)
 	{
 		std::cerr << "Uh oh no atlas we lost :/" << std::endl;

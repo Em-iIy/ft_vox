@@ -11,7 +11,7 @@ std::map<std::string, std::string>	Settings::_paths;
 
 const std::vector<std::string>			requiredPaths = {
 	"terrainGenerator",
-	"manager",
+	"chunkManager",
 	"renderer",
 	"atlas",
 };
