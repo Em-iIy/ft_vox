@@ -177,7 +177,10 @@ void	Renderer::renderWater()
 	_waterFrameBuffer.blitDepthFrom(0, size.x, size.y);
 	_waterFrameBuffer.bind();
 	
+
+	glDisable(GL_CULL_FACE);
 	_manager.renderWater(_chunkShader);
+	glEnable(GL_CULL_FACE);
 	_waterFrameBuffer.unbind();
 
 	_manager.renderClear();
