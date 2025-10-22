@@ -12,7 +12,6 @@ Created on: 19/08/2025
 const int	MAX_LOAD_PER_FRAME = 8;
 const int	MAX_GENERATE_PER_FRAME = 8;
 const int	MAX_MESH_PER_FRAME = 8;
-const int	MAX_UPDATE_PER_FRAME = 8;
 
 const int	THREAD_COUNT = 8;
 
@@ -36,7 +35,6 @@ void						ChunkManager::cleanup()
 	chunkLoadList.clear();
 	chunkGenerateList.clear();
 	chunkMeshList.clear();
-	chunkUpdateFlagList.clear();
 	chunkUnloadList.clear();
 	chunkVisibleList.clear();
 	chunkRenderList.clear();
@@ -62,7 +60,6 @@ void						ChunkManager::update()
 	_updateMeshList();
 	_updateUnloadList();
 	_updateUploadList();
-	_updateFlagList();
 	_updateVisibleList();
 	_updateRenderList();
 	_updateCameraChunkCoord();
@@ -128,11 +125,6 @@ void						ChunkManager::_updateMeshList()
 				chunksMtx.unlock();
 				if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::DIRTY)
 					break ;
-				if (chunk->getState() != Chunk::DIRTY && false)
-				{
-					if (chunkNeighbor && chunkNeighbor->getState() >= Chunk::MESHED)
-						chunkUpdateFlagList.insert(chunkNeighbor);
-				}
 				neighborSetupCount++;
 			}
 			if (neighborSetupCount == neighbors.size())
@@ -177,23 +169,6 @@ void						ChunkManager::_updateUploadList()
 		}
 	}
 	chunkUploadList.clear();
-}
-
-void						ChunkManager::_updateFlagList()
-{
-	int	updateCount = 0;
-	std::vector<std::shared_ptr<Chunk>>	temp;
-	temp.reserve(MAX_UPDATE_PER_FRAME);
-	for (std::shared_ptr<Chunk> chunk : chunkUpdateFlagList)
-	{
-		if (updateCount >= MAX_UPDATE_PER_FRAME)
-			break ;
-		chunk->setState(Chunk::DIRTY);
-		temp.push_back(chunk);
-		updateCount++;
-	}
-	for (std::shared_ptr<Chunk> &chunk : temp)
-		chunkUpdateFlagList.erase(chunk);
 }
 
 void						ChunkManager::_updateVisibleList()

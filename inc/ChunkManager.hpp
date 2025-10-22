@@ -81,7 +81,6 @@ class ChunkManager {
 		std::vector<mlm::ivec2>												chunkLoadList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkGenerateList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkMeshList = {};
-		std::set<std::shared_ptr<Chunk>>									chunkUpdateFlagList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkUnloadList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkUploadList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkVisibleList = {};
@@ -108,7 +107,6 @@ class ChunkManager {
 		void																_updateMeshList();
 		void																_updateUnloadList();
 		void																_updateUploadList();
-		void																_updateFlagList();
 		void																_updateVisibleList();
 		void																_updateRenderList();
 
