@@ -1,0 +1,57 @@
+{
+	"atlas": {
+		"path": "resources/textures/",
+		"name": "texture_atlas.bmp"
+	},
+	"pixelWidth": "8",
+	"textures": {
+		"Block::AIR": [7, 7],
+		"Block::DIRT": [1, 7],
+		"Block::GRASS::TOP": [0, 7],
+		"Block::GRASS::SIDE": [0, 6],
+		"Block::STONE": [2, 7],
+		"Block::WATER": [3, 7]
+	},
+	"blocks": {
+		"Block::AIR": {
+			"TOP": "Block::AIR",
+			"EAST": "Block::AIR",
+			"WEST": "Block::AIR",
+			"NORTH": "Block::AIR",
+			"SOUTH": "Block::AIR",
+			"BOTTOM": "Block::AIR"
+		},
+		"Block::DIRT": {
+			"TOP": "Block::DIRT",
+			"EAST": "Block::DIRT",
+			"WEST": "Block::DIRT",
+			"NORTH": "Block::DIRT",
+			"SOUTH": "Block::DIRT",
+			"BOTTOM": "Block::DIRT"
+		},
+		"Block::GRASS": {
+			"TOP": "Block::GRASS::TOP",
+			"EAST": "Block::GRASS::SIDE",
+			"WEST": "Block::GRASS::SIDE",
+			"NORTH": "Block::GRASS::SIDE",
+			"SOUTH": "Block::GRASS::SIDE",
+			"BOTTOM": "Block::DIRT"
+		},
+		"Block::STONE": {
+			"TOP": "Block::STONE",
+			"EAST": "Block::STONE",
+			"WEST": "Block::STONE",
+			"NORTH": "Block::STONE",
+			"SOUTH": "Block::STONE",
+			"BOTTOM": "Block::STONE"
+		},
+		"Block::WATER": {
+			"TOP": "Block::WATER",
+			"EAST": "Block::WATER",
+			"WEST": "Block::WATER",
+			"NORTH": "Block::WATER",
+			"SOUTH": "Block::WATER",
+			"BOTTOM": "Block::WATER"
+		}
+	}
+}
