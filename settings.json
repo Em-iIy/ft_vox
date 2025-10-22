@@ -2,6 +2,9 @@
 	"terrainGenerator": {
 		"path": "terrain.json"
 	},
+	"manager": {
+		"path": "manager.json"
+	},
 	"renderer": {
 		"path": ""
 	},

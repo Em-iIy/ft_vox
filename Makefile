@@ -21,6 +21,7 @@ FILES_SRCS = \
 			Player.cpp \
 			Coords.cpp \
 			TerrainGenerator.cpp \
+			loadTerrainGenerator.cpp \
 			Settings.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
@@ -34,6 +35,7 @@ DIR_JSP = $(DIR_LIB)json-parser/
 
 vpath %.cpp \
 	$(DIR_SRCS) \
+	$(DIR_SRCS)settings/ \
 
 # ----------------------------------------Sources
 SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
@@ -101,8 +103,8 @@ run-tsan:
 .PHONY: run-tsan
 
 lines:
-	wc -l src/*.cpp inc/*.hpp
-# 	wc -l src/*.cpp inc/*.hpp lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
+	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp
+# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
 .PHONY: lines
 # ----------------------------------------Cleaning
 clean:

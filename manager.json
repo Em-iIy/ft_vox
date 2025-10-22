@@ -1,0 +1,7 @@
+{
+	"renderDistance": 10,
+	"threadCount": 8,
+	"maxLoad": 8,
+	"maxGenerate": 8,
+	"maxMesh": 8
+}
