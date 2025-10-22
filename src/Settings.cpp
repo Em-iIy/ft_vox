@@ -30,7 +30,7 @@ void	Settings::loadPaths(int argc, char **argv)
 		JSON::ObjectPtr	rootObj = settingsRoot->getObject();
 		for (auto &[key, val] : *rootObj)
 		{
-			_paths[key] = val->get("path")->getString();
+			_paths[key] = val->get("path")->getString() + val->get("name")->getString();
 		}
 		ensurePaths();
 	}

@@ -1,14 +1,18 @@
 {
 	"terrainGenerator": {
-		"path": "terrain.json"
+		"path": "resources/settings/",
+		"name": "terrain.json"
 	},
-	"manager": {
-		"path": "manager.json"
+	"chunkManager": {
+		"path": "resources/settings/",
+		"name": "manager.json"
 	},
 	"renderer": {
-		"path": ""
+		"path": "",
+		"name": ""
 	},
 	"atlas": {
-		"path": ""
+		"path": "",
+		"name": ""
 	}
 }
