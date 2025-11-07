@@ -102,6 +102,8 @@ void	VoxEngine::mainLoop()
 		Window::update();
 		_chunkManager.update();
 		_renderer.update();
+		updateFrustum(_renderer.getProjection(), _renderer.getView());
+
 		_renderer.render();
 
 		glfwSwapBuffers(Window::get_window());
