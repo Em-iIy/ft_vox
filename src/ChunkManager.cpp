@@ -343,7 +343,7 @@ ChunkManager::ChunkTask	ChunkManager::_popFromQueue()
 
 void						ChunkManager::renderChunks(Shader &shader)
 {
-	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " f" << chunkUpdateFlagList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
+	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
 	// _queueMtx.lock();
 	// std::cerr << "queue size: " << _queue.size() << std::endl;
 	// _queueMtx.unlock();
