@@ -7,6 +7,7 @@ Created on: 21/10/2025
 
 #include "TerrainGenerator.hpp"
 #include "ChunkManager.hpp"
+#include "Atlas.hpp"
 #include "json-parser/json-parser.hpp"
 
 #include <map>
@@ -21,6 +22,7 @@ class Settings {
 
 		static TerrainGeneratorDTO	loadTerrainGenerator();
 		static ChunkManagerDTO		loadChunkManager();
+		static AtlasDTO				loadAtlas();
 
 	private:
 		// Setting filenames

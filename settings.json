@@ -12,7 +12,7 @@
 		"name": ""
 	},
 	"atlas": {
-		"path": "",
-		"name": ""
+		"path": "resources/settings/",
+		"name": "atlas.json"
 	}
 }

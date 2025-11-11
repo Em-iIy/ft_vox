@@ -10,6 +10,22 @@ Created on: 27/08/2025
 
 #include <unordered_map>
 
+
+struct AtlasDTO {
+	enum class SIDE {
+		TOP = 0,
+		EAST,
+		WEST,
+		NORTH,
+		SOUTH,
+		BOTTOM
+	};
+	std::unordered_map<std::string, mlm::vec2>					textureOffsets;
+	std::string													filename;
+	int															pixelWidth;
+	std::unordered_map<Block::Type, std::vector<std::string>>	blockOffsets;
+};
+
 class Atlas {
 	public:
 		Atlas();

@@ -3,7 +3,7 @@
 		"path": "resources/textures/",
 		"name": "texture_atlas.bmp"
 	},
-	"pixelWidth": "8",
+	"pixelWidth": 8,
 	"textures": {
 		"Block::AIR": [7, 7],
 		"Block::DIRT": [1, 7],

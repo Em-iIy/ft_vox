@@ -23,6 +23,7 @@ FILES_SRCS = \
 			Coords.cpp \
 			TerrainGenerator.cpp \
 			loadTerrainGenerator.cpp \
+			loadAtlas.cpp \
 			Settings.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
