@@ -31,7 +31,7 @@ class Atlas {
 		Atlas();
 		~Atlas();
 
-		bool													load(const std::string &atlasFileName, uint32_t len);
+		bool													load();
 		void													bind();
 		const std::vector<mlm::vec2>							&getOffset(Block::Type blockType);
 		const std::vector<mlm::vec2>							&getCorners();

@@ -4,6 +4,7 @@ Created on: 27/08/2025
 */
 
 #include "Atlas.hpp"
+#include "Settings.hpp"
 
 Atlas::Atlas()
 {}
@@ -11,20 +12,27 @@ Atlas::Atlas()
 Atlas::~Atlas()
 {}
 
-bool	Atlas::load(const std::string &atlasFileName, uint32_t len)
+bool	Atlas::load()
 {
-	bmp_t	bmp = load_bmp(atlasFileName.c_str());
+	AtlasDTO	atlasDto = Settings::loadAtlas();
+
+	bmp_t	bmp = load_bmp(atlasDto.filename.c_str());
 	if (!bmp.data)
 		return (false);
+	
 	mlm::vec2	offsetFormat(0.0f);
-	offsetFormat.x = static_cast<float>(len) / static_cast<float>(bmp.width);
-	offsetFormat.y = static_cast<float>(len) / static_cast<float>(bmp.height);
+	offsetFormat.x = static_cast<float>(atlasDto.pixelWidth) / static_cast<float>(bmp.width);
+	offsetFormat.y = static_cast<float>(atlasDto.pixelWidth) / static_cast<float>(bmp.height);
 
-	_offsets.insert({Block::AIR, {offsetFormat * mlm::vec2(7.0f, 7.0f), offsetFormat * mlm::vec2(7.0f, 7.0f), offsetFormat * mlm::vec2(7.0f, 7.0f), offsetFormat * mlm::vec2(7.0f, 7.0f), offsetFormat * mlm::vec2(7.0f, 7.0f), offsetFormat * mlm::vec2(7.0f, 7.0f)}});
-	_offsets.insert({Block::DIRT, {offsetFormat * mlm::vec2(1.0f, 7.0f), offsetFormat * mlm::vec2(1.0f, 7.0f), offsetFormat * mlm::vec2(1.0f, 7.0f), offsetFormat * mlm::vec2(1.0f, 7.0f), offsetFormat * mlm::vec2(1.0f, 7.0f), offsetFormat * mlm::vec2(1.0f, 7.0f)}});
-	_offsets.insert({Block::GRASS, {offsetFormat * mlm::vec2(0.0f, 7.0f), offsetFormat * mlm::vec2(0.0f, 6.0f), offsetFormat * mlm::vec2(0.0f, 6.0f), offsetFormat * mlm::vec2(0.0f, 6.0f), offsetFormat * mlm::vec2(0.0f, 6.0f), offsetFormat * mlm::vec2(1.0f, 7.0f)}});
-	_offsets.insert({Block::STONE, {offsetFormat * mlm::vec2(2.0f, 7.0f), offsetFormat * mlm::vec2(2.0f, 7.0f), offsetFormat * mlm::vec2(2.0f, 7.0f), offsetFormat * mlm::vec2(2.0f, 7.0f), offsetFormat * mlm::vec2(2.0f, 7.0f), offsetFormat * mlm::vec2(2.0f, 7.0f)}});
-	_offsets.insert({Block::WATER, {offsetFormat * mlm::vec2(3.0f, 7.0f), offsetFormat * mlm::vec2(3.0f, 7.0f), offsetFormat * mlm::vec2(3.0f, 7.0f), offsetFormat * mlm::vec2(3.0f, 7.0f), offsetFormat * mlm::vec2(3.0f, 7.0f), offsetFormat * mlm::vec2(3.0f, 7.0f)}});
+	for (auto &[type, textureOffsetNames] : atlasDto.blockOffsets)
+	{
+		std::vector<mlm::vec2>	temp;
+
+		for (const std::string &textureOffsetName : textureOffsetNames)
+			temp.push_back(atlasDto.textureOffsets.at(textureOffsetName) * offsetFormat);
+		
+		_offsets.insert({type, temp});
+	}
 
 	_uvCorners = {
 		mlm::vec2(0.0f, 0.0f) * (offsetFormat - std::numeric_limits<float>::epsilon()), // bottom left

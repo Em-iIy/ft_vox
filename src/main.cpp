@@ -14,7 +14,6 @@ int main(int argc, char **argv)
 	try
 	{
 		Settings::loadPaths(argc, argv);
-		[[ maybe_unused ]] AtlasDTO atlasDto = Settings::loadAtlas();
 		engine.run();
 	}
 	catch(const std::exception& e)
