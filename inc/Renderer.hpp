@@ -43,6 +43,7 @@ class Renderer {
 
 		mlm::vec3		_bgColor;
 		bool			_isUnderwater = false;
+		mlm::vec3		_sunPos;
 
 		Shader			_chunkShader;
 		Shader			_cubeShader;
@@ -63,6 +64,7 @@ class Renderer {
 		void			updateProjection();
 		void			updateView();
 		void			updateUnderWater();
+		void			updateSunPos();
 
 		// void	renderText();
 };

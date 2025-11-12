@@ -128,6 +128,7 @@ void	Renderer::update()
 	updateProjection();
 	updateView();
 	updateUnderWater();
+	updateSunPos();
 }
 
 void	Renderer::render()
@@ -159,6 +160,7 @@ void	Renderer::updateChunkShader()
 
 	_chunkShader.set_float("uFogFar", FOG_FAR);
 	_chunkShader.set_vec3("uFogColor", _bgColor);
+	_chunkShader.set_vec3("uLightDir", _sunPos);
 
 	_engine.getAtlas().bind();
 }
@@ -238,6 +240,12 @@ void			Renderer::updateUnderWater()
 		_bgColor = SKY_COLOR;
 		_isUnderwater = false;
 	}
+}
+
+void			Renderer::updateSunPos()
+{
+	float	t = glfwGetTime() / 5.0f;
+	_sunPos = mlm::vec3(sinf(t), 0.2f, cosf(t)) * 50.0f;
 }
 
 mlm::mat4	&Renderer::getProjection()

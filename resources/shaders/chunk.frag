@@ -6,6 +6,7 @@ uniform sampler2D	atlas;
 uniform float		uFogNear;
 uniform float		uFogFar;
 uniform vec3		uFogColor;
+uniform vec3		uLightDir;
 
 in vec3	vert_world_pos;
 in vec3	vert_normal;
@@ -17,7 +18,9 @@ void main()
 	float	fogFactor = clamp((dist - uFogNear) / (uFogFar - uFogNear), 0.0, 1.0);
 	
 	vec4	texColor = texture(atlas, vert_texUV);
-	texColor.rgb = texColor.rgb * length(vert_normal);
+	texColor.rgb = texColor.rgb * max(dot(normalize(vert_normal), normalize(uLightDir - vert_world_pos)), 0.2);
+	// texColor.rgb = texColor.rgb * length(vert_normal);
+
 	FragColor = vec4(texColor.rgb, 1.0);
 	// FragColor = vec4(texColor.rgb, texColor.a);
 	FragColor.rgb = mix(texColor.rgb, uFogColor, fogFactor);
