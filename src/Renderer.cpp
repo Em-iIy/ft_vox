@@ -6,7 +6,8 @@ Created on: 29/09/2025
 #include "Renderer.hpp"
 #include "VoxEngine.hpp"
 
-const mlm::vec3	SKY_COLOR(0.4f, 0.7f, 0.9f);
+const mlm::vec3	SKY_COLOR_DAY(0.4f, 0.7f, 0.9f);
+const mlm::vec3	SKY_COLOR_NIGHT(0.05f, 0.1f, 0.2f);
 const mlm::vec3	WATER_COLOR(0.0f, 0.0f, 0.8f);
 
 const float		FOG_WATER_NEAR = 0.0f;
@@ -125,6 +126,7 @@ void	Renderer::cleanFrameBuffers()
 
 void	Renderer::update()
 {
+	updateTime();
 	updateProjection();
 	updateView();
 	updateUnderWater();
@@ -136,6 +138,7 @@ void	Renderer::render()
 	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
 	glActiveTexture(GL_TEXTURE0);
 
+	renderSun();
 	renderChunks();
 	renderUI();
 }
@@ -200,6 +203,35 @@ void	Renderer::renderWater()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
+void	Renderer::renderSun()
+{
+	mlm::mat4	model;
+
+	_cubeShader.use();
+	_cubeShader.set_mat4("projection", _projection);
+	_cubeShader.set_mat4("view", _view);
+
+	// draw sun
+	model = mlm::translate(mlm::mat4(1.0f), _sunPos);
+	model = mlm::scale(model, mlm::vec3(5.0f));
+	_cubeShader.set_mat4("model", model);
+
+	_cubeShader.set_vec3("uColor", mlm::vec3(1.f, 1.0f, .5f));
+	_cubeShader.set_float("uAlpha", 1.0f);
+
+	_cubeMesh.draw(_cubeShader);
+
+	// draw moon
+	model = mlm::translate(mlm::mat4(1.0f), -1.0f * _sunPos);
+	model = mlm::scale(model, mlm::vec3(2.0f));
+	_cubeShader.set_mat4("model", model);
+
+	_cubeShader.set_vec3("uColor", mlm::vec3(1.f, 1.0f, 1.0f));
+	_cubeShader.set_float("uAlpha", 1.0f);
+
+	_cubeMesh.draw(_cubeShader);
+}
+
 void	Renderer::renderUI()
 {
 	Expected<mlm::ivec3, bool>	rayWorldCoord = _manager.castRayIncluding();
@@ -212,6 +244,10 @@ void	Renderer::renderUI()
 		mlm::vec3	pos = static_cast<mlm::vec3>(rayWorldCoord.value()) - _camera.getPos();
 		model = mlm::translate(model, pos);
 		_cubeShader.set_mat4("model", model);
+
+		_cubeShader.set_vec3("uColor", mlm::vec3(0.0f));
+		_cubeShader.set_float("uAlpha", 0.2f);
+
 		_cubeMesh.draw(_cubeShader);
 	}
 }
@@ -227,6 +263,11 @@ void			Renderer::updateView()
 	_view = _camera.getViewMatrix();
 }
 
+mlm::vec3	v3Lerp(const mlm::vec3 &v1, const mlm::vec3 &v2, float t)
+{
+	return (v1 + t * (v2 - v1));
+}
+
 void			Renderer::updateUnderWater()
 {
 	auto	block = _manager.getBlockType(_camera.getPos());
@@ -237,15 +278,19 @@ void			Renderer::updateUnderWater()
 	}
 	else
 	{
-		_bgColor = SKY_COLOR;
+		_bgColor = v3Lerp(SKY_COLOR_NIGHT, SKY_COLOR_DAY, (sinf(_time) + 1.0) / 2);
 		_isUnderwater = false;
 	}
 }
 
 void			Renderer::updateSunPos()
 {
-	float	t = glfwGetTime() / 5.0f;
-	_sunPos = mlm::vec3(sinf(t), 0.2f, cosf(t)) * 50.0f;
+	_sunPos = mlm::vec3(0.2f, sinf(_time), cosf(_time)) * 200.0f;
+}
+
+void			Renderer::updateTime()
+{
+	_time = glfwGetTime() / 60.0f;
 }
 
 mlm::mat4	&Renderer::getProjection()

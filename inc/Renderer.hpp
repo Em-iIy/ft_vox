@@ -38,11 +38,15 @@ class Renderer {
 		void			updateChunkShader();
 		void			renderTerrain();
 		void			renderWater();
+		void			renderSun();
 		
 		void			renderUI();
 
 		mlm::vec3		_bgColor;
 		bool			_isUnderwater = false;
+
+		float			_time;
+
 		mlm::vec3		_sunPos;
 
 		Shader			_chunkShader;
@@ -65,6 +69,7 @@ class Renderer {
 		void			updateView();
 		void			updateUnderWater();
 		void			updateSunPos();
+		void			updateTime();
 
 		// void	renderText();
 };
