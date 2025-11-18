@@ -41,6 +41,7 @@ void	Renderer::initShaders()
 	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
+	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 }
 
 void	Renderer::initMeshes()
@@ -95,6 +96,14 @@ void	Renderer::initFrameBuffers()
 	_waterFrameBuffer.unbind();
 	if (_waterFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
+	
+	_shadowFrameBuffer.create(4096, 4096);
+	_shadowFrameBuffer.bind();
+	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, false, GL_CLAMP_TO_BORDER, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	_shadowFrameBuffer.setDrawBuffers({GL_NONE});
+	_shadowFrameBuffer.unbind();
+	if (_shadowFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Shadow Framebuffer missing");
 }
 
 void	Renderer::cleanup()
@@ -109,7 +118,7 @@ void	Renderer::cleanShaders()
 	_chunkShader.del();
 	_cubeShader.del();
 	_waterShader.del();
-	_quadShader.del();
+	_shadowShader.del();
 }
 
 void	Renderer::cleanMeshes()
@@ -121,7 +130,7 @@ void	Renderer::cleanMeshes()
 void	Renderer::cleanFrameBuffers()
 {
 	_waterFrameBuffer.destroy();
-
+	_shadowFrameBuffer.destroy();
 }
 
 void	Renderer::update()
@@ -136,7 +145,6 @@ void	Renderer::update()
 void	Renderer::render()
 {
 	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
-	glActiveTexture(GL_TEXTURE0);
 
 	renderSun();
 	renderChunks();
@@ -147,6 +155,7 @@ void	Renderer::renderChunks()
 {
 	_chunkShader.use();
 	updateChunkShader();
+	renderShadowMap();
 	renderTerrain();
 	renderWater();
 }
@@ -163,13 +172,47 @@ void	Renderer::updateChunkShader()
 
 	_chunkShader.set_float("uFogFar", FOG_FAR);
 	_chunkShader.set_vec3("uFogColor", _bgColor);
-	_chunkShader.set_vec3("uLightDir", _sunPos);
+	_chunkShader.set_vec3("uLightDir", _sunDir);
 
 	_engine.getAtlas().bind();
 }
 
+void	Renderer::renderShadowMap()
+{
+	_lightProjection = mlm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, 16.0f, 256.0f);
+	_lightView = mlm::lookat(_sunPos, mlm::vec3(0.0f), mlm::vec3(0.0f, 1.0f, 0.0f));
+
+	_shadowShader.use();
+	_shadowShader.set_mat4("lightProjection", _lightProjection);
+	_shadowShader.set_mat4("lightView", _lightView);
+
+	_shadowFrameBuffer.bind();
+	FrameBuffer::clear(false, true, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	glViewport(0, 0, _shadowFrameBuffer.getWidth(), _shadowFrameBuffer.getHeight());
+	glDisable(GL_CULL_FACE);
+	_manager.renderChunks(_shadowShader);
+	glEnable(GL_CULL_FACE);
+	mlm::ivec2	size = _engine.get_size();
+	glViewport(0, 0, size.x, size.y);
+
+	_shadowFrameBuffer.unbind();
+}
+
 void	Renderer::renderTerrain()
 {
+
+	_chunkShader.use();
+
+	_chunkShader.set_mat4("lightProjection", _lightProjection);
+	_chunkShader.set_mat4("lightView", _lightView);
+	glActiveTexture(GL_TEXTURE0);
+	_engine.getAtlas().bind();
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
+
+	_chunkShader.set_int("atlas", 0);
+	_chunkShader.set_int("uShadowMap", 1);
 	_manager.renderChunks(_chunkShader);
 }
 
@@ -196,7 +239,9 @@ void	Renderer::renderWater()
 
 	_waterShader.use();
 	_waterShader.set_float("uWaterOpacity", 0.7f);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(0));
+	_waterShader.set_int("renderTex", 0);
 	_quadMesh.draw(_waterShader);
 
 	if (wireFrameMode)
@@ -212,7 +257,7 @@ void	Renderer::renderSun()
 	_cubeShader.set_mat4("view", _view);
 
 	// draw sun
-	model = mlm::translate(mlm::mat4(1.0f), _sunPos);
+	model = mlm::translate(mlm::mat4(1.0f), _sunPos * 2.0f);
 	model = mlm::scale(model, mlm::vec3(5.0f));
 	_cubeShader.set_mat4("model", model);
 
@@ -285,7 +330,8 @@ void			Renderer::updateUnderWater()
 
 void			Renderer::updateSunPos()
 {
-	_sunPos = mlm::vec3(0.2f, sinf(_time), cosf(_time)) * 200.0f;
+	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(_time), cosf(_time)));
+	_sunPos = _sunDir * 160.0f;
 }
 
 void			Renderer::updateTime()

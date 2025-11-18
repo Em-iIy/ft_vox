@@ -8,7 +8,11 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 
+uniform mat4 lightProjection;
+uniform mat4 lightView;
+
 out vec3	vert_world_pos;
+out vec4	vert_light_pos;
 out vec3	vert_normal;
 out	vec2	vert_texUV;
 
@@ -19,4 +23,5 @@ void main()
 	vec4 world_pos = model * vec4(in_pos, 1.0);
 	vert_world_pos = world_pos.xyz;
 	gl_Position = projection * view * world_pos;
+	vert_light_pos = lightProjection * lightView * world_pos;
 }

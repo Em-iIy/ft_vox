@@ -36,6 +36,7 @@ class Renderer {
 
 		void			renderChunks();
 		void			updateChunkShader();
+		void			renderShadowMap();
 		void			renderTerrain();
 		void			renderWater();
 		void			renderSun();
@@ -47,12 +48,10 @@ class Renderer {
 
 		float			_time;
 
-		mlm::vec3		_sunPos;
-
 		Shader			_chunkShader;
 		Shader			_cubeShader;
 		Shader			_waterShader;
-		Shader			_quadShader;
+		Shader			_shadowShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
@@ -61,9 +60,15 @@ class Renderer {
 		ChunkManager	&_manager;
 		Camera			&_camera;
 		FrameBuffer		_waterFrameBuffer;
+		FrameBuffer		_shadowFrameBuffer;
 
 		mlm::mat4		_projection;
 		mlm::mat4		_view;
+
+		mlm::mat4		_lightProjection;
+		mlm::mat4		_lightView;
+		mlm::vec3		_sunDir;
+		mlm::vec3		_sunPos;
 
 		void			updateProjection();
 		void			updateView();
