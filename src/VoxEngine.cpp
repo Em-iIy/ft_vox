@@ -92,8 +92,6 @@ void	VoxEngine::init()
 
 void	VoxEngine::mainLoop()
 {
-
-	Shader	chunkShader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	#ifdef FPS
 	int frame = 0;
 	float time = glfwGetTime();
