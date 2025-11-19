@@ -17,10 +17,10 @@
 		- moon
 	- render
 
-- Lighting
-	- sunlight
-		- day/night cycle
-	- torches/lightsource
++ Lighting
+	+ sunlight
+		+ day/night cycle
+	x torches/lightsource
 		? colors
 	+ fog
 
@@ -43,13 +43,13 @@
 		+ update neighboring chunks
 		+ ray casting from camera
 
-- Terrain generation
++ Terrain generation
 	+ move generation to separate class
 	+ different noise values per block
 	+ splines
-	- biomes
-	- decoration
-		- trees
+	x biomes
+	+ decoration
+		x trees
 		+ water
 			+ mesh
 			+ opacity
@@ -67,7 +67,7 @@
 	- create configs
 		- input verification
 		x chunk dimensions
-		- render distance
+		+ render distance
 		+ terrain generation
 			+ spline settings
 			+ noise settings
