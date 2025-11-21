@@ -24,6 +24,9 @@ class Renderer {
 
 		mlm::mat4		&getProjection();
 		mlm::mat4		&getView();
+		mlm::mat4		&getLightProjection();
+		mlm::mat4		&getLightView();
+		mlm::vec3		&getSunPos();
 	
 	private:
 		void			initShaders();
@@ -50,6 +53,7 @@ class Renderer {
 
 		Shader			_chunkShader;
 		Shader			_cubeShader;
+		Shader			_quadShader;
 		Shader			_waterShader;
 		Shader			_shadowShader;
 
@@ -72,6 +76,8 @@ class Renderer {
 
 		void			updateProjection();
 		void			updateView();
+		void			updateLightProjection();
+		void			updateLightView();
 		void			updateUnderWater();
 		void			updateSunPos();
 		void			updateTime();

@@ -31,6 +31,7 @@ void						ChunkManager::cleanup()
 	chunkUnloadList.clear();
 	chunkVisibleList.clear();
 	chunkRenderList.clear();
+	chunkShadowRenderList.clear();
 
 	chunks.clear();
 }
@@ -60,6 +61,7 @@ void						ChunkManager::update()
 	_updateUploadList();
 	_updateVisibleList();
 	_updateRenderList();
+	_updateShadowRenderList();
 	_updateCameraChunkCoord();
 }
 
@@ -255,6 +257,22 @@ void						ChunkManager::_updateRenderList()
 	}
 }
 
+void						ChunkManager::_updateShadowRenderList()
+{
+	mlm::vec3	cameraPos = _engine.getCamera().getPos();
+	chunkShadowRenderList.clear();
+	for (std::shared_ptr<Chunk> chunk : chunkVisibleList)
+	{
+		if (chunk->getState() == Chunk::UPLOADED)
+		{
+			const auto [min, max] = chunk->getMinMax();
+			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
+			if (_engine.getShadowFrustum().isBoxVisible(AABB(min + chunkToCamPos, max + chunkToCamPos)) == true)
+				chunkShadowRenderList.push_back(chunk);
+		}
+	}
+}
+
 void						ChunkManager::_updateCameraChunkCoord()
 {
 	const mlm::ivec2 &cameraChunkCoord = getChunkCoord(_engine.getCamera().getPos());
@@ -353,6 +371,14 @@ void						ChunkManager::renderChunks(Shader &shader)
 		(*it)->draw(shader);
 	}
 	// glDisable(GL_CULL_FACE);
+}
+
+void						ChunkManager::renderChunksShadows(Shader &shader)
+{
+	for (auto it = chunkShadowRenderList.rbegin(); it != chunkShadowRenderList.rend(); it++)
+	{
+		(*it)->draw(shader);
+	}
 }
 
 void						ChunkManager::renderWater(Shader &shader)

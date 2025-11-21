@@ -56,6 +56,7 @@ class ChunkManager {
 
 		void																update();
 		void																renderChunks(Shader &shader);
+		void																renderChunksShadows(Shader &shader);
 		void																renderWater(Shader &shader);
 		void																renderClear();
 
@@ -92,6 +93,7 @@ class ChunkManager {
 		std::vector<std::shared_ptr<Chunk>>									chunkUploadList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkVisibleList = {};
 		std::vector<std::shared_ptr<Chunk>>									chunkRenderList = {};
+		std::vector<std::shared_ptr<Chunk>>									chunkShadowRenderList = {};
 
 		// Multithreading stuff
 		std::deque<ChunkTask>												_queue;
@@ -121,6 +123,7 @@ class ChunkManager {
 		void																_updateUploadList();
 		void																_updateVisibleList();
 		void																_updateRenderList();
+		void																_updateShadowRenderList();
 
 		void																_updateCameraChunkCoord();
 		

@@ -103,6 +103,7 @@ void	VoxEngine::mainLoop()
 		_chunkManager.update();
 		_renderer.update();
 		updateFrustum(_renderer.getProjection(), _renderer.getView());
+		updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
 
 		_renderer.render();
 
@@ -141,6 +142,11 @@ void			VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &vi
 	_updateFrustum = false;
 }
 
+void			VoxEngine::updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
+{
+	_shadowFrustum.update(projection * view);
+}
+
 Camera	&VoxEngine::getCamera()
 {
 	return (_camera);
@@ -164,6 +170,11 @@ Atlas			&VoxEngine::getAtlas()
 Frustum			&VoxEngine::getFrustum()
 {
 	return (_frustum);
+}
+
+Frustum			&VoxEngine::getShadowFrustum()
+{
+	return (_shadowFrustum);
 }
 
 void			VoxEngine::setFrustumUpdate()

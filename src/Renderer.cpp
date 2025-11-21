@@ -40,6 +40,7 @@ void	Renderer::initShaders()
 {
 	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
+	_quadShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
 	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 }
@@ -117,6 +118,7 @@ void	Renderer::cleanShaders()
 {
 	_chunkShader.del();
 	_cubeShader.del();
+	_quadShader.del();
 	_waterShader.del();
 	_shadowShader.del();
 }
@@ -138,6 +140,8 @@ void	Renderer::update()
 	updateTime();
 	updateProjection();
 	updateView();
+	updateLightProjection();
+	updateLightView();
 	updateUnderWater();
 	updateSunPos();
 }
@@ -179,9 +183,6 @@ void	Renderer::updateChunkShader()
 
 void	Renderer::renderShadowMap()
 {
-	_lightProjection = mlm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, 16.0f, 256.0f);
-	_lightView = mlm::lookat(_sunPos, mlm::vec3(0.0f), mlm::vec3(0.0f, 1.0f, 0.0f));
-
 	_shadowShader.use();
 	_shadowShader.set_mat4("lightProjection", _lightProjection);
 	_shadowShader.set_mat4("lightView", _lightView);
@@ -190,7 +191,7 @@ void	Renderer::renderShadowMap()
 	FrameBuffer::clear(false, true, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	glViewport(0, 0, _shadowFrameBuffer.getWidth(), _shadowFrameBuffer.getHeight());
 	glDisable(GL_CULL_FACE);
-	_manager.renderChunks(_shadowShader);
+	_manager.renderChunksShadows(_shadowShader);
 	glEnable(GL_CULL_FACE);
 	mlm::ivec2	size = _engine.get_size();
 	glViewport(0, 0, size.x, size.y);
@@ -200,7 +201,7 @@ void	Renderer::renderShadowMap()
 
 void	Renderer::renderTerrain()
 {
-
+	// return ;
 	_chunkShader.use();
 
 	_chunkShader.set_mat4("lightProjection", _lightProjection);
@@ -218,6 +219,7 @@ void	Renderer::renderTerrain()
 
 void	Renderer::renderWater()
 {
+	// return ;
 	_waterFrameBuffer.bind();
 	_waterFrameBuffer.clear(true, true, mlm::vec4(0.0f));
 
@@ -295,6 +297,28 @@ void	Renderer::renderUI()
 
 		_cubeMesh.draw(_cubeShader);
 	}
+
+	{
+		_quadShader.use();
+
+		mlm::mat4	proj(1.0f);
+		_quadShader.set_mat4("projection", proj);
+
+		mlm::mat4	view(1.0f);
+		_quadShader.set_mat4("view", view);
+
+		mlm::mat4	model(1.0f);
+		model = mlm::translate(model, mlm::vec3(0.8f, 0.8f, -0.5f));
+		model = mlm::scale(model, mlm::vec3(0.2f));
+		_quadShader.set_mat4("model", model);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
+		_quadShader.set_int("uTexture", 0);
+
+		_quadMesh.draw(_quadShader);
+	}
+
 }
 
 void			Renderer::updateProjection()
@@ -306,6 +330,16 @@ void			Renderer::updateProjection()
 void			Renderer::updateView()
 {
 	_view = _camera.getViewMatrix();
+}
+
+void			Renderer::updateLightProjection()
+{
+	_lightProjection = mlm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, 0.1f, 512.0f);
+}
+
+void			Renderer::updateLightView()
+{
+	_lightView = mlm::lookat(_sunPos, mlm::vec3(0.0f), mlm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 mlm::vec3	v3Lerp(const mlm::vec3 &v1, const mlm::vec3 &v2, float t)
@@ -331,7 +365,7 @@ void			Renderer::updateUnderWater()
 void			Renderer::updateSunPos()
 {
 	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(_time), cosf(_time)));
-	_sunPos = _sunDir * 160.0f;
+	_sunPos = _sunDir * 256.0f;
 }
 
 void			Renderer::updateTime()
@@ -349,3 +383,17 @@ mlm::mat4	&Renderer::getView()
 	return (_view);
 }
 
+mlm::mat4	&Renderer::getLightProjection()
+{
+	return (_lightProjection);
+}
+
+mlm::mat4	&Renderer::getLightView()
+{
+	return (_lightView);
+}
+
+mlm::vec3	&Renderer::getSunPos()
+{
+	return (_sunPos);
+}
