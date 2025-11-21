@@ -18,8 +18,8 @@ Created on: 24/07/2025
 #include "Player.hpp"
 #include "TerrainGenerator.hpp"
 
-// const mlm::ivec2	WINDOW_SIZE(1024, 1024);
-const mlm::ivec2	WINDOW_SIZE(3840, 2160);
+const mlm::ivec2	WINDOW_SIZE(1024, 1024);
+// const mlm::ivec2	WINDOW_SIZE(3840, 2160);
 
 class VoxEngine: public Window {
 	public:
