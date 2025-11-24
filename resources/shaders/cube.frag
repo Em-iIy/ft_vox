@@ -3,9 +3,9 @@
 uniform vec3	uColor;
 uniform float	uAlpha;
 
-out vec4 FragColor;
+out vec4	FragColor;
 
-void main()
+void	main()
 {
 	FragColor = vec4(uColor, uAlpha);
 }

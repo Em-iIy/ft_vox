@@ -1,17 +1,17 @@
 #version 430 core
 
-layout (location = 0) in vec3 in_pos;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_texUV;
+layout (location = 0) in vec3	inPos;
+layout (location = 1) in vec3	inNormal;
+layout (location = 2) in vec2	inTexUV;
 
-uniform mat4 projection;
-uniform mat4 model;
-uniform mat4 view;
+uniform mat4	uProjection;
+uniform mat4	uModel;
+uniform mat4	uView;
 
 out vec2	vertTexUv;
 
-void main()
+void	main()
 {
-	gl_Position = projection * view * model * vec4(in_pos, 1.0);
-	vertTexUv = in_texUV;
+	gl_Position = uProjection * uView * uModel * vec4(inPos, 1.0);
+	vertTexUv = inTexUV;
 }

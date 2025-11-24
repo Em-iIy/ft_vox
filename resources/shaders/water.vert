@@ -1,13 +1,13 @@
 #version 430
 
-layout (location = 0) in vec3 in_pos;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_texUV;
+layout (location = 0) in vec3	inPos;
+layout (location = 1) in vec3	inNormal;
+layout (location = 2) in vec2	inTexUV;
 
-out vec2	vert_texUV;
+out vec2	vertTexUV;
 
-void main()
+void	main()
 {
-	vert_texUV = in_texUV;
-	gl_Position = vec4(in_pos, 1.0f);
+	vertTexUV = inTexUV;
+	gl_Position = vec4(inPos, 1.0f);
 }

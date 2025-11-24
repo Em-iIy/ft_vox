@@ -166,8 +166,8 @@ void	Renderer::renderChunks()
 
 void	Renderer::updateChunkShader()
 {
-	_chunkShader.set_mat4("projection", _projection);
-	_chunkShader.set_mat4("view", _view);
+	_chunkShader.set_mat4("uProjection", _projection);
+	_chunkShader.set_mat4("uView", _view);
 
 	if (_isUnderwater)
 		_chunkShader.set_float("uFogNear", FOG_WATER_NEAR);
@@ -184,8 +184,8 @@ void	Renderer::updateChunkShader()
 void	Renderer::renderShadowMap()
 {
 	_shadowShader.use();
-	_shadowShader.set_mat4("lightProjection", _lightProjection);
-	_shadowShader.set_mat4("lightView", _lightView);
+	_shadowShader.set_mat4("uLightProjection", _lightProjection);
+	_shadowShader.set_mat4("uLightView", _lightView);
 
 	_shadowFrameBuffer.bind();
 	FrameBuffer::clear(false, true, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -204,15 +204,15 @@ void	Renderer::renderTerrain()
 	// return ;
 	_chunkShader.use();
 
-	_chunkShader.set_mat4("lightProjection", _lightProjection);
-	_chunkShader.set_mat4("lightView", _lightView);
+	_chunkShader.set_mat4("uLightProjection", _lightProjection);
+	_chunkShader.set_mat4("uLightView", _lightView);
 	glActiveTexture(GL_TEXTURE0);
 	_engine.getAtlas().bind();
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
 
-	_chunkShader.set_int("atlas", 0);
+	_chunkShader.set_int("uAtlas", 0);
 	_chunkShader.set_int("uShadowMap", 1);
 	_manager.renderChunks(_chunkShader);
 }
@@ -243,7 +243,7 @@ void	Renderer::renderWater()
 	_waterShader.set_float("uWaterOpacity", 0.7f);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(0));
-	_waterShader.set_int("renderTex", 0);
+	_waterShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_waterShader);
 
 	if (wireFrameMode)
@@ -255,13 +255,13 @@ void	Renderer::renderSun()
 	mlm::mat4	model;
 
 	_cubeShader.use();
-	_cubeShader.set_mat4("projection", _projection);
-	_cubeShader.set_mat4("view", _view);
+	_cubeShader.set_mat4("uProjection", _projection);
+	_cubeShader.set_mat4("uView", _view);
 
 	// draw sun
 	model = mlm::translate(mlm::mat4(1.0f), _sunPos * 2.0f);
 	model = mlm::scale(model, mlm::vec3(5.0f));
-	_cubeShader.set_mat4("model", model);
+	_cubeShader.set_mat4("uModel", model);
 
 	_cubeShader.set_vec3("uColor", mlm::vec3(1.f, 1.0f, .5f));
 	_cubeShader.set_float("uAlpha", 1.0f);
@@ -271,7 +271,7 @@ void	Renderer::renderSun()
 	// draw moon
 	model = mlm::translate(mlm::mat4(1.0f), -1.0f * _sunPos);
 	model = mlm::scale(model, mlm::vec3(2.0f));
-	_cubeShader.set_mat4("model", model);
+	_cubeShader.set_mat4("uModel", model);
 
 	_cubeShader.set_vec3("uColor", mlm::vec3(1.f, 1.0f, 1.0f));
 	_cubeShader.set_float("uAlpha", 1.0f);
@@ -285,12 +285,12 @@ void	Renderer::renderUI()
 	if (rayWorldCoord.hasValue())
 	{
 		_cubeShader.use();
-		_cubeShader.set_mat4("projection", _projection);
-		_cubeShader.set_mat4("view", _view);
+		_cubeShader.set_mat4("uProjection", _projection);
+		_cubeShader.set_mat4("uView", _view);
 		mlm::mat4	model(1.0f);
 		mlm::vec3	pos = static_cast<mlm::vec3>(rayWorldCoord.value()) - _camera.getPos();
 		model = mlm::translate(model, pos);
-		_cubeShader.set_mat4("model", model);
+		_cubeShader.set_mat4("uModel", model);
 
 		_cubeShader.set_vec3("uColor", mlm::vec3(0.0f));
 		_cubeShader.set_float("uAlpha", 0.2f);
@@ -302,15 +302,15 @@ void	Renderer::renderUI()
 		_quadShader.use();
 
 		mlm::mat4	proj(1.0f);
-		_quadShader.set_mat4("projection", proj);
+		_quadShader.set_mat4("uProjection", proj);
 
 		mlm::mat4	view(1.0f);
-		_quadShader.set_mat4("view", view);
+		_quadShader.set_mat4("uView", view);
 
 		mlm::mat4	model(1.0f);
 		model = mlm::translate(model, mlm::vec3(0.8f, 0.8f, -0.5f));
 		model = mlm::scale(model, mlm::vec3(0.2f));
-		_quadShader.set_mat4("model", model);
+		_quadShader.set_mat4("uModel", model);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());

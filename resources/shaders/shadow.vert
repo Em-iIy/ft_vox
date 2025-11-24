@@ -1,14 +1,14 @@
 #version 430 core
 
-layout (location = 0) in vec3 in_pos;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_texUV;
+layout (location = 0) in vec3	inPos;
+layout (location = 1) in vec3	inNormal;
+layout (location = 2) in vec2	inTexUV;
 
-uniform mat4 lightProjection;
-uniform mat4 model;
-uniform mat4 lightView;
+uniform mat4	uLightProjection;
+uniform mat4	uModel;
+uniform mat4	uLightView;
 
-void main()
+void	main()
 {
-	gl_Position = lightProjection * lightView * model * vec4(in_pos, 1.0);
+	gl_Position = uLightProjection * uLightView * uModel * vec4(inPos, 1.0);
 }

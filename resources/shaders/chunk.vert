@@ -1,27 +1,27 @@
 #version 430 core
 
-layout (location = 0) in vec3 in_pos;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_texUV;
+layout (location = 0) in vec3	inPos;
+layout (location = 1) in vec3	inNormal;
+layout (location = 2) in vec2	inTexUV;
 
-uniform mat4 projection;
-uniform mat4 model;
-uniform mat4 view;
+uniform mat4 uProjection;
+uniform mat4 uModel;
+uniform mat4 uView;
 
-uniform mat4 lightProjection;
-uniform mat4 lightView;
+uniform mat4 uLightProjection;
+uniform mat4 uLightView;
 
-out vec3	vert_world_pos;
-out vec4	vert_light_pos;
-out vec3	vert_normal;
-out	vec2	vert_texUV;
+out vec3	vertWorldPos;
+out vec4	vertLightPos;
+out vec3	vertNormal;
+out	vec2	vertTexUV;
 
-void main()
+void	main()
 {
-	vert_normal = in_normal;
-	vert_texUV = in_texUV;
-	vec4 world_pos = model * vec4(in_pos, 1.0);
-	vert_world_pos = world_pos.xyz;
-	gl_Position = projection * view * world_pos;
-	vert_light_pos = lightProjection * lightView * world_pos;
+	vertNormal = inNormal;
+	vertTexUV = inTexUV;
+	vec4 worldPos = uModel * vec4(inPos, 1.0);
+	vertWorldPos = worldPos.xyz;
+	gl_Position = uProjection * uView * worldPos;
+	vertLightPos = uLightProjection * uLightView * worldPos;
 }

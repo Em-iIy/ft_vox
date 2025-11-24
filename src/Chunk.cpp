@@ -244,7 +244,7 @@ void	Chunk::draw(Shader &shader)
 {
 	mlm::mat4 model(1.0f);
 	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
-	shader.set_mat4("model", model);
+	shader.set_mat4("uModel", model);
 	_busyMtx.lock();
 	_mesh.draw(shader);
 	_busyMtx.unlock();
@@ -254,7 +254,7 @@ void	Chunk::drawWater(Shader &shader)
 {
 	mlm::mat4 model(1.0f);
 	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
-	shader.set_mat4("model", model);
+	shader.set_mat4("uModel", model);
 	_busyMtx.lock();
 	_waterMesh.draw(shader);
 	_busyMtx.unlock();
