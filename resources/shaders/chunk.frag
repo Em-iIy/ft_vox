@@ -26,7 +26,7 @@ float	shadowMapCalculation()
 	float	shadowDepth = texture(uShadowMap, projectionCoords.xy).r;
 	float	currentDepth = projectionCoords.z;
 
-	float	bias = 0.005;
+	float	bias = 0.001;
 
 	float	shadow = (currentDepth - bias) > shadowDepth ? shadowStrength : 0.0;
 	return (shadow);
@@ -47,7 +47,7 @@ void	main()
 	float	ambient = 0.2;
 	shadow *= horizonFade;
 	// texColor.rgb = (texColor.rgb) * (1.0 - shadow) + (vec3(1.0, 0.0, 1.0) * (shadow));
-	texColor.rgb = texColor.rgb * max((diffuse + ambient) * (1.0 - shadow), shadowStrength);
+	texColor.rgb = texColor.rgb * max((diffuse + ambient) * (1.0 - shadow), (1.0 - shadowStrength));
 
 	texColor.rgb = texColor.rgb * length(vertNormal);
 
