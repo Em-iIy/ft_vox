@@ -76,6 +76,12 @@ void	VoxEngine::init()
 	// Random other key inputs
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
 	_input.addOnPressCallback(GLFW_KEY_TAB, [this]() {_input.toggleWireFrame();});
+	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_renderer.togglePause();});
+	_input.addOnPressCallback(GLFW_KEY_KP_0, [this]() {_renderer.setLightingMode(0);});
+	_input.addOnPressCallback(GLFW_KEY_KP_1, [this]() {_renderer.setLightingMode(1);});
+	_input.addOnPressCallback(GLFW_KEY_KP_2, [this]() {_renderer.setLightingMode(2);});
+	_input.addOnPressCallback(GLFW_KEY_KP_3, [this]() {_renderer.setLightingMode(3);});
+
 
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 

@@ -89,6 +89,16 @@ void	Renderer::initMeshes()
 void	Renderer::initFrameBuffers()
 {
 	mlm::ivec2	size = _engine.get_size();
+	_geometryFrameBuffer.create(size.x, size.y);
+	_geometryFrameBuffer.bind();
+	_geometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
+	_geometryFrameBuffer.attachColorTexture(1, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
+	_geometryFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
+	_geometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
+	_geometryFrameBuffer.unbind();
+	if (_geometryFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Water Framebuffer missing");
+
 	_waterFrameBuffer.create(size.x, size.y);
 	_waterFrameBuffer.bind();
 	_waterFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
@@ -101,7 +111,7 @@ void	Renderer::initFrameBuffers()
 	_shadowFrameBuffer.create(4096, 4096);
 	_shadowFrameBuffer.bind();
 	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, false, GL_CLAMP_TO_BORDER, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	_shadowFrameBuffer.setDrawBuffers({GL_NONE});
+	_shadowFrameBuffer.setDrawBuffers({});
 	_shadowFrameBuffer.unbind();
 	if (_shadowFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Shadow Framebuffer missing");
@@ -131,6 +141,7 @@ void	Renderer::cleanMeshes()
 
 void	Renderer::cleanFrameBuffers()
 {
+	_geometryFrameBuffer.destroy();
 	_waterFrameBuffer.destroy();
 	_shadowFrameBuffer.destroy();
 }
@@ -177,6 +188,8 @@ void	Renderer::updateChunkShader()
 	_chunkShader.set_float("uFogFar", FOG_FAR);
 	_chunkShader.set_vec3("uFogColor", _bgColor);
 	_chunkShader.set_vec3("uLightDir", _sunDir);
+
+	_chunkShader.set_int("uLightingMode", _lightingMode);
 
 	_engine.getAtlas().bind();
 }
@@ -370,7 +383,18 @@ void			Renderer::updateSunPos()
 
 void			Renderer::updateTime()
 {
-	_time = glfwGetTime() / 60.0f;
+	if (!_pause)
+		_time += _engine.get_delta_time() / 5.0f;
+}
+
+void	Renderer::togglePause()
+{
+	_pause = !_pause;
+}
+
+void	Renderer::setLightingMode(int mode)
+{
+	_lightingMode = mode;
 }
 
 mlm::mat4	&Renderer::getProjection()

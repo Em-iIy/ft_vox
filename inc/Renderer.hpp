@@ -27,6 +27,9 @@ class Renderer {
 		mlm::mat4		&getLightProjection();
 		mlm::mat4		&getLightView();
 		mlm::vec3		&getSunPos();
+
+		void			togglePause();
+		void			setLightingMode(int mode);
 	
 	private:
 		void			initShaders();
@@ -50,6 +53,8 @@ class Renderer {
 		bool			_isUnderwater = false;
 
 		float			_time;
+		bool			_pause = false;
+		int				_lightingMode = 0;
 
 		Shader			_chunkShader;
 		Shader			_cubeShader;
@@ -63,6 +68,7 @@ class Renderer {
 		VoxEngine		&_engine;
 		ChunkManager	&_manager;
 		Camera			&_camera;
+		FrameBuffer		_geometryFrameBuffer;
 		FrameBuffer		_waterFrameBuffer;
 		FrameBuffer		_shadowFrameBuffer;
 
