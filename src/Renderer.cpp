@@ -110,7 +110,7 @@ void	Renderer::initFrameBuffers()
 	
 	_shadowFrameBuffer.create(4096, 4096);
 	_shadowFrameBuffer.bind();
-	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, false, GL_CLAMP_TO_BORDER, mlm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, true, GL_CLAMP_TO_BORDER, mlm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	_shadowFrameBuffer.setDrawBuffers({});
 	_shadowFrameBuffer.unbind();
 	if (_shadowFrameBuffer.checkStatus() == false)
