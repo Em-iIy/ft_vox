@@ -41,6 +41,7 @@ void	Renderer::initShaders()
 	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 	_quadShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
+	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
 	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 }
@@ -91,8 +92,8 @@ void	Renderer::initFrameBuffers()
 	mlm::ivec2	size = _engine.get_size();
 	_geometryFrameBuffer.create(size.x, size.y);
 	_geometryFrameBuffer.bind();
-	_geometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
-	_geometryFrameBuffer.attachColorTexture(1, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
+	_geometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
+	_geometryFrameBuffer.attachColorTexture(1, GL_RGB16F, GL_RGB, GL_FLOAT, true, true, false);
 	_geometryFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
 	_geometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
 	_geometryFrameBuffer.unbind();
@@ -129,6 +130,7 @@ void	Renderer::cleanShaders()
 	_chunkShader.del();
 	_cubeShader.del();
 	_quadShader.del();
+	_depthShader.del();
 	_waterShader.del();
 	_shadowShader.del();
 }
@@ -173,6 +175,7 @@ void	Renderer::renderChunks()
 	renderShadowMap();
 	renderTerrain();
 	renderWater();
+	renderFinal();
 }
 
 void	Renderer::updateChunkShader()
@@ -227,6 +230,12 @@ void	Renderer::renderTerrain()
 
 	_chunkShader.set_int("uAtlas", 0);
 	_chunkShader.set_int("uShadowMap", 1);
+
+	_geometryFrameBuffer.bind();
+	FrameBuffer::clearBufferfv(GL_COLOR, 0,  mlm::vec4(_bgColor, 1.0f));
+	FrameBuffer::clearBufferfv(GL_COLOR, 1, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	FrameBuffer::clear(false, true, mlm::vec4(0.0f));
+
 	_manager.renderChunks(_chunkShader);
 }
 
@@ -237,7 +246,7 @@ void	Renderer::renderWater()
 	_waterFrameBuffer.clear(true, true, mlm::vec4(0.0f));
 
 	mlm::ivec2	size = _engine.get_size();
-	_waterFrameBuffer.blitDepthFrom(0, size.x, size.y);
+	_waterFrameBuffer.blitDepthFrom(_geometryFrameBuffer.getId(), size.x, size.y);
 	_waterFrameBuffer.bind();
 	
 
@@ -247,6 +256,8 @@ void	Renderer::renderWater()
 	_waterFrameBuffer.unbind();
 
 	_manager.renderClear();
+
+	_geometryFrameBuffer.bind();
 
 	bool wireFrameMode = _engine.getInput().getWireFrameMode();
 	if (wireFrameMode)
@@ -312,26 +323,48 @@ void	Renderer::renderUI()
 	}
 
 	{
-		_quadShader.use();
+		_depthShader.use();
 
 		mlm::mat4	proj(1.0f);
-		_quadShader.set_mat4("uProjection", proj);
+		_depthShader.set_mat4("uProjection", proj);
 
 		mlm::mat4	view(1.0f);
-		_quadShader.set_mat4("uView", view);
+		_depthShader.set_mat4("uView", view);
 
 		mlm::mat4	model(1.0f);
 		model = mlm::translate(model, mlm::vec3(0.8f, 0.8f, -0.5f));
 		model = mlm::scale(model, mlm::vec3(0.2f));
-		_quadShader.set_mat4("uModel", model);
+		_depthShader.set_mat4("uModel", model);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
-		_quadShader.set_int("uTexture", 0);
+		_depthShader.set_int("uTexture", 0);
 
-		_quadMesh.draw(_quadShader);
+		bool wireFrameMode = _engine.getInput().getWireFrameMode();
+		if (wireFrameMode)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		_quadMesh.draw(_depthShader);
+		if (wireFrameMode)
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
+}
+
+void	Renderer::renderFinal()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	_quadShader.use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
+	_quadShader.set_int("uRenderTex", 0);
+	_quadMesh.draw(_quadShader);
+
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 void			Renderer::updateProjection()

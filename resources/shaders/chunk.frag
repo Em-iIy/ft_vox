@@ -1,6 +1,7 @@
 #version 430 core
 
-out vec4	FragColor;
+layout (location = 0) out vec4	gColor;
+layout (location = 1) out vec4	gNormal;
 
 uniform sampler2D	uAtlas;
 uniform float		uFogNear;
@@ -17,7 +18,7 @@ in vec3	vertNormal;
 in vec2	vertTexUV;
 
 const float	shadowStrength = 0.6;
-const float	ambientStrength = 0.2;
+const float	ambientStrength = 0.4;
 const vec3	lightColor = vec3(1.0);
 
 float	shadowMapCalculation()
@@ -65,14 +66,13 @@ vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 
 void	main()
 {
-
+	gNormal = vec4(normalize(vertNormal), 1.0);
 	float	dist = length(vertWorldPos);
 	float	fogFactor = clamp((dist - uFogNear) / (uFogFar - uFogNear), 0.0, 1.0);
 	
-
 	vec3	texColor = texture(uAtlas, vertTexUV).rgb;
 
-	float	diffuseAngle = dot(normalize(vertNormal), uLightDir);
+	float	diffuseAngle = dot(gNormal.xyz, uLightDir);
 	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
 
 	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor;
@@ -87,7 +87,7 @@ void	main()
 	// texColor = texColor * max(clamp((diffuse + ambient), 0.0, 1.0) * (1.0 - shadow), (1.0 - shadowStrength));
 
 	texColor = texColor * length(vertNormal);
-	FragColor = lightCalculation(ambient, shadow, diffuse, texColor);
-	FragColor.rgb = mix(FragColor.rgb, uFogColor, fogFactor);
-	// FragColor = vec4(vertNormal, 1.0);
+	gColor = lightCalculation(ambient, shadow, diffuse, texColor);
+	gColor.rgb = mix(gColor.rgb, uFogColor, fogFactor);
+	// gColor = vec4(normalize(vertNormal), 1.0);
 }

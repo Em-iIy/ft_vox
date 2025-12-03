@@ -46,6 +46,7 @@ class Renderer {
 		void			renderTerrain();
 		void			renderWater();
 		void			renderSun();
+		void			renderFinal();
 		
 		void			renderUI();
 
@@ -59,6 +60,7 @@ class Renderer {
 		Shader			_chunkShader;
 		Shader			_cubeShader;
 		Shader			_quadShader;
+		Shader			_depthShader;
 		Shader			_waterShader;
 		Shader			_shadowShader;
 
