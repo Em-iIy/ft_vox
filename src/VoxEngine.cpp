@@ -8,6 +8,8 @@ Created on: 24/07/2025
 
 #include "Frustum.hpp"
 
+const mlm::ivec2	WINDOW_SIZE(1024, 1024);
+// const mlm::ivec2	WINDOW_SIZE(3840, 2160);
 
 // #define FPS
 
