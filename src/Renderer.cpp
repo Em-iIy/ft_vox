@@ -365,7 +365,7 @@ void	Renderer::renderFinal()
 
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(2));
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
 	_quadShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_quadShader);
 

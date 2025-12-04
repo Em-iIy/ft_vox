@@ -14,8 +14,10 @@ uniform sampler2D	uShadowMap;
 uniform int			uLightingMode;
 
 in vec3	vertWorldPos;
+in vec3	vertViewWorldPos;
 in vec4	vertLightPos;
 in vec3	vertNormal;
+in vec3	vertViewNormal;
 in vec2	vertTexUV;
 
 const float	shadowStrength = 0.6;
@@ -67,8 +69,8 @@ vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 
 void	main()
 {
-	gNormal = vec4(normalize(vertNormal), 1.0);
-	gPosition = vec4(vertWorldPos, 1.0);
+	gNormal = vec4(normalize(vertViewNormal), 1.0);
+	gPosition = vec4(vertViewWorldPos, 1.0);
 	float	dist = length(vertWorldPos);
 	float	fogFactor = clamp((dist - uFogNear) / (uFogFar - uFogNear), 0.0, 1.0);
 	

@@ -12,16 +12,21 @@ uniform mat4 uLightProjection;
 uniform mat4 uLightView;
 
 out vec3	vertWorldPos;
+out vec3	vertViewWorldPos;
 out vec4	vertLightPos;
 out vec3	vertNormal;
+out vec3	vertViewNormal;
+
 out	vec2	vertTexUV;
 
 void	main()
 {
 	vertNormal = inNormal;
+	vertViewNormal = transpose(inverse(mat3(uView * uModel))) * normalize(inNormal);
 	vertTexUV = inTexUV;
 	vec4 worldPos = uModel * vec4(inPos, 1.0);
 	vertWorldPos = worldPos.xyz;
+	vertViewWorldPos = (uView * worldPos).xyz;
 	gl_Position = uProjection * uView * worldPos;
 	vertLightPos = uLightProjection * uLightView * worldPos;
 }
