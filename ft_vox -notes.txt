@@ -117,11 +117,13 @@ render order {
 		clear gBuffer {
 			clear color attachment 0
 			clear color attachment 1
+			clear color attachment 2
 			clear depth buffer
 		}
 		render chunks {
 			color -> color attachment 0
 			normals -> color attachment 1
+			positions -> color attachment 1
 		}
 	}
 	render water {

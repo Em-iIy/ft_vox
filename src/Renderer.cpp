@@ -93,9 +93,10 @@ void	Renderer::initFrameBuffers()
 	_geometryFrameBuffer.create(size.x, size.y);
 	_geometryFrameBuffer.bind();
 	_geometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
-	_geometryFrameBuffer.attachColorTexture(1, GL_RGB16F, GL_RGB, GL_FLOAT, true, true, false);
+	_geometryFrameBuffer.attachColorTexture(1, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
+	_geometryFrameBuffer.attachColorTexture(2, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
 	_geometryFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
-	_geometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1});
+	_geometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
 	_geometryFrameBuffer.unbind();
 	if (_geometryFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
@@ -233,6 +234,7 @@ void	Renderer::renderTerrain()
 	_geometryFrameBuffer.bind();
 	FrameBuffer::clearBufferfv(GL_COLOR, 0,  mlm::vec4(_bgColor, 1.0f));
 	FrameBuffer::clearBufferfv(GL_COLOR, 1, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	FrameBuffer::clearBufferfv(GL_COLOR, 2, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	FrameBuffer::clear(false, true, mlm::vec4(0.0f));
 
 	_manager.renderChunks(_chunkShader);
@@ -363,7 +365,7 @@ void	Renderer::renderFinal()
 
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(2));
 	_quadShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_quadShader);
 

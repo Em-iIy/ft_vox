@@ -2,6 +2,7 @@
 
 layout (location = 0) out vec4	gColor;
 layout (location = 1) out vec4	gNormal;
+layout (location = 2) out vec4	gPosition;
 
 uniform sampler2D	uAtlas;
 uniform float		uFogNear;
@@ -67,6 +68,7 @@ vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 void	main()
 {
 	gNormal = vec4(normalize(vertNormal), 1.0);
+	gPosition = vec4(vertWorldPos, 1.0);
 	float	dist = length(vertWorldPos);
 	float	fogFactor = clamp((dist - uFogNear) / (uFogFar - uFogNear), 0.0, 1.0);
 	
