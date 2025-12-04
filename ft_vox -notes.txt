@@ -104,6 +104,52 @@ render {
 	}
 }
 
+render order {
+	render shadow map {
+		bind shadowBuffer
+		clear shadowBuffer depth texture
+		render chunks {
+			depth -> depth texture
+		}
+	}
+	render terrain {
+		bind gBuffer
+		clear gBuffer {
+			clear color attachment 0
+			clear color attachment 1
+			clear depth buffer
+		}
+		render chunks {
+			color -> color attachment 0
+			normals -> color attachment 1
+		}
+	}
+	render water {
+		bind waterBuffer
+		clear waterBuffer {
+			clear color attachment 0
+			clear depth buffer
+		}
+		blit (copy) depth buffer from gBuffer
+		bind waterBuffer
+		render water {
+			color -> color attachment 0
+			depth -> depth buffer
+		}
+	}
+	SSAO pass {
+		bind gBuffer
+
+	}
+	render gBuffer final {
+		bind main buffer
+		render gBuffer -> main buffer
+	}
+	render water final {
+		bind main buffer
+		render water -> main buffer
+	}
+}
 
 back
 0 2 1, 1 2 3

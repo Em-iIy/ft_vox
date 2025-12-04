@@ -45,6 +45,7 @@ class Renderer {
 		void			renderShadowMap();
 		void			renderTerrain();
 		void			renderWater();
+		void			renderWaterFinal();
 		void			renderSun();
 		void			renderFinal();
 		

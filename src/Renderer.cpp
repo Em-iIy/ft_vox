@@ -176,6 +176,7 @@ void	Renderer::renderChunks()
 	renderTerrain();
 	renderWater();
 	renderFinal();
+	renderWaterFinal();
 }
 
 void	Renderer::updateChunkShader()
@@ -211,8 +212,6 @@ void	Renderer::renderShadowMap()
 	glEnable(GL_CULL_FACE);
 	mlm::ivec2	size = _engine.get_size();
 	glViewport(0, 0, size.x, size.y);
-
-	_shadowFrameBuffer.unbind();
 }
 
 void	Renderer::renderTerrain()
@@ -256,8 +255,13 @@ void	Renderer::renderWater()
 	_waterFrameBuffer.unbind();
 
 	_manager.renderClear();
+}
 
-	_geometryFrameBuffer.bind();
+void	Renderer::renderWaterFinal()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	FrameBuffer::clear(false, true, mlm::vec4(1.0));
+
 
 	bool wireFrameMode = _engine.getInput().getWireFrameMode();
 	if (wireFrameMode)
