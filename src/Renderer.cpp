@@ -28,6 +28,7 @@ void	Renderer::init()
 	initShaders();
 	initMeshes();
 	initFrameBuffers();
+	initSsaoSamples();
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -44,6 +45,7 @@ void	Renderer::initShaders()
 	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
 	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
+	_ssaoShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/SSAO.frag");
 }
 
 void	Renderer::initMeshes()
@@ -119,6 +121,38 @@ void	Renderer::initFrameBuffers()
 		throw std::runtime_error("Shadow Framebuffer missing");
 }
 
+void	Renderer::initSsaoSamples()
+{
+	std::array<mlm::vec3, 64>		ssaoSamples;
+
+	static rng::fgen	gen = rng::generator(0.0f, 1.0f);
+
+	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
+	{
+		// Create sample in hemisphere
+		mlm::vec3 sample(
+			rng::rand(gen) * 2.0f - 1.0f,
+			rng::rand(gen) * 2.0f - 1.0f,
+			rng::rand(gen)	
+		);
+		sample = mlm::normalize(sample);
+		sample *= rng::rand(gen);
+
+		// focus more samples closer to the center
+		float scale = static_cast<float>(i) / static_cast<float>(ssaoSamples.size());
+		scale = std::lerp(0.1f, 1.0f, scale * scale);
+		sample *= scale;
+
+		ssaoSamples[i] = sample;
+	}
+	_ssaoShader.use();
+	_ssaoShader.set_int("uSampleCount", ssaoSamples.size());
+
+	// replace with ssbo
+	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
+		_ssaoShader.set_vec3("uSamples[" + std::to_string(i) + "]", ssaoSamples[i]);
+}
+
 void	Renderer::cleanup()
 {
 	cleanShaders();
@@ -134,6 +168,7 @@ void	Renderer::cleanShaders()
 	_depthShader.del();
 	_waterShader.del();
 	_shadowShader.del();
+	_ssaoShader.del();
 }
 
 void	Renderer::cleanMeshes()

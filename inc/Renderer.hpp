@@ -35,6 +35,7 @@ class Renderer {
 		void			initShaders();
 		void			initMeshes();
 		void			initFrameBuffers();
+		void			initSsaoSamples();
 
 		void			cleanShaders();
 		void			cleanMeshes();
@@ -64,6 +65,7 @@ class Renderer {
 		Shader			_depthShader;
 		Shader			_waterShader;
 		Shader			_shadowShader;
+		Shader			_ssaoShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
