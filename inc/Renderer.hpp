@@ -79,6 +79,7 @@ class Renderer {
 		FrameBuffer		_waterFrameBuffer;
 		FrameBuffer		_shadowFrameBuffer;
 		FrameBuffer		_ssaoFrameBuffer;
+		FrameBuffer		_ssaoBlurFrameBuffer;
 
 		GLuint			_ssaoNoiseTex;
 

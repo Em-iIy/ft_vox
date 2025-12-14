@@ -127,6 +127,13 @@ void	Renderer::initFrameBuffers()
 	_ssaoFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	if (_ssaoFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("SSAO Framebuffer missing");
+
+	_ssaoBlurFrameBuffer.create(size.x, size.y);
+	_ssaoBlurFrameBuffer.bind();
+	_ssaoBlurFrameBuffer.attachColorTexture(0, GL_RED, GL_RED, GL_FLOAT, true, true, false);
+	_ssaoBlurFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
+	if (_ssaoBlurFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("SSAO Blur Framebuffer missing");
 }
 
 void	Renderer::initSsaoSamples()
@@ -222,6 +229,7 @@ void	Renderer::cleanFrameBuffers()
 	_waterFrameBuffer.destroy();
 	_shadowFrameBuffer.destroy();
 	_ssaoFrameBuffer.destroy();
+	_ssaoBlurFrameBuffer.destroy();
 }
 
 void	Renderer::update()

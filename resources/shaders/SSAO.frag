@@ -20,11 +20,6 @@ in vec2	vertTexUV;
 
 const float			bias = 0.025;
 
-void	outputColor(vec3 color)
-{
-	FragColor = vec4(color, 1.0);
-}
-
 void	main()
 {
 	vec3	normal = texture(uGNormal, vertTexUV).xyz;
@@ -56,7 +51,5 @@ void	main()
 
 	occlusion = 1.0 - (occlusion / uSampleCount);
 
-	outputColor(vec3(occlusion));
-	// outputColor(randomVec);
-	// FragColor = vec4(fragPos * normal, 1.0);
+	FragColor = vec4(vec3(occlusion), 1.0);
 }
