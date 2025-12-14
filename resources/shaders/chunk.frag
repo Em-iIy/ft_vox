@@ -76,7 +76,7 @@ void	main()
 	
 	vec3	texColor = texture(uAtlas, vertTexUV).rgb;
 
-	float	diffuseAngle = dot(gNormal.xyz, uLightDir);
+	float	diffuseAngle = dot(normalize(vertNormal.xyz), uLightDir);
 	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
 
 	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor;
