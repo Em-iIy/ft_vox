@@ -76,6 +76,7 @@ class Renderer {
 		FrameBuffer		_geometryFrameBuffer;
 		FrameBuffer		_waterFrameBuffer;
 		FrameBuffer		_shadowFrameBuffer;
+		FrameBuffer		_ssaoFrameBuffer;
 
 		mlm::mat4		_projection;
 		mlm::mat4		_view;
