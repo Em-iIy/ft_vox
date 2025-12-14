@@ -29,6 +29,7 @@ void	Renderer::init()
 	initMeshes();
 	initFrameBuffers();
 	initSsaoSamples();
+	initSsaoNoise();
 	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -45,7 +46,7 @@ void	Renderer::initShaders()
 	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
 	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
-	_ssaoShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/SSAO.frag");
+	_ssaoShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag");
 }
 
 void	Renderer::initMeshes()
@@ -112,7 +113,7 @@ void	Renderer::initFrameBuffers()
 	if (_waterFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
 	
-	_shadowFrameBuffer.create(4096, 4096);
+	_shadowFrameBuffer.create(size.x * 2, size.y * 2);
 	_shadowFrameBuffer.bind();
 	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, true, GL_CLAMP_TO_BORDER, mlm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	_shadowFrameBuffer.setDrawBuffers({});
@@ -132,7 +133,7 @@ void	Renderer::initSsaoSamples()
 {
 	std::array<mlm::vec3, 64>		ssaoSamples;
 
-	static rng::fgen	gen = rng::generator(0.0f, 1.0f);
+	rng::fgen	gen = rng::generator(0.0f, 1.0f);
 
 	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
 	{
@@ -158,6 +159,37 @@ void	Renderer::initSsaoSamples()
 	// replace with ssbo
 	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
 		_ssaoShader.set_vec3("uSamples[" + std::to_string(i) + "]", ssaoSamples[i]);
+
+	_ssaoShader.set_float("uRadius", 0.9f);
+
+	_ssaoShader.set_int("uGNormal", 0);
+	_ssaoShader.set_int("uGPosition", 1);
+	_ssaoShader.set_int("uNoiseTex", 2);
+}
+
+void	Renderer::initSsaoNoise()
+{
+	std::array<mlm::vec3, 16>	ssaoNoise;
+
+	rng::fgen	gen = rng::generator(0.0f, 1.0f);
+
+	for (uint32_t i = 0; i < ssaoNoise.size(); i++)
+	{
+		mlm::vec3 noise(
+			rng::rand(gen) * 2.0f - 1.0f,
+			rng::rand(gen) * 2.0f - 1.0f,
+			0.0f	
+		);
+		ssaoNoise[i] = noise;
+	}
+
+	glGenTextures(1, &_ssaoNoiseTex);
+	glBindTexture(GL_TEXTURE_2D, _ssaoNoiseTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 void	Renderer::cleanup()
@@ -209,7 +241,7 @@ void	Renderer::render()
 
 	renderSun();
 	renderChunks();
-	renderUI();
+	// renderUI();
 }
 
 void	Renderer::renderChunks()
@@ -218,9 +250,10 @@ void	Renderer::renderChunks()
 	updateChunkShader();
 	renderShadowMap();
 	renderTerrain();
-	renderWater();
+	renderSSAO();
+	// renderWater();
 	renderFinal();
-	renderWaterFinal();
+	// renderWaterFinal();
 }
 
 void	Renderer::updateChunkShader()
@@ -256,6 +289,28 @@ void	Renderer::renderShadowMap()
 	glEnable(GL_CULL_FACE);
 	mlm::ivec2	size = _engine.get_size();
 	glViewport(0, 0, size.x, size.y);
+}
+
+void	Renderer::renderSSAO()
+{
+	_ssaoShader.use();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(1));
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(2));
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, _ssaoNoiseTex);
+
+	mlm::ivec2	size = _engine.get_size();
+	_ssaoShader.set_float("uScreenWidth", static_cast<float>(size.x));
+	_ssaoShader.set_float("uScreenHeight", static_cast<float>(size.y));
+
+	_ssaoShader.set_mat4("uProjection", _projection);
+
+	_ssaoFrameBuffer.bind();
+	FrameBuffer::clear(true, false, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	_quadMesh.draw(_ssaoShader);
 }
 
 void	Renderer::renderTerrain()
@@ -408,7 +463,8 @@ void	Renderer::renderFinal()
 
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
+	// glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _ssaoFrameBuffer.getColorTexture(0));
 	_quadShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_quadShader);
 

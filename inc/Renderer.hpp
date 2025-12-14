@@ -36,6 +36,7 @@ class Renderer {
 		void			initMeshes();
 		void			initFrameBuffers();
 		void			initSsaoSamples();
+		void			initSsaoNoise();
 
 		void			cleanShaders();
 		void			cleanMeshes();
@@ -44,6 +45,7 @@ class Renderer {
 		void			renderChunks();
 		void			updateChunkShader();
 		void			renderShadowMap();
+		void			renderSSAO();
 		void			renderTerrain();
 		void			renderWater();
 		void			renderWaterFinal();
@@ -77,6 +79,8 @@ class Renderer {
 		FrameBuffer		_waterFrameBuffer;
 		FrameBuffer		_shadowFrameBuffer;
 		FrameBuffer		_ssaoFrameBuffer;
+
+		GLuint			_ssaoNoiseTex;
 
 		mlm::mat4		_projection;
 		mlm::mat4		_view;
