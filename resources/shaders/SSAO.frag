@@ -44,6 +44,8 @@ void	main()
 		offset.xyz = offset.xyz * 0.5 + 0.5;
 
 		float	sampleDepth = texture(uGPosition, offset.xy).z;
+		if (sampleDepth >= 0.0)
+			continue ;
 
 		float	rangeCheck = smoothstep(0.0, 1.0, uRadius / abs(fragPos.z - sampleDepth));
 		occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;
