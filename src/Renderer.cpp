@@ -47,6 +47,7 @@ void	Renderer::initShaders()
 	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
 	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 	_ssaoShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag");
+	_ssaoBlurShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag");
 }
 
 void	Renderer::initMeshes()
@@ -167,11 +168,14 @@ void	Renderer::initSsaoSamples()
 	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
 		_ssaoShader.set_vec3("uSamples[" + std::to_string(i) + "]", ssaoSamples[i]);
 
-	_ssaoShader.set_float("uRadius", 0.9f);
+	_ssaoShader.set_float("uRadius", 0.5f);
 
 	_ssaoShader.set_int("uGNormal", 0);
 	_ssaoShader.set_int("uGPosition", 1);
 	_ssaoShader.set_int("uNoiseTex", 2);
+
+	_ssaoBlurShader.use();
+	_ssaoBlurShader.set_int("uTexture", 0);
 }
 
 void	Renderer::initSsaoNoise()
@@ -215,6 +219,7 @@ void	Renderer::cleanShaders()
 	_waterShader.del();
 	_shadowShader.del();
 	_ssaoShader.del();
+	_ssaoBlurShader.del();
 }
 
 void	Renderer::cleanMeshes()
@@ -319,6 +324,14 @@ void	Renderer::renderSSAO()
 	_ssaoFrameBuffer.bind();
 	FrameBuffer::clear(true, false, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	_quadMesh.draw(_ssaoShader);
+
+	_ssaoBlurShader.use();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _ssaoFrameBuffer.getColorTexture(0));
+	_ssaoBlurFrameBuffer.bind();
+	FrameBuffer::clear(true, false, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	_quadMesh.draw(_ssaoBlurShader);
 }
 
 void	Renderer::renderTerrain()
@@ -472,7 +485,7 @@ void	Renderer::renderFinal()
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
-	glBindTexture(GL_TEXTURE_2D, _ssaoFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
 	_quadShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_quadShader);
 

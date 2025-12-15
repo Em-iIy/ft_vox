@@ -68,6 +68,7 @@ class Renderer {
 		Shader			_waterShader;
 		Shader			_shadowShader;
 		Shader			_ssaoShader;
+		Shader			_ssaoBlurShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
