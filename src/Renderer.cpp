@@ -114,7 +114,7 @@ void	Renderer::initFrameBuffers()
 	if (_waterFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
 	
-	_shadowFrameBuffer.create(size.x * 2, size.y * 2);
+	_shadowFrameBuffer.create(std::max(size.x * 2, 4096), std::max(size.y * 2, 4096));
 	_shadowFrameBuffer.bind();
 	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, true, GL_CLAMP_TO_BORDER, mlm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	_shadowFrameBuffer.setDrawBuffers({});
