@@ -1,23 +1,22 @@
 #version 430 core
 
-layout (location = 0) out vec4	gColor;
-layout (location = 1) out vec4	gNormal;
-layout (location = 2) out vec4	gPosition;
+out vec4	FragColor;
 
-uniform sampler2D	uAtlas;
+uniform sampler2D	uGColor;
+uniform sampler2D	uGNormal;
+uniform sampler2D	uGPosition;
+
+uniform sampler2D	uShadowMap;
+uniform sampler2D	uSSAO;
 uniform float		uFogNear;
 uniform float		uFogFar;
 uniform vec3		uFogColor;
 uniform vec3		uLightPos;
 uniform vec3		uLightDir;
-uniform sampler2D	uShadowMap;
 uniform int			uLightingMode;
 
-in vec3	vertWorldPos;
-in vec3	vertViewWorldPos;
-in vec4	vertLightPos;
-in vec3	vertNormal;
-in vec3	vertViewNormal;
+uniform mat4		uProjection;
+
 in vec2	vertTexUV;
 
 const float	shadowStrength = 0.6;
@@ -69,31 +68,9 @@ vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 
 void	main()
 {
-	gNormal = vec4(normalize(vertViewNormal), 1.0);
-	gPosition = vec4(vertViewWorldPos, 1.0);
-	// gColor = vec4(texture(uAtlas, vertTexUV).rgb, 1.0);
-	// return ;
-	float	dist = length(vertWorldPos);
-	float	fogFactor = clamp((dist - uFogNear) / (uFogFar - uFogNear), 0.0, 1.0);
+	vec3	color = texture(uGColor, vertTexUV).xyz;
+	vec3	normal = texture(uGNormal, vertTexUV).xyz;
+	vec3	fragPos = texture(uGPosition, vertTexUV).xyz;
+
 	
-	vec3	texColor = texture(uAtlas, vertTexUV).rgb;
-
-	float	diffuseAngle = dot(normalize(vertNormal.xyz), uLightDir);
-	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
-
-	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor;
-	vec3	ambient = ambientStrength * lightColor;
-
-	float	shadow = shadowMapCalculation();
-	if (diffuseAngle < 0.0)
-		shadow = shadowStrength;
-	shadow *= horizonFade;
-
-	// texColor = (texColor) * (1.0 - shadow) + (vec3(1.0, 0.0, 1.0) * (shadow));
-	// texColor = texColor * max(clamp((diffuse + ambient), 0.0, 1.0) * (1.0 - shadow), (1.0 - shadowStrength));
-
-	texColor = texColor * length(vertNormal);
-	gColor = lightCalculation(ambient, shadow, diffuse, texColor);
-	gColor.rgb = mix(gColor.rgb, uFogColor, fogFactor);
-	// gColor = vec4(normalize(vertNormal), 1.0);
 }

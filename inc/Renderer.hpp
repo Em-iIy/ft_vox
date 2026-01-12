@@ -30,7 +30,31 @@ class Renderer {
 
 		void			togglePause();
 		void			setLightingMode(int mode);
-	
+
+
+
+
+		// TEMP FUNCTIONS TO TEST SHADERS
+		void			temp_render();
+		void			temp_initShaders();
+		void			temp_initFrameBuffers();
+
+		void			temp_swapFrameBuffer(int direction);
+		uint32_t		temp_currentFrameBufferIdx = 0;
+		std::vector<std::pair<GLuint, std::string>>	temp_FrameBufferIds;
+
+		void			temp_shadowPass();
+		void			temp_terrainGeometryPass();
+		void			temp_waterGeometryPass();
+		void			temp_SSAOPass();
+		void			temp_lightingPass();
+
+		void			temp_renderFinal();
+
+		Shader			temp_geometryShader;
+		Shader			temp_lightingShader;
+
+
 	private:
 		void			initShaders();
 		void			initMeshes();
@@ -79,6 +103,8 @@ class Renderer {
 		FrameBuffer		_geometryFrameBuffer;
 		FrameBuffer		_waterFrameBuffer;
 		FrameBuffer		_shadowFrameBuffer;
+		FrameBuffer		_terrainLightingFrameBuffer;
+		FrameBuffer		_waterLightingFrameBuffer;
 		FrameBuffer		_ssaoFrameBuffer;
 		FrameBuffer		_ssaoBlurFrameBuffer;
 

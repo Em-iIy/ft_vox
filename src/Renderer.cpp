@@ -40,6 +40,9 @@ void	Renderer::init()
 
 void	Renderer::initShaders()
 {
+	temp_initShaders();
+	return ;
+
 	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 	_quadShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
@@ -93,6 +96,9 @@ void	Renderer::initMeshes()
 
 void	Renderer::initFrameBuffers()
 {
+	temp_initFrameBuffers();
+	return ;
+
 	mlm::ivec2	size = _engine.get_size();
 	_geometryFrameBuffer.create(size.x, size.y);
 	_geometryFrameBuffer.bind();
@@ -168,7 +174,7 @@ void	Renderer::initSsaoSamples()
 	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
 		_ssaoShader.set_vec3("uSamples[" + std::to_string(i) + "]", ssaoSamples[i]);
 
-	_ssaoShader.set_float("uRadius", 0.5f);
+	_ssaoShader.set_float("uRadius", 1.8f);
 
 	_ssaoShader.set_int("uGNormal", 0);
 	_ssaoShader.set_int("uGPosition", 1);
@@ -250,6 +256,9 @@ void	Renderer::update()
 
 void	Renderer::render()
 {
+	temp_render();
+	return ;
+
 	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
 
 	renderSun();
@@ -484,8 +493,8 @@ void	Renderer::renderFinal()
 
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);
-	// glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
-	glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
+	// glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
 	_quadShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_quadShader);
 

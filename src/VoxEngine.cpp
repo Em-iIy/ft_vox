@@ -84,6 +84,9 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_KP_2, [this]() {_renderer.setLightingMode(2);});
 	_input.addOnPressCallback(GLFW_KEY_KP_3, [this]() {_renderer.setLightingMode(3);});
 
+	_input.addOnPressCallback(GLFW_KEY_LEFT, [this]() {_renderer.temp_swapFrameBuffer(-1);});
+	_input.addOnPressCallback(GLFW_KEY_RIGHT, [this]() {_renderer.temp_swapFrameBuffer(1);});
+
 
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
 
