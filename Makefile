@@ -106,8 +106,8 @@ run-tsan:
 .PHONY: run-tsan
 
 lines:
-	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp resources/shaders/* 
-# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
+# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp resources/shaders/* 
+	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
 .PHONY: lines
 # ----------------------------------------Cleaning
 clean:

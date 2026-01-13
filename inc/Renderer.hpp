@@ -47,7 +47,8 @@ class Renderer {
 		void			temp_terrainGeometryPass();
 		void			temp_waterGeometryPass();
 		void			temp_SSAOPass();
-		void			temp_lightingPass();
+		void			temp_terrainLightingPass();
+		void			temp_waterLightingPass();
 
 		void			temp_renderFinal();
 

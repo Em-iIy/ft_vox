@@ -19,9 +19,58 @@ uniform mat4		uView;
 uniform mat4		uLightProjection;
 uniform mat4		uLightView;
 
+uniform bool		uIsWater;
+
 const float	shadowStrength = 0.6;
 const float	ambientStrength = 0.4;
 const vec3	lightColor = vec3(1.0);
+
+float	shadowMapCalculation(vec4 worldPos)
+{
+	vec4	posLightSpace = uLightProjection * uLightView * worldPos;
+	vec3	projectionCoords = posLightSpace.xyz / posLightSpace.w;
+
+	projectionCoords = projectionCoords / 2 + 0.5;
+
+	float	shadowDepth = texture(uShadowMap, projectionCoords.xy).r;
+	float	currentDepth = projectionCoords.z;
+
+	const float	bias = 0.0005;
+
+	float	shadow = 0.0;
+	vec2	texelSize = 1.0 / textureSize(uShadowMap, 0);
+	for (int x = -2; x <= 2; ++x)
+	{
+		for (int y = -2; y <= 2; ++y)
+		{
+			float pcfDepth = texture(uShadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r; 
+			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;        
+		}    
+	}
+	shadow /= 25.0;
+
+	return (shadow);
+}
+
+
+vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
+{
+	vec3	lighting = (ambient + (1.0 - shadow) * diffuse) * texColor;
+	return (vec4(lighting, 1.0));
+	// if (uLightingMode == 0)
+	// {
+	// 	return (vec4(lighting, 1.0));
+	// }
+	// else if (uLightingMode == 1)
+	// 	return (vec4(ambient * texColor, 1.0));
+	// else if (uLightingMode == 2)
+	// 	return (vec4(diffuse * texColor, 1.0));
+	// else if (uLightingMode == 3)
+	// 	return (vec4((1.0 - shadow) * texColor, 1.0));
+	// else
+	// 	return (vec4(texColor, 1.0));
+}
+
 
 void	main()
 {
@@ -31,11 +80,24 @@ void	main()
 	float	SSAO = texture(uSSAO, vertTexUV).r;
 
 	mat4	inverseView = inverse(uView);
-	vec3	worldPos = (inverseView * vec4(fragPos, 1.0)).xyz;
+	vec4	worldPos = inverseView * vec4(fragPos, 1.0);
 
 	vec3	ViewlightDir = mat3(uView) * uLightDir;
-	float	diffuse = dot(normal, ViewlightDir);
+	float	diffuseAngle = dot(normal, ViewlightDir);
+	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
+
+	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor;
+	vec3	ambient = ambientStrength * lightColor;
+
+	float	shadow = shadowMapCalculation(worldPos);
+	if (diffuseAngle < 0.0)
+		shadow = shadowStrength;
+	shadow *= horizonFade;
+
+	FragColor = lightCalculation(ambient, shadow, diffuse, color);
+	if (uIsWater)
+		FragColor *= SSAO;
 	// FragColor = vec4(worldPos, 1.0);
 	// FragColor = vec4(diffuse * color, 1.0);
-	FragColor = vec4(color * (SSAO * diffuse), 1.0);
+	// FragColor = vec4(color * (SSAO * diffuse), 1.0);
 }
