@@ -10,9 +10,9 @@ const mlm::vec3	SKY_COLOR_DAY(0.4f, 0.7f, 0.9f);
 const mlm::vec3	SKY_COLOR_NIGHT(0.05f, 0.1f, 0.2f);
 const mlm::vec3	WATER_COLOR(0.0f, 0.0f, 0.8f);
 
-const float		FOG_WATER_NEAR = 0.0f;
-const float		FOG_NEAR = 120.0f;
-const float		FOG_FAR = 160.0f;
+// const float		FOG_WATER_NEAR = 0.0f;
+// const float		FOG_NEAR = 120.0f;
+// const float		FOG_FAR = 160.0f;
 
 const float		CLIPPING_NEAR = 0.25f;
 const float		CLIPPING_FAR = 640.0f;
@@ -40,17 +40,28 @@ void	Renderer::init()
 
 void	Renderer::initShaders()
 {
-	temp_initShaders();
-	return ;
+	// Draws textured quad to the screen
+	_quadShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/quad.frag");
 
-	_chunkShader = Shader("./resources/shaders/chunk.vert", "./resources/shaders/chunk.frag");
+	// Render shadow map
+	_shadowShader = Shader("./resources/temp-shaders/shadow.vert", "./resources/temp-shaders/shadow.frag");
+
+	// SSAO and blur shaders
+	_ssaoShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/SSAO.frag");
+	_ssaoBlurShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/SSAOBlur.frag");
+
+	// Draw basic geometry to gBuffers
+	_geometryShader = Shader("./resources/temp-shaders/geometry.vert", "./resources/temp-shaders/geometry.frag");
+
+	// Final lighting shader - Combines Light with shadows and SSAO
+	_lightingShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/lighting.frag");
+
+	// Draws water with opacity
+	_waterShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/water.frag");
+
+	// General UI/Debug shaders
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
-	_quadShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
 	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
-	_waterShader = Shader("./resources/shaders/water.vert", "./resources/shaders/water.frag");
-	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
-	_ssaoShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag");
-	_ssaoBlurShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag");
 }
 
 void	Renderer::initMeshes()
@@ -96,30 +107,57 @@ void	Renderer::initMeshes()
 
 void	Renderer::initFrameBuffers()
 {
-	temp_initFrameBuffers();
-	return ;
+	frameBufferIds.emplace_back(0, "Default");
 
 	mlm::ivec2	size = _engine.get_size();
-	_geometryFrameBuffer.create(size.x, size.y);
-	_geometryFrameBuffer.bind();
-	_geometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
-	_geometryFrameBuffer.attachColorTexture(1, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
-	_geometryFrameBuffer.attachColorTexture(2, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
-	_geometryFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
-	_geometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
-	_geometryFrameBuffer.unbind();
-	if (_geometryFrameBuffer.checkStatus() == false)
+	_terrainGeometryFrameBuffer.create(size.x, size.y);
+	_terrainGeometryFrameBuffer.bind();
+	_terrainGeometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
+	_terrainGeometryFrameBuffer.attachColorTexture(1, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
+	_terrainGeometryFrameBuffer.attachColorTexture(2, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
+	_terrainGeometryFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
+	_terrainGeometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+	_terrainGeometryFrameBuffer.unbind();
+	if (_terrainGeometryFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
+	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(0), "Geometry Color");
+	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(1), "Geometry Normal");
+	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(2), "Geometry Position");
 
-	_waterFrameBuffer.create(size.x, size.y);
-	_waterFrameBuffer.bind();
-	_waterFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, true, true, false);
-	_waterFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
-	_waterFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
-	_waterFrameBuffer.unbind();
-	if (_waterFrameBuffer.checkStatus() == false)
+	_waterGeometryFrameBuffer.create(size.x, size.y);
+	_waterGeometryFrameBuffer.bind();
+	_waterGeometryFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
+	_waterGeometryFrameBuffer.attachColorTexture(1, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
+	_waterGeometryFrameBuffer.attachColorTexture(2, GL_RGB16F, GL_RGBA, GL_FLOAT, true, true, false);
+	_waterGeometryFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
+	_waterGeometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+	_waterGeometryFrameBuffer.unbind();
+	if (_waterGeometryFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
+	frameBufferIds.emplace_back(_waterGeometryFrameBuffer.getColorTexture(0), "Water Color");
+	frameBufferIds.emplace_back(_waterGeometryFrameBuffer.getColorTexture(1), "Water Normal");
+	frameBufferIds.emplace_back(_waterGeometryFrameBuffer.getColorTexture(2), "Water Position");
+
+	_terrainLightingFrameBuffer.create(size.x, size.y);
+	_terrainLightingFrameBuffer.bind();
+	_terrainLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
+	_terrainLightingFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
+	_terrainLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+	_terrainLightingFrameBuffer.unbind();
+	if (_terrainLightingFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Water Framebuffer missing");
+	frameBufferIds.emplace_back(_terrainLightingFrameBuffer.getColorTexture(0), "Terrain Lighting Color");
 	
+	_waterLightingFrameBuffer.create(size.x, size.y);
+	_waterLightingFrameBuffer.bind();
+	_waterLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
+	_waterLightingFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
+	_waterLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+	_waterLightingFrameBuffer.unbind();
+	if (_waterLightingFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Water Framebuffer missing");
+	frameBufferIds.emplace_back(_waterLightingFrameBuffer.getColorTexture(0), "Water Lighting Color");
+
 	_shadowFrameBuffer.create(std::max(size.x * 2, 4096), std::max(size.y * 2, 4096));
 	_shadowFrameBuffer.bind();
 	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, true, GL_CLAMP_TO_BORDER, mlm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -134,6 +172,7 @@ void	Renderer::initFrameBuffers()
 	_ssaoFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	if (_ssaoFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("SSAO Framebuffer missing");
+	frameBufferIds.emplace_back(_ssaoFrameBuffer.getColorTexture(0), "SSAO Color");
 
 	_ssaoBlurFrameBuffer.create(size.x, size.y);
 	_ssaoBlurFrameBuffer.bind();
@@ -141,6 +180,7 @@ void	Renderer::initFrameBuffers()
 	_ssaoBlurFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	if (_ssaoBlurFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("SSAO Blur Framebuffer missing");
+	frameBufferIds.emplace_back(_ssaoBlurFrameBuffer.getColorTexture(0), "SSAO Blur Color");
 }
 
 void	Renderer::initSsaoSamples()
@@ -218,14 +258,15 @@ void	Renderer::cleanup()
 
 void	Renderer::cleanShaders()
 {
-	_chunkShader.del();
-	_cubeShader.del();
 	_quadShader.del();
-	_depthShader.del();
-	_waterShader.del();
 	_shadowShader.del();
 	_ssaoShader.del();
 	_ssaoBlurShader.del();
+	_geometryShader.del();
+	_lightingShader.del();
+	_waterShader.del();
+	_cubeShader.del();
+	_depthShader.del();
 }
 
 void	Renderer::cleanMeshes()
@@ -236,11 +277,16 @@ void	Renderer::cleanMeshes()
 
 void	Renderer::cleanFrameBuffers()
 {
-	_geometryFrameBuffer.destroy();
-	_waterFrameBuffer.destroy();
+	_terrainGeometryFrameBuffer.destroy();
+	_waterGeometryFrameBuffer.destroy();
 	_shadowFrameBuffer.destroy();
+	_terrainLightingFrameBuffer.destroy();
+	_waterLightingFrameBuffer.destroy();
 	_ssaoFrameBuffer.destroy();
 	_ssaoBlurFrameBuffer.destroy();
+
+	// Clear all framebuffers ids that were stored for debug purposes
+	frameBufferIds.clear();
 }
 
 void	Renderer::update()
@@ -256,48 +302,51 @@ void	Renderer::update()
 
 void	Renderer::render()
 {
-	temp_render();
+	FrameBuffer::unbind();
+	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
+
+	shadowPass();
+	terrainGeometryPass();
+	waterGeometryPass();
+	SSAOPass();
+	terrainLightingPass();
+	waterLightingPass();
+
+	renderFinal();
 	return ;
+
+	// bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	// if (wireFrameMode)
+	// 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	// if (wireFrameMode)
+	// 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
 
 	renderSun();
-	renderChunks();
-	// renderUI();
+	renderUI();
 }
 
-void	Renderer::renderChunks()
-{
-	_chunkShader.use();
-	updateChunkShader();
-	renderShadowMap();
-	renderTerrain();
-	renderSSAO();
-	// renderWater();
-	renderFinal();
-	// renderWaterFinal();
-}
+// void	Renderer::updateChunkShader()
+// {
+// 	_chunkShader.set_mat4("uProjection", _projection);
+// 	_chunkShader.set_mat4("uView", _view);
 
-void	Renderer::updateChunkShader()
-{
-	_chunkShader.set_mat4("uProjection", _projection);
-	_chunkShader.set_mat4("uView", _view);
+// 	if (_isUnderwater)
+// 		_chunkShader.set_float("uFogNear", FOG_WATER_NEAR);
+// 	else
+// 		_chunkShader.set_float("uFogNear", FOG_NEAR);
 
-	if (_isUnderwater)
-		_chunkShader.set_float("uFogNear", FOG_WATER_NEAR);
-	else
-		_chunkShader.set_float("uFogNear", FOG_NEAR);
+// 	_chunkShader.set_float("uFogFar", FOG_FAR);
+// 	_chunkShader.set_vec3("uFogColor", _bgColor);
+// 	_chunkShader.set_vec3("uLightDir", _sunDir);
 
-	_chunkShader.set_float("uFogFar", FOG_FAR);
-	_chunkShader.set_vec3("uFogColor", _bgColor);
-	_chunkShader.set_vec3("uLightDir", _sunDir);
+// 	_chunkShader.set_int("uLightingMode", _lightingMode);
 
-	_chunkShader.set_int("uLightingMode", _lightingMode);
+// 	_engine.getAtlas().bind();
+// }
 
-	_engine.getAtlas().bind();
-}
-
-void	Renderer::renderShadowMap()
+void	Renderer::shadowPass()
 {
 	_shadowShader.use();
 	_shadowShader.set_mat4("uLightProjection", _lightProjection);
@@ -313,14 +362,60 @@ void	Renderer::renderShadowMap()
 	glViewport(0, 0, size.x, size.y);
 }
 
-void	Renderer::renderSSAO()
+void	Renderer::terrainGeometryPass()
+{
+	_geometryShader.use();
+
+	_geometryShader.set_mat4("uProjection", _projection);
+	_geometryShader.set_mat4("uView", _view);
+	
+	glActiveTexture(GL_TEXTURE0);
+	_engine.getAtlas().bind();
+	_geometryShader.set_int("uAtlas", 0);
+
+	_terrainGeometryFrameBuffer.bind();
+	FrameBuffer::clearBufferfv(GL_COLOR, 0, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	FrameBuffer::clearBufferfv(GL_COLOR, 1, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	FrameBuffer::clearBufferfv(GL_COLOR, 2, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	FrameBuffer::clear(false, true, mlm::vec4(0.0f));
+
+	_manager.renderChunks(_geometryShader);
+}
+
+void	Renderer::waterGeometryPass()
+{
+	_geometryShader.use();
+
+	_geometryShader.set_mat4("uProjection", _projection);
+	_geometryShader.set_mat4("uView", _view);
+	
+	glActiveTexture(GL_TEXTURE0);
+	_engine.getAtlas().bind();
+	_geometryShader.set_int("uAtlas", 0);
+
+	_waterGeometryFrameBuffer.bind();
+	FrameBuffer::clearBufferfv(GL_COLOR, 0, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	FrameBuffer::clearBufferfv(GL_COLOR, 1, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	FrameBuffer::clearBufferfv(GL_COLOR, 2, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	FrameBuffer::clear(false, true, mlm::vec4(0.0f));
+
+	mlm::ivec2	size = _engine.get_size();
+	_waterGeometryFrameBuffer.blitDepthFrom(_terrainGeometryFrameBuffer.getId(), size.x, size.y);
+	_waterGeometryFrameBuffer.bind();
+
+	glDisable(GL_CULL_FACE);
+	_manager.renderWater(_geometryShader);
+	glEnable(GL_CULL_FACE);
+}
+
+void	Renderer::SSAOPass()
 {
 	_ssaoShader.use();
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(1));
+	glBindTexture(GL_TEXTURE_2D, _terrainGeometryFrameBuffer.getColorTexture(1));
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(2));
+	glBindTexture(GL_TEXTURE_2D, _terrainGeometryFrameBuffer.getColorTexture(2));
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, _ssaoNoiseTex);
 
@@ -343,70 +438,103 @@ void	Renderer::renderSSAO()
 	_quadMesh.draw(_ssaoBlurShader);
 }
 
-void	Renderer::renderTerrain()
+void	Renderer::terrainLightingPass()
 {
-	// return ;
-	_chunkShader.use();
+	_lightingShader.use();
 
-	_chunkShader.set_mat4("uLightProjection", _lightProjection);
-	_chunkShader.set_mat4("uLightView", _lightView);
 	glActiveTexture(GL_TEXTURE0);
-	_engine.getAtlas().bind();
-
+	glBindTexture(GL_TEXTURE_2D, _terrainGeometryFrameBuffer.getColorTexture(0));
+	_lightingShader.set_int("uGColor", 0);
 	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, _terrainGeometryFrameBuffer.getColorTexture(1));
+	_lightingShader.set_int("uGNormal", 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, _terrainGeometryFrameBuffer.getColorTexture(2));
+	_lightingShader.set_int("uGPosition", 2);
+
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
+	_lightingShader.set_int("uShadowMap", 3);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
+	_lightingShader.set_int("uSSAO", 4);
 
-	_chunkShader.set_int("uAtlas", 0);
-	_chunkShader.set_int("uShadowMap", 1);
-
-	_geometryFrameBuffer.bind();
-	FrameBuffer::clearBufferfv(GL_COLOR, 0,  mlm::vec4(_bgColor, 1.0f));
-	FrameBuffer::clearBufferfv(GL_COLOR, 1, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	FrameBuffer::clearBufferfv(GL_COLOR, 2, mlm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	FrameBuffer::clear(false, true, mlm::vec4(0.0f));
-
-	_manager.renderChunks(_chunkShader);
-}
-
-void	Renderer::renderWater()
-{
-	// return ;
-	_waterFrameBuffer.bind();
-	_waterFrameBuffer.clear(true, true, mlm::vec4(0.0f));
-
-	mlm::ivec2	size = _engine.get_size();
-	_waterFrameBuffer.blitDepthFrom(_geometryFrameBuffer.getId(), size.x, size.y);
-	_waterFrameBuffer.bind();
+	// _lightingShader.set_vec3("uLightPos", _sunDir)
+	_lightingShader.set_vec3("uLightDir", _sunDir);
+	_lightingShader.set_mat4("uLightView", _lightView);
+	_lightingShader.set_mat4("uLightProjection", _lightProjection);
 	
+	_lightingShader.set_mat4("uView", _view);
 
-	glDisable(GL_CULL_FACE);
-	_manager.renderWater(_chunkShader);
-	glEnable(GL_CULL_FACE);
-	_waterFrameBuffer.unbind();
+	_lightingShader.set_bool("uIsWater", false);
 
-	_manager.renderClear();
+	_terrainLightingFrameBuffer.bind();
+	_terrainLightingFrameBuffer.clear(true, true, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	_quadMesh.draw(_lightingShader);
 }
 
-void	Renderer::renderWaterFinal()
+void	Renderer::waterLightingPass()
+{
+	_lightingShader.use();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _waterGeometryFrameBuffer.getColorTexture(0));
+	_lightingShader.set_int("uGColor", 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, _waterGeometryFrameBuffer.getColorTexture(1));
+	_lightingShader.set_int("uGNormal", 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, _waterGeometryFrameBuffer.getColorTexture(2));
+	_lightingShader.set_int("uGPosition", 2);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
+	_lightingShader.set_int("uShadowMap", 3);
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
+	_lightingShader.set_int("uSSAO", 4);
+
+	// _lightingShader.set_vec3("uLightPos", _sunDir)
+	_lightingShader.set_vec3("uLightDir", _sunDir);
+	_lightingShader.set_mat4("uLightView", _lightView);
+	_lightingShader.set_mat4("uLightProjection", _lightProjection);
+	
+	_lightingShader.set_mat4("uView", _view);
+
+	_lightingShader.set_bool("uIsWater", true);
+
+	_waterLightingFrameBuffer.bind();
+	_waterLightingFrameBuffer.clear(true, true, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	_quadMesh.draw(_lightingShader);
+}
+
+void			Renderer::renderFinal()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	FrameBuffer::clear(false, true, mlm::vec4(1.0));
 
 
-	bool wireFrameMode = _engine.getInput().getWireFrameMode();
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	_quadShader.use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _terrainLightingFrameBuffer.getColorTexture(0));
+	_quadShader.set_int("uRenderTex", 0);
+	_quadMesh.draw(_quadShader);
+
+	glClear(GL_DEPTH_BUFFER_BIT);
 
 	_waterShader.use();
-	_waterShader.set_float("uWaterOpacity", 0.7f);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _waterLightingFrameBuffer.getColorTexture(0));
 	_waterShader.set_int("uRenderTex", 0);
+	_waterShader.set_float("uWaterOpacity", 0.9f);
 	_quadMesh.draw(_waterShader);
+	// _quadShader.use();
+	// glActiveTexture(GL_TEXTURE0);
+	// glBindTexture(GL_TEXTURE_2D, frameBufferIds[currentFrameBufferIdx].first);
+	// _quadShader.set_int("uRenderTex", 0);
 
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	// _quadMesh.draw(_quadShader);
 }
+
 
 void	Renderer::renderSun()
 {
@@ -484,41 +612,23 @@ void	Renderer::renderUI()
 
 }
 
-void	Renderer::renderFinal()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	bool wireFrameMode = _engine.getInput().getWireFrameMode();
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	_quadShader.use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
-	// glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
-	_quadShader.set_int("uRenderTex", 0);
-	_quadMesh.draw(_quadShader);
-
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-}
-
-void			Renderer::updateProjection()
+void	Renderer::updateProjection()
 {
 	mlm::vec2	size = static_cast<mlm::vec2>(_engine.get_size());
 	_projection = mlm::perspective(_camera.getZoom(), size.x / size.y, CLIPPING_NEAR, CLIPPING_FAR);
 }
 
-void			Renderer::updateView()
+void	Renderer::updateView()
 {
 	_view = _camera.getViewMatrix();
 }
 
-void			Renderer::updateLightProjection()
+void	Renderer::updateLightProjection()
 {
 	_lightProjection = mlm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, 0.1f, 512.0f);
 }
 
-void			Renderer::updateLightView()
+void	Renderer::updateLightView()
 {
 	_lightView = mlm::lookat(_sunPos, mlm::vec3(0.0f), mlm::vec3(0.0f, 1.0f, 0.0f));
 }
@@ -528,7 +638,7 @@ mlm::vec3	v3Lerp(const mlm::vec3 &v1, const mlm::vec3 &v2, float t)
 	return (v1 + t * (v2 - v1));
 }
 
-void			Renderer::updateUnderWater()
+void	Renderer::updateUnderWater()
 {
 	auto	block = _manager.getBlockType(_camera.getPos());
 	if (block.hasValue() && block.value() == Block::WATER)
@@ -543,13 +653,13 @@ void			Renderer::updateUnderWater()
 	}
 }
 
-void			Renderer::updateSunPos()
+void	Renderer::updateSunPos()
 {
 	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(_time), cosf(_time)));
 	_sunPos = _sunDir * 256.0f;
 }
 
-void			Renderer::updateTime()
+void	Renderer::updateTime()
 {
 	if (!_pause)
 		_time += _engine.get_delta_time() / 5.0f;
@@ -563,6 +673,12 @@ void	Renderer::togglePause()
 void	Renderer::setLightingMode(int mode)
 {
 	_lightingMode = mode;
+}
+
+void			Renderer::swapFrameBuffer(int direction)
+{
+	currentFrameBufferIdx = (currentFrameBufferIdx + frameBufferIds.size() + direction) % frameBufferIds.size();
+	std::cout << "Swapped framebuffer to <" << frameBufferIds[currentFrameBufferIdx].first << ">: " << frameBufferIds[currentFrameBufferIdx].second << std::endl;
 }
 
 mlm::mat4	&Renderer::getProjection()

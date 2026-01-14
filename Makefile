@@ -19,7 +19,6 @@ FILES_SRCS = \
 			AABB.cpp \
 			Frustum.cpp \
 			Renderer.cpp \
-			tempRenderer.cpp \
 			Player.cpp \
 			Coords.cpp \
 			TerrainGenerator.cpp \

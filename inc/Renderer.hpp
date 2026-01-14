@@ -30,30 +30,15 @@ class Renderer {
 
 		void			togglePause();
 		void			setLightingMode(int mode);
+		void			swapFrameBuffer(int direction);
 
 
 
 
 		// TEMP FUNCTIONS TO TEST SHADERS
-		void			temp_render();
-		void			temp_initShaders();
-		void			temp_initFrameBuffers();
 
-		void			temp_swapFrameBuffer(int direction);
-		uint32_t		temp_currentFrameBufferIdx = 0;
-		std::vector<std::pair<GLuint, std::string>>	temp_FrameBufferIds;
 
-		void			temp_shadowPass();
-		void			temp_terrainGeometryPass();
-		void			temp_waterGeometryPass();
-		void			temp_SSAOPass();
-		void			temp_terrainLightingPass();
-		void			temp_waterLightingPass();
 
-		void			temp_renderFinal();
-
-		Shader			temp_geometryShader;
-		Shader			temp_lightingShader;
 
 
 	private:
@@ -67,16 +52,15 @@ class Renderer {
 		void			cleanMeshes();
 		void			cleanFrameBuffers();
 
-		void			renderChunks();
-		void			updateChunkShader();
-		void			renderShadowMap();
-		void			renderSSAO();
-		void			renderTerrain();
-		void			renderWater();
-		void			renderWaterFinal();
-		void			renderSun();
+		void			shadowPass();
+		void			terrainGeometryPass();
+		void			waterGeometryPass();
+		void			SSAOPass();
+		void			terrainLightingPass();
+		void			waterLightingPass();
 		void			renderFinal();
-		
+
+		void			renderSun();
 		void			renderUI();
 
 		mlm::vec3		_bgColor;
@@ -86,14 +70,15 @@ class Renderer {
 		bool			_pause = false;
 		int				_lightingMode = 0;
 
-		Shader			_chunkShader;
-		Shader			_cubeShader;
 		Shader			_quadShader;
-		Shader			_depthShader;
-		Shader			_waterShader;
 		Shader			_shadowShader;
 		Shader			_ssaoShader;
 		Shader			_ssaoBlurShader;
+		Shader			_geometryShader;
+		Shader			_lightingShader;
+		Shader			_waterShader;
+		Shader			_cubeShader;
+		Shader			_depthShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
@@ -101,13 +86,16 @@ class Renderer {
 		VoxEngine		&_engine;
 		ChunkManager	&_manager;
 		Camera			&_camera;
-		FrameBuffer		_geometryFrameBuffer;
-		FrameBuffer		_waterFrameBuffer;
+
+		FrameBuffer		_terrainGeometryFrameBuffer;
+		FrameBuffer		_waterGeometryFrameBuffer;
 		FrameBuffer		_shadowFrameBuffer;
 		FrameBuffer		_terrainLightingFrameBuffer;
 		FrameBuffer		_waterLightingFrameBuffer;
 		FrameBuffer		_ssaoFrameBuffer;
 		FrameBuffer		_ssaoBlurFrameBuffer;
+		uint32_t		currentFrameBufferIdx = 0;
+		std::vector<std::pair<GLuint, std::string>>	frameBufferIds;
 
 		GLuint			_ssaoNoiseTex;
 

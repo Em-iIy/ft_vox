@@ -8,10 +8,10 @@ Created on: 24/07/2025
 
 #include "Frustum.hpp"
 
-const mlm::ivec2	WINDOW_SIZE(1024, 1024);
-// const mlm::ivec2	WINDOW_SIZE(3840, 2160);
+// const mlm::ivec2	WINDOW_SIZE(1024, 1024);
+const mlm::ivec2	WINDOW_SIZE(3840, 2160);
 
-// #define FPS
+#define FPS
 
 mlm::vec3	randVec3()
 {
@@ -46,8 +46,8 @@ void	VoxEngine::init()
 	rng::seed();
 
 	init_glfw();
-	// Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
-	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
+	Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
+	// Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
 	glfwSwapInterval(0);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
@@ -84,8 +84,8 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_KP_2, [this]() {_renderer.setLightingMode(2);});
 	_input.addOnPressCallback(GLFW_KEY_KP_3, [this]() {_renderer.setLightingMode(3);});
 
-	_input.addOnPressCallback(GLFW_KEY_LEFT, [this]() {_renderer.temp_swapFrameBuffer(-1);});
-	_input.addOnPressCallback(GLFW_KEY_RIGHT, [this]() {_renderer.temp_swapFrameBuffer(1);});
+	_input.addOnPressCallback(GLFW_KEY_LEFT, [this]() {_renderer.swapFrameBuffer(-1);});
+	_input.addOnPressCallback(GLFW_KEY_RIGHT, [this]() {_renderer.swapFrameBuffer(1);});
 
 
 	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
