@@ -145,7 +145,7 @@ void	Renderer::initFrameBuffers()
 
 void	Renderer::initSsaoSamples()
 {
-	std::array<mlm::vec3, 64>		ssaoSamples;
+	std::array<mlm::vec3, 16>		ssaoSamples;
 
 	rng::fgen	gen = rng::generator(0.0f, 1.0f);
 
