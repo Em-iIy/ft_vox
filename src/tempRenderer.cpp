@@ -215,13 +215,13 @@ void			Renderer::temp_terrainLightingPass()
 	temp_lightingShader.use();
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
 	temp_lightingShader.set_int("uGColor", 0);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(1));
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(1));
 	temp_lightingShader.set_int("uGNormal", 1);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(2));
+	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(2));
 	temp_lightingShader.set_int("uGPosition", 2);
 
 	glActiveTexture(GL_TEXTURE3);
@@ -250,13 +250,13 @@ void			Renderer::temp_waterLightingPass()
 	temp_lightingShader.use();
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(0));
+	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(0));
 	temp_lightingShader.set_int("uGColor", 0);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(1));
+	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(1));
 	temp_lightingShader.set_int("uGNormal", 1);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, _geometryFrameBuffer.getColorTexture(2));
+	glBindTexture(GL_TEXTURE_2D, _waterFrameBuffer.getColorTexture(2));
 	temp_lightingShader.set_int("uGPosition", 2);
 
 	glActiveTexture(GL_TEXTURE3);

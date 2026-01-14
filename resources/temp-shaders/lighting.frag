@@ -95,7 +95,7 @@ void	main()
 	shadow *= horizonFade;
 
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
-	if (uIsWater)
+	if (uIsWater == false)
 		FragColor *= SSAO;
 	// FragColor = vec4(worldPos, 1.0);
 	// FragColor = vec4(diffuse * color, 1.0);
