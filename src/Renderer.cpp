@@ -214,7 +214,7 @@ void	Renderer::initSsaoSamples()
 	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
 		_ssaoShader.set_vec3("uSamples[" + std::to_string(i) + "]", ssaoSamples[i]);
 
-	_ssaoShader.set_float("uRadius", 1.8f);
+	_ssaoShader.set_float("uRadius", 0.8f);
 
 	_ssaoShader.set_int("uGNormal", 0);
 	_ssaoShader.set_int("uGPosition", 1);

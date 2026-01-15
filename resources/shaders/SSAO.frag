@@ -18,7 +18,7 @@ uniform mat4		uProjection;
 
 in vec2	vertTexUV;
 
-const float			bias = 0.025;
+const float			bias = 0.05;
 
 void	main()
 {
@@ -45,6 +45,10 @@ void	main()
 
 		float	sampleDepth = texture(uGPosition, offset.xy).z;
 		if (sampleDepth >= 0.0)
+			continue ;
+		
+		vec3	sampleNormal = texture(uGNormal, offset.xy).xyz;
+		if (dot(sampleNormal, normal) > 0.99)
 			continue ;
 
 		float	rangeCheck = smoothstep(0.0, 1.0, uRadius / abs(fragPos.z - sampleDepth));
