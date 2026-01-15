@@ -66,7 +66,7 @@ class Renderer {
 		mlm::vec3		_bgColor;
 		bool			_isUnderwater = false;
 
-		float			_time;
+		float			_time = 0;
 		bool			_pause = false;
 		int				_lightingMode = 0;
 
