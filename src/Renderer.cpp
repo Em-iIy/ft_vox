@@ -540,7 +540,7 @@ void			Renderer::renderFinal()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _waterLightingFrameBuffer.getColorTexture(0));
 	_waterShader.set_int("uRenderTex", 0);
-	_waterShader.set_float("uWaterOpacity", 0.9f);
+	_waterShader.set_float("uWaterOpacity", 0.7f);
 	_quadMesh.draw(_waterShader);
 	// _quadShader.use();
 	// glActiveTexture(GL_TEXTURE0);
