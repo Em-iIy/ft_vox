@@ -41,23 +41,23 @@ void	Renderer::init()
 void	Renderer::initShaders()
 {
 	// Draws textured quad to the screen
-	_quadShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/quad.frag");
+	_quadShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
 
 	// Render shadow map
-	_shadowShader = Shader("./resources/temp-shaders/shadow.vert", "./resources/temp-shaders/shadow.frag");
+	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 
 	// SSAO and blur shaders
-	_ssaoShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/SSAO.frag");
-	_ssaoBlurShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/SSAOBlur.frag");
+	_ssaoShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag");
+	_ssaoBlurShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag");
 
 	// Draw basic geometry to gBuffers
-	_geometryShader = Shader("./resources/temp-shaders/geometry.vert", "./resources/temp-shaders/geometry.frag");
+	_geometryShader = Shader("./resources/shaders/geometry.vert", "./resources/shaders/geometry.frag");
 
 	// Final lighting shader - Combines Light with shadows and SSAO
-	_lightingShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/lighting.frag");
+	_lightingShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/lighting.frag");
 
 	// Draws water with opacity
-	_waterShader = Shader("./resources/temp-shaders/quad.vert", "./resources/temp-shaders/water.frag");
+	_waterShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/water.frag");
 
 	// General UI/Debug shaders
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
@@ -315,11 +315,11 @@ void	Renderer::render()
 	renderFinal();
 	return ;
 
-	// bool wireFrameMode = _engine.getInput().getWireFrameMode();
-	// if (wireFrameMode)
-	// 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	// if (wireFrameMode)
-	// 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
 
@@ -379,7 +379,15 @@ void	Renderer::terrainGeometryPass()
 	FrameBuffer::clearBufferfv(GL_COLOR, 2, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
 	FrameBuffer::clear(false, true, mlm::vec4(0.0f));
 
+
+	bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	_manager.renderChunks(_geometryShader);
+
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void	Renderer::waterGeometryPass()
@@ -403,9 +411,16 @@ void	Renderer::waterGeometryPass()
 	_waterGeometryFrameBuffer.blitDepthFrom(_terrainGeometryFrameBuffer.getId(), size.x, size.y);
 	_waterGeometryFrameBuffer.bind();
 
+		bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	glDisable(GL_CULL_FACE);
 	_manager.renderWater(_geometryShader);
 	glEnable(GL_CULL_FACE);
+
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void	Renderer::SSAOPass()
