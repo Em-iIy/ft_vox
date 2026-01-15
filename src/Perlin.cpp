@@ -85,7 +85,7 @@ float	Perlin::getValue(float x, float y, float z) const
 	return (value);
 }
 
-float		Perlin::_smoothStep(float t) const
+float	Perlin::_smoothStep(float t) const
 {
 	return (t * t * t * (t * (t * 6 - 15) + 10));
 }

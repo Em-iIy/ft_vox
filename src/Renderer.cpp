@@ -35,7 +35,6 @@ void	Renderer::init()
 	glEnable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-
 }
 
 void	Renderer::initShaders()
@@ -327,25 +326,6 @@ void	Renderer::render()
 	renderUI();
 }
 
-// void	Renderer::updateChunkShader()
-// {
-// 	_chunkShader.set_mat4("uProjection", _projection);
-// 	_chunkShader.set_mat4("uView", _view);
-
-// 	if (_isUnderwater)
-// 		_chunkShader.set_float("uFogNear", FOG_WATER_NEAR);
-// 	else
-// 		_chunkShader.set_float("uFogNear", FOG_NEAR);
-
-// 	_chunkShader.set_float("uFogFar", FOG_FAR);
-// 	_chunkShader.set_vec3("uFogColor", _bgColor);
-// 	_chunkShader.set_vec3("uLightDir", _sunDir);
-
-// 	_chunkShader.set_int("uLightingMode", _lightingMode);
-
-// 	_engine.getAtlas().bind();
-// }
-
 void	Renderer::shadowPass()
 {
 	_shadowShader.use();
@@ -523,7 +503,7 @@ void	Renderer::waterLightingPass()
 	_quadMesh.draw(_lightingShader);
 }
 
-void			Renderer::renderFinal()
+void	Renderer::renderFinal()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -690,7 +670,7 @@ void	Renderer::setLightingMode(int mode)
 	_lightingMode = mode;
 }
 
-void			Renderer::swapFrameBuffer(int direction)
+void	Renderer::swapFrameBuffer(int direction)
 {
 	currentFrameBufferIdx = (currentFrameBufferIdx + frameBufferIds.size() + direction) % frameBufferIds.size();
 	std::cout << "Swapped framebuffer to <" << frameBufferIds[currentFrameBufferIdx].first << ">: " << frameBufferIds[currentFrameBufferIdx].second << std::endl;

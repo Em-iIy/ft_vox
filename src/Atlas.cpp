@@ -46,7 +46,7 @@ bool	Atlas::load()
 	return (true);
 }
 
-void							Atlas::bind()
+void	Atlas::bind()
 {
 	_texture.bind();
 }

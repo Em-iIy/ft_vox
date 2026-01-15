@@ -19,7 +19,7 @@ Plane::Plane(const mlm::vec4 &eq)
 	_d = eq.w / length;
 }
 
-void		Plane::normalize()
+void	Plane::normalize()
 {
 	float	length = mlm::abs(_normal);
 	if (length > 0.0f)
@@ -29,7 +29,7 @@ void		Plane::normalize()
 	}
 }
 
-float		Plane::distance(const mlm::vec3 &p) const
+float	Plane::distance(const mlm::vec3 &p) const
 {
 	return (mlm::dot(_normal, p) + _d);
 }

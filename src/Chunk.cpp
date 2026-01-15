@@ -345,24 +345,24 @@ std::pair<mlm::vec3 &, mlm::vec3 &>	Chunk::getMinMax()
 	return (std::make_pair(std::reference_wrapper(_min), std::reference_wrapper(_max)));
 }
 
-mlm::ivec2							Chunk::getChunkPos()
+mlm::ivec2	Chunk::getChunkPos()
 {
 	return (_chunkPos);
 }
 
-mlm::ivec3							Chunk::getWorldPos()
+mlm::ivec3	Chunk::getWorldPos()
 {
 	return (_worldPos);
 }
 
-void								Chunk::setState(const Chunk::State state)
+void	Chunk::setState(const Chunk::State state)
 {
 	_stateMtx.lock();
 	_state = state;
 	_stateMtx.unlock();
 }
 
-Chunk::State						Chunk::getState()
+Chunk::State	Chunk::getState()
 {
 	_stateMtx.lock();
 	State ret = _state;

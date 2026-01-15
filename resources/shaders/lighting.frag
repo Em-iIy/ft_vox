@@ -11,13 +11,12 @@ uniform sampler2D	uGPosition;
 uniform sampler2D	uShadowMap;
 uniform sampler2D	uSSAO;
 
-uniform vec3		uLightPos;
-uniform vec3		uLightDir;
-
 uniform mat4		uProjection;
 uniform mat4		uView;
+
 uniform mat4		uLightProjection;
 uniform mat4		uLightView;
+uniform vec3		uLightDir;
 
 uniform bool		uIsWater;
 
@@ -52,25 +51,11 @@ float	shadowMapCalculation(vec4 worldPos)
 	return (shadow);
 }
 
-
 vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 {
 	vec3	lighting = (ambient + (1.0 - shadow) * diffuse) * texColor;
 	return (vec4(lighting, 1.0));
-	// if (uLightingMode == 0)
-	// {
-	// 	return (vec4(lighting, 1.0));
-	// }
-	// else if (uLightingMode == 1)
-	// 	return (vec4(ambient * texColor, 1.0));
-	// else if (uLightingMode == 2)
-	// 	return (vec4(diffuse * texColor, 1.0));
-	// else if (uLightingMode == 3)
-	// 	return (vec4((1.0 - shadow) * texColor, 1.0));
-	// else
-	// 	return (vec4(texColor, 1.0));
 }
-
 
 void	main()
 {
@@ -97,7 +82,4 @@ void	main()
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
 	if (uIsWater == false)
 		FragColor *= SSAO;
-	// FragColor = vec4(worldPos, 1.0);
-	// FragColor = vec4(diffuse * color, 1.0);
-	// FragColor = vec4(color * (SSAO * diffuse), 1.0);
 }

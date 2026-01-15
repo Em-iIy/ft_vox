@@ -18,7 +18,7 @@ ChunkManager::ChunkManager(VoxEngine &engine): _engine(engine)
 ChunkManager::~ChunkManager()
 {}
 
-void						ChunkManager::cleanup()
+void	ChunkManager::cleanup()
 {
 	// Join threads before clearing chunks to avoid heap-use-after-free on chunks
 	_running = false;
@@ -36,7 +36,7 @@ void						ChunkManager::cleanup()
 	chunks.clear();
 }
 
-void						ChunkManager::init(const ChunkManagerDTO &dto)
+void	ChunkManager::init(const ChunkManagerDTO &dto)
 {
 	_renderDistance = dto.renderDistance + 1;
 	_threadCount = dto.threadCount;
@@ -52,7 +52,7 @@ void						ChunkManager::init(const ChunkManagerDTO &dto)
 	
 }
 
-void						ChunkManager::update()
+void	ChunkManager::update()
 {
 	_updateLoadList();
 	_updateGenerateList();
@@ -65,7 +65,7 @@ void						ChunkManager::update()
 	_updateCameraChunkCoord();
 }
 
-void						ChunkManager::_updateLoadList()
+void	ChunkManager::_updateLoadList()
 {
 	int	loadCount = 0;
 	for (const mlm::ivec2 &pos : chunkLoadList)
@@ -81,7 +81,7 @@ void						ChunkManager::_updateLoadList()
 	chunkLoadList.clear();
 }
 
-void						ChunkManager::_updateGenerateList()
+void	ChunkManager::_updateGenerateList()
 {
 	int	generateCount = 0;
 	for (std::shared_ptr<Chunk> chunk : chunkGenerateList)
@@ -102,7 +102,7 @@ void						ChunkManager::_updateGenerateList()
 	chunkGenerateList.clear();
 }
 
-void						ChunkManager::_updateMeshList()
+void	ChunkManager::_updateMeshList()
 {
 	const std::vector<mlm::ivec2>	neighbors = {
 		mlm::ivec2(0, 1),
@@ -142,7 +142,7 @@ void						ChunkManager::_updateMeshList()
 	chunkMeshList.clear();
 }
 
-void						ChunkManager::_updateUnloadList()
+void	ChunkManager::_updateUnloadList()
 {
 	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
 	{
@@ -158,7 +158,7 @@ void						ChunkManager::_updateUnloadList()
 	}
 }
 
-void						ChunkManager::_updateUploadList()
+void	ChunkManager::_updateUploadList()
 {
 	for (std::shared_ptr<Chunk> chunk : chunkUploadList)
 	{
@@ -171,7 +171,7 @@ void						ChunkManager::_updateUploadList()
 	chunkUploadList.clear();
 }
 
-void						ChunkManager::_updateVisibleList()
+void	ChunkManager::_updateVisibleList()
 {
 	if (!_updateVisibility)
 		return ;
@@ -241,7 +241,7 @@ void						ChunkManager::_updateVisibleList()
 	_updateVisibility = false;
 }
 
-void						ChunkManager::_updateRenderList()
+void	ChunkManager::_updateRenderList()
 {
 	mlm::vec3	cameraPos = _engine.getCamera().getPos();
 	chunkRenderList.clear();
@@ -257,7 +257,7 @@ void						ChunkManager::_updateRenderList()
 	}
 }
 
-void						ChunkManager::_updateShadowRenderList()
+void	ChunkManager::_updateShadowRenderList()
 {
 	mlm::vec3	cameraPos = _engine.getCamera().getPos();
 	chunkShadowRenderList.clear();
@@ -273,7 +273,7 @@ void						ChunkManager::_updateShadowRenderList()
 	}
 }
 
-void						ChunkManager::_updateCameraChunkCoord()
+void	ChunkManager::_updateCameraChunkCoord()
 {
 	const mlm::ivec2 &cameraChunkCoord = getChunkCoord(_engine.getCamera().getPos());
 	if (cameraChunkCoord != _cameraChunkCoord)
@@ -286,7 +286,7 @@ void						ChunkManager::_updateCameraChunkCoord()
 	}
 }
 
-bool						ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
+bool	ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 {
 	// if loadable from file
 	// load from file
@@ -302,7 +302,7 @@ bool						ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 	return (true);
 }
 
-void						ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
+void	ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 {
 	if (!chunk)
 		return ;
@@ -359,7 +359,7 @@ ChunkManager::ChunkTask	ChunkManager::_popFromQueue()
 	return (ret);
 }
 
-void						ChunkManager::renderChunks(Shader &shader)
+void	ChunkManager::renderChunks(Shader &shader)
 {
 	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
 	// _queueMtx.lock();
@@ -373,7 +373,7 @@ void						ChunkManager::renderChunks(Shader &shader)
 	// glDisable(GL_CULL_FACE);
 }
 
-void						ChunkManager::renderChunksShadows(Shader &shader)
+void	ChunkManager::renderChunksShadows(Shader &shader)
 {
 	for (auto it = chunkShadowRenderList.rbegin(); it != chunkShadowRenderList.rend(); it++)
 	{
@@ -381,7 +381,7 @@ void						ChunkManager::renderChunksShadows(Shader &shader)
 	}
 }
 
-void						ChunkManager::renderWater(Shader &shader)
+void	ChunkManager::renderWater(Shader &shader)
 {
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
@@ -389,12 +389,12 @@ void						ChunkManager::renderWater(Shader &shader)
 	}
 }
 
-void						ChunkManager::renderClear()
+void	ChunkManager::renderClear()
 {
 	chunkRenderList.clear();
 }
 
-void						ChunkManager::unloadAll()
+void	ChunkManager::unloadAll()
 {
 	chunksMtx.lock();
 	chunks.clear();
@@ -574,12 +574,12 @@ void	ChunkManager::deleteBlock()
 	}
 }
 
-void						ChunkManager::setUpdateVisibility()
+void	ChunkManager::setUpdateVisibility()
 {
 	_updateVisibility = true;
 }
 
-VoxEngine					&ChunkManager::getEngine()
+VoxEngine	&ChunkManager::getEngine()
 {
 	return (_engine);
 }

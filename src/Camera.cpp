@@ -23,7 +23,7 @@ mlm::mat4	Camera::getViewMatrix() const
 	return (mlm::lookat(_front, _up));
 }
 
-void		Camera::processKeyboard(Direction dir, float deltaTime)
+void	Camera::processKeyboard(Direction dir, float deltaTime)
 {
 	float	velocity = _movementSpeed * deltaTime;
 	if (_sprinting)
@@ -56,7 +56,7 @@ void		Camera::processKeyboard(Direction dir, float deltaTime)
 	}
 }
 
-void		Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPitch)
+void	Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPitch)
 {
 	xOffset *= _mouseSensitivity;
 	yOffset *= _mouseSensitivity;
@@ -75,7 +75,7 @@ void		Camera::processMouseMovement(float xOffset, float yOffset, bool constrainP
 	updateVectors();
 }
 
-void		Camera::processMouseScroll(float yOffset)
+void	Camera::processMouseScroll(float yOffset)
 {
 	_zoom -= yOffset;
 	if (_zoom > 90.0f)
@@ -85,12 +85,12 @@ void		Camera::processMouseScroll(float yOffset)
 	std::cout << _zoom << std::endl;
 }
 
-void		Camera::toggleSprint()
+void	Camera::toggleSprint()
 {
 	_sprinting = !_sprinting;
 }
 
-void		Camera::updateVectors()
+void	Camera::updateVectors()
 {
 	_front = mlm::normalize(
 		mlm::vec3(
@@ -119,7 +119,7 @@ const mlm::vec3	&Camera::getViewDir() const
 	return (_front);
 }
 
-void		Camera::setPos(const mlm::vec3 &pos)
+void	Camera::setPos(const mlm::vec3 &pos)
 {
 	_pos = pos;
 }

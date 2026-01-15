@@ -5,7 +5,7 @@ Created on: 29/09/2025
 
 #include "Player.hpp"
 
-void		Player::setActiveBlock(Block::Type type)
+void	Player::setActiveBlock(Block::Type type)
 {
 	_activeBlock = type;
 }

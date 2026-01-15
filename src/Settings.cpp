@@ -9,7 +9,7 @@ Created on: 21/10/2025
 
 std::map<std::string, std::string>	Settings::_paths;
 
-const std::vector<std::string>			requiredPaths = {
+const std::vector<std::string>	requiredPaths = {
 	"terrainGenerator",
 	"chunkManager",
 	"renderer",

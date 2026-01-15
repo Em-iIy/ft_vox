@@ -145,7 +145,7 @@ void	VoxEngine::cleanup()
 	glfwTerminate();
 }
 
-void			VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
+void	VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
 {
 	if (!_updateFrustum)
 		return ;
@@ -153,7 +153,7 @@ void			VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &vi
 	_updateFrustum = false;
 }
 
-void			VoxEngine::updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
+void	VoxEngine::updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
 {
 	_shadowFrustum.update(projection * view);
 }
@@ -173,22 +173,22 @@ ChunkManager	&VoxEngine::getManager()
 	return (_chunkManager);
 }
 
-Atlas			&VoxEngine::getAtlas()
+Atlas	&VoxEngine::getAtlas()
 {
 	return (_atlas);
 }
 
-Frustum			&VoxEngine::getFrustum()
+Frustum	&VoxEngine::getFrustum()
 {
 	return (_frustum);
 }
 
-Frustum			&VoxEngine::getShadowFrustum()
+Frustum	&VoxEngine::getShadowFrustum()
 {
 	return (_shadowFrustum);
 }
 
-void			VoxEngine::setFrustumUpdate()
+void	VoxEngine::setFrustumUpdate()
 {
 	_updateFrustum = true;
 }

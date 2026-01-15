@@ -25,29 +25,29 @@ Block	&Block::operator=(const Block &src)
 	return (*this);
 }
 
-bool		Block::getEnabled() const
+bool	Block::getEnabled() const
 {
 	return (_isEnabled);
 }
 
-void		Block::setEnabled(bool enabled)
+void	Block::setEnabled(bool enabled)
 {
 	_isEnabled = enabled;
 }
 
-bool		Block::getTransparent() const
+bool	Block::getTransparent() const
 {
 	return (_type == WATER || _type == AIR);
 	// 	return (true);
 	// return (false);
 }
 
-Block::Type		Block::getType() const
+Block::Type	Block::getType() const
 {
 	return (_type);
 }
 
-void		Block::setType(Block::Type type)
+void	Block::setType(Block::Type type)
 {
 	_type = type;
 }
