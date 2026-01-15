@@ -32,15 +32,6 @@ class Renderer {
 		void			setLightingMode(int mode);
 		void			swapFrameBuffer(int direction);
 
-
-
-
-		// TEMP FUNCTIONS TO TEST SHADERS
-
-
-
-
-
 	private:
 		void			initShaders();
 		void			initMeshes();
