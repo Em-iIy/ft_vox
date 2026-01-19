@@ -11,5 +11,5 @@ uniform mat4	uView;
 void	main()
 {
 	gl_Position = uProjection * uView * uModel * vec4(inPos, 1.0);
-	gl_Position.z -= 0.001;
+	// gl_Position.z -= 0.001;
 }

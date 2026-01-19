@@ -8,5 +8,5 @@ in vec2	vertTexUV;
 
 void	main()
 {
-    FragColor = vec4(texture(uTexture, vertTexUV).rgb, 1.0);
+    FragColor = texture(uTexture, vertTexUV);
 }

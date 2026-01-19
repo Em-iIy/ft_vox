@@ -66,13 +66,13 @@ void	Renderer::initShaders()
 void	Renderer::initMeshes()
 {
 	std::vector<Vertex>		cubeVertices = {
-		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(0.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(0.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(0.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(-1.0f, -1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, -1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(-1.0f, 1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(-1.0f, -1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, -1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(-1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 	};
 	std::vector<uint32_t>	cubeIndices = {
@@ -118,7 +118,7 @@ void	Renderer::initFrameBuffers()
 	_terrainGeometryFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
 	_terrainGeometryFrameBuffer.unbind();
 	if (_terrainGeometryFrameBuffer.checkStatus() == false)
-		throw std::runtime_error("Water Framebuffer missing");
+		throw std::runtime_error("Terrain Framebuffer missing");
 	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(0), "Geometry Color");
 	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(1), "Geometry Normal");
 	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(2), "Geometry Position");
@@ -140,7 +140,6 @@ void	Renderer::initFrameBuffers()
 	_terrainLightingFrameBuffer.create(size.x, size.y);
 	_terrainLightingFrameBuffer.bind();
 	_terrainLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
-	_terrainLightingFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
 	_terrainLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
 	_terrainLightingFrameBuffer.unbind();
 	if (_terrainLightingFrameBuffer.checkStatus() == false)
@@ -150,7 +149,6 @@ void	Renderer::initFrameBuffers()
 	_waterLightingFrameBuffer.create(size.x, size.y);
 	_waterLightingFrameBuffer.bind();
 	_waterLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
-	_waterLightingFrameBuffer.ensureDepthRbo(GL_DEPTH24_STENCIL8);
 	_waterLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
 	_waterLightingFrameBuffer.unbind();
 	if (_waterLightingFrameBuffer.checkStatus() == false)
@@ -302,7 +300,7 @@ void	Renderer::update()
 void	Renderer::render()
 {
 	FrameBuffer::unbind();
-	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
+	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 0.0f));
 
 	shadowPass();
 	terrainGeometryPass();
@@ -311,16 +309,26 @@ void	Renderer::render()
 	terrainLightingPass();
 	waterLightingPass();
 
+	glDisable(GL_DEPTH_TEST);
+
+	FrameBuffer::unbind();
+	_cubeShader.use();
+	mlm::mat4	proj(1.0f);
+	mlm::mat4	view(1.0f);
+	mlm::mat4	model(1.0f);
+
+	_cubeShader.set_mat4("uProjection", proj);
+	_cubeShader.set_mat4("uView", view);
+	_cubeShader.set_mat4("uModel", model);
+	_cubeShader.set_vec3("uColor", mlm::vec3(0.3f, 0.0f, 0.8f));
+	_cubeShader.set_float("uAlpha", 1.0f);
+
+	_cubeMesh.draw(_cubeShader);
+
 	renderFinal();
+	glEnable(GL_DEPTH_TEST);
+
 	return ;
-
-	bool wireFrameMode = _engine.getInput().getWireFrameMode();
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 1.0f));
 
 	renderSun();
 	renderUI();
@@ -465,7 +473,9 @@ void	Renderer::terrainLightingPass()
 
 	_terrainLightingFrameBuffer.bind();
 	_terrainLightingFrameBuffer.clear(true, true, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	glDisable(GL_DEPTH_TEST);
 	_quadMesh.draw(_lightingShader);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::waterLightingPass()
@@ -500,7 +510,9 @@ void	Renderer::waterLightingPass()
 
 	_waterLightingFrameBuffer.bind();
 	_waterLightingFrameBuffer.clear(true, true, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	glDisable(GL_DEPTH_TEST);
 	_quadMesh.draw(_lightingShader);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::renderFinal()
@@ -513,8 +525,6 @@ void	Renderer::renderFinal()
 	glBindTexture(GL_TEXTURE_2D, _terrainLightingFrameBuffer.getColorTexture(0));
 	_quadShader.set_int("uRenderTex", 0);
 	_quadMesh.draw(_quadShader);
-
-	glClear(GL_DEPTH_BUFFER_BIT);
 
 	_waterShader.use();
 	glActiveTexture(GL_TEXTURE0);

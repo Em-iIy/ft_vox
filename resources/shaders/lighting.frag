@@ -59,7 +59,10 @@ vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 
 void	main()
 {
-	vec3	color = texture(uGColor, vertTexUV).xyz;
+	vec4	color4 = texture(uGColor, vertTexUV);
+	if (color4.a < 1.0)
+		discard ;
+	vec3	color = color4.rgb;
 	vec3	normal = normalize(texture(uGNormal, vertTexUV).xyz);
 	vec3	fragPos = texture(uGPosition, vertTexUV).xyz;
 	float	SSAO = texture(uSSAO, vertTexUV).r;
@@ -81,5 +84,5 @@ void	main()
 
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
 	if (uIsWater == false)
-		FragColor *= SSAO;
+		FragColor.rgb *= SSAO;
 }
