@@ -22,6 +22,7 @@ uniform bool		uIsWater;
 
 const float	shadowStrength = 0.6;
 const float	ambientStrength = 0.4;
+const float	diffuseStrength = 1.0 - ambientStrength;
 const vec3	lightColor = vec3(1.0);
 
 float	shadowMapCalculation(vec4 worldPos)
@@ -74,7 +75,7 @@ void	main()
 	float	diffuseAngle = dot(normal, ViewlightDir);
 	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
 
-	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor;
+	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor * ambientStrength;
 	vec3	ambient = ambientStrength * lightColor;
 
 	float	shadow = shadowMapCalculation(worldPos);
@@ -84,5 +85,5 @@ void	main()
 
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
 	if (uIsWater == false)
-		FragColor.rgb *= SSAO;
+		FragColor.rgb *= pow(SSAO, 2);
 }
