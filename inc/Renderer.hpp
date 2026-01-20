@@ -70,6 +70,7 @@ class Renderer {
 		Shader			_waterShader;
 		Shader			_cubeShader;
 		Shader			_depthShader;
+		Shader			_skyShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;

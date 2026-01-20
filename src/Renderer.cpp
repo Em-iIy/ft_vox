@@ -58,6 +58,9 @@ void	Renderer::initShaders()
 	// Draws water with opacity
 	_waterShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/water.frag");
 
+	// Shader for the skybox
+	_skyShader = Shader("./resources/shaders/sky.vert", "./resources/shaders/sky.frag");
+
 	// General UI/Debug shaders
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
@@ -264,6 +267,7 @@ void	Renderer::cleanShaders()
 	_waterShader.del();
 	_cubeShader.del();
 	_depthShader.del();
+	_skyShader.del();
 }
 
 void	Renderer::cleanMeshes()
@@ -312,18 +316,17 @@ void	Renderer::render()
 	glDisable(GL_DEPTH_TEST);
 
 	FrameBuffer::unbind();
-	_cubeShader.use();
+	_skyShader.use();
 	mlm::mat4	proj(1.0f);
 	mlm::mat4	view(1.0f);
 	mlm::mat4	model(1.0f);
 
-	_cubeShader.set_mat4("uProjection", proj);
-	_cubeShader.set_mat4("uView", view);
-	_cubeShader.set_mat4("uModel", model);
-	_cubeShader.set_vec3("uColor", mlm::vec3(0.3f, 0.0f, 0.8f));
-	_cubeShader.set_float("uAlpha", 1.0f);
+	_skyShader.set_mat4("uProjection", proj);
+	_skyShader.set_mat4("uView", view);
+	_skyShader.set_mat4("uModel", model);
+	_skyShader.set_vec3("uColor", mlm::vec3(0.3f, 0.0f, 0.8f));
 
-	_cubeMesh.draw(_cubeShader);
+	_cubeMesh.draw(_skyShader);
 
 	renderFinal();
 	glEnable(GL_DEPTH_TEST);
