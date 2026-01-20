@@ -312,24 +312,8 @@ void	Renderer::render()
 	SSAOPass();
 	terrainLightingPass();
 	waterLightingPass();
-
-	glDisable(GL_DEPTH_TEST);
-
-	FrameBuffer::unbind();
-	_skyShader.use();
-	mlm::mat4	proj(1.0f);
-	mlm::mat4	view(1.0f);
-	mlm::mat4	model(1.0f);
-
-	_skyShader.set_mat4("uProjection", proj);
-	_skyShader.set_mat4("uView", view);
-	_skyShader.set_mat4("uModel", model);
-	_skyShader.set_vec3("uColor", mlm::vec3(0.3f, 0.0f, 0.8f));
-
-	_cubeMesh.draw(_skyShader);
-
+	renderSkyBox();
 	renderFinal();
-	glEnable(GL_DEPTH_TEST);
 
 	return ;
 
@@ -518,10 +502,29 @@ void	Renderer::waterLightingPass()
 	glEnable(GL_DEPTH_TEST);
 }
 
+void	Renderer::renderSkyBox()
+{
+	FrameBuffer::unbind();
+
+	_skyShader.use();
+	mlm::mat4	proj(1.0f);
+	mlm::mat4	view(1.0f);
+	mlm::mat4	model(1.0f);
+
+	_skyShader.set_mat4("uProjection", proj);
+	_skyShader.set_mat4("uView", view);
+	_skyShader.set_mat4("uModel", model);
+	_skyShader.set_vec3("uColor", mlm::vec3(0.3f, 0.0f, 0.8f));
+
+	glDisable(GL_DEPTH_TEST);
+	_cubeMesh.draw(_skyShader);
+	glEnable(GL_DEPTH_TEST);
+}
+
 void	Renderer::renderFinal()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	FrameBuffer::unbind();
+	glDisable(GL_DEPTH_TEST);
 
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);
@@ -535,6 +538,8 @@ void	Renderer::renderFinal()
 	_waterShader.set_int("uRenderTex", 0);
 	_waterShader.set_float("uWaterOpacity", 0.7f);
 	_quadMesh.draw(_waterShader);
+
+	glEnable(GL_DEPTH_TEST);
 	// _quadShader.use();
 	// glActiveTexture(GL_TEXTURE0);
 	// glBindTexture(GL_TEXTURE_2D, frameBufferIds[currentFrameBufferIdx].first);

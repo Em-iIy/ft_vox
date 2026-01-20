@@ -49,6 +49,7 @@ class Renderer {
 		void			SSAOPass();
 		void			terrainLightingPass();
 		void			waterLightingPass();
+		void			renderSkyBox();
 		void			renderFinal();
 
 		void			renderSun();
