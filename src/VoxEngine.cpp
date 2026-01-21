@@ -48,7 +48,7 @@ void	VoxEngine::init()
 	init_glfw();
 	Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
 	// Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
-	glfwSwapInterval(0);
+	// glfwSwapInterval(0);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 

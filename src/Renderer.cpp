@@ -386,7 +386,7 @@ void	Renderer::waterGeometryPass()
 	_waterGeometryFrameBuffer.blitDepthFrom(_terrainGeometryFrameBuffer.getId(), size.x, size.y);
 	_waterGeometryFrameBuffer.bind();
 
-		bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	bool wireFrameMode = _engine.getInput().getWireFrameMode();
 	if (wireFrameMode)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -505,20 +505,25 @@ void	Renderer::waterLightingPass()
 void	Renderer::renderSkyBox()
 {
 	FrameBuffer::unbind();
-
+	mlm::mat4	model = mlm::scale(mlm::mat4(1.0f), mlm::vec3(0.5f));
 	_skyShader.use();
-	mlm::mat4	proj(1.0f);
-	mlm::mat4	view(1.0f);
-	mlm::mat4	model(1.0f);
-
-	_skyShader.set_mat4("uProjection", proj);
-	_skyShader.set_mat4("uView", view);
+	_skyShader.set_mat4("uProjection", _projection);
+	_skyShader.set_mat4("uView", _view);
 	_skyShader.set_mat4("uModel", model);
-	_skyShader.set_vec3("uColor", mlm::vec3(0.3f, 0.0f, 0.8f));
+	_skyShader.set_float("uTime", _time);
+
+	bool wireFrameMode = _engine.getInput().getWireFrameMode();
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	_cubeMesh.draw(_skyShader);
+	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+
+	if (wireFrameMode)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void	Renderer::renderFinal()
