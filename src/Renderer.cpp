@@ -512,6 +512,13 @@ void	Renderer::renderSkyBox()
 	_skyShader.set_mat4("uModel", model);
 	_skyShader.set_float("uTime", _time);
 
+	_skyShader.set_vec4("uStops", mlm::vec4(0.1f, 0.25f, 0.60f, 0.8f));
+	_skyShader.set_vec4("uColors[0]", mlm::vec4(0.5f, 0.25f, 0.6f, 1.0f));
+	_skyShader.set_vec4("uColors[1]", mlm::vec4(1.0f, 0.25f, 0.70f, 1.0f));
+	_skyShader.set_vec4("uColors[2]", mlm::vec4(0.0f, 1.0f, 0.70f, 1.0f));
+	_skyShader.set_vec4("uColors[3]", mlm::vec4(0.5f, 0.25f, 1.0f, 1.0f));
+	_skyShader.set_int("uStopCount", 4);
+
 	bool wireFrameMode = _engine.getInput().getWireFrameMode();
 	if (wireFrameMode)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
