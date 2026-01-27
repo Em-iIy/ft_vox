@@ -1,0 +1,40 @@
+{
+	"timeSettings": {
+		"sunriseLen": 5,
+		"dayLen": 5,
+		"sunsetLen": 1,
+		"nightLen": 1
+	},
+	"gradientStop0": {
+		"sunriseCol": [0.0, 1.0, 2.0, 3.0],
+		"dayLowCol": [0.0, 1.0, 2.0, 3.0],
+		"dayHighCol": [0.0, 1.0, 2.0, 3.0],
+		"sunsetCol": [0.0, 1.0, 2.0, 3.0],
+		"nightLowCol": [0.0, 1.0, 2.0, 3.0],
+		"nightHighCol": [0.0, 1.0, 2.0, 3.0]
+	},
+	"gradientStop1": {
+		"sunriseCol": [0.0, 1.0, 2.0, 3.0],
+		"dayLowCol": [0.0, 1.0, 2.0, 3.0],
+		"dayHighCol": [0.0, 1.0, 2.0, 3.0],
+		"sunsetCol": [0.0, 1.0, 2.0, 3.0],
+		"nightLowCol": [0.0, 1.0, 2.0, 3.0],
+		"nightHighCol": [0.0, 1.0, 2.0, 3.0]
+	},
+	"gradientStop2": {
+		"sunriseCol": [0.0, 1.0, 2.0, 3.0],
+		"dayLowCol": [0.0, 1.0, 2.0, 3.0],
+		"dayHighCol": [0.0, 1.0, 2.0, 3.0],
+		"sunsetCol": [0.0, 1.0, 2.0, 3.0],
+		"nightLowCol": [0.0, 1.0, 2.0, 3.0],
+		"nightHighCol": [0.0, 1.0, 2.0, 3.0]
+	},
+	"gradientStop3": {
+		"sunriseCol": [0.0, 1.0, 2.0, 3.0],
+		"dayLowCol": [0.0, 1.0, 2.0, 3.0],
+		"dayHighCol": [0.0, 1.0, 2.0, 3.0],
+		"sunsetCol": [0.0, 1.0, 2.0, 3.0],
+		"nightLowCol": [0.0, 1.0, 2.0, 3.0],
+		"nightHighCol": [0.0, 1.0, 2.0, 3.0]
+	}
+}

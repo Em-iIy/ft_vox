@@ -94,6 +94,8 @@ void	VoxEngine::init()
 	{
 		throw std::runtime_error("Uh oh no atlas we lost :/");
 	}
+
+	_sky.load(Settings::loadSky());
 	
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
 	_chunkManager.init(Settings::loadChunkManager());
@@ -186,6 +188,11 @@ Frustum	&VoxEngine::getFrustum()
 Frustum	&VoxEngine::getShadowFrustum()
 {
 	return (_shadowFrustum);
+}
+
+Sky	&VoxEngine::getSky()
+{
+	return (_sky);
 }
 
 void	VoxEngine::setFrustumUpdate()

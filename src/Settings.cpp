@@ -14,6 +14,7 @@ const std::vector<std::string>	requiredPaths = {
 	"chunkManager",
 	"renderer",
 	"atlas",
+	"sky",
 };
 
 Settings::Settings() {}

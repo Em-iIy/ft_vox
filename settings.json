@@ -14,5 +14,9 @@
 	"atlas": {
 		"path": "resources/settings/",
 		"name": "atlas.json"
+	},
+	"sky": {
+		"path": "resources/settings/",
+		"name": "sky.json"
 	}
 }

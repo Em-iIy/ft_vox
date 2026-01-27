@@ -7,16 +7,38 @@ Created on: 26/01/2026
 
 #include "SkyGradient.hpp"
 
-class Sky
+struct	SkyTimeSettings
 {
-public:
-	Sky();
-	~Sky();
-private:
-	// Holds the colors for all times of the day for it's specific stop
-	SkyGradient _gradientStop0;
-	SkyGradient _gradientStop1;
-	SkyGradient _gradientStop2;
-	SkyGradient _gradientStop3;
+	// Length of differnt times of day in seconds
+	float	sunriseLen = {};
+	float	dayLen = {};
+	float	sunsetLen = {};
+	float	nightLen = {};
 };
 
+struct	SkyDTO
+{
+	SkyTimeSettings	timeSettings;
+	GradientDTO		stop0;
+	GradientDTO		stop1;
+	GradientDTO		stop2;
+	GradientDTO		stop3;
+};
+
+class	Sky
+{
+	public:
+		Sky();
+		Sky(const SkyDTO &dto);
+		~Sky();
+
+		void	load(const SkyDTO &dto);
+	private:
+		SkyTimeSettings	_timeSettings;
+
+		// Holds the colors for all times of the day for it's specific stop
+		SkyGradient		_gradientStop0;
+		SkyGradient		_gradientStop1;
+		SkyGradient		_gradientStop2;
+		SkyGradient		_gradientStop3;
+};

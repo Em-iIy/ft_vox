@@ -24,6 +24,9 @@ FILES_SRCS = \
 			TerrainGenerator.cpp \
 			loadTerrainGenerator.cpp \
 			loadAtlas.cpp \
+			loadSky.cpp \
+			Sky.cpp \
+			SkyGradient.cpp \
 			Settings.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
