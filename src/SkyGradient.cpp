@@ -52,3 +52,20 @@ void	SkyGradient::load(const GradientDTO &dto, const SkyTimeSettings &timeSettin
 		}
 	);
 }
+
+mlm::vec4	SkyGradient::sampleAt(const float t) const
+{
+	auto stop = std::find_if(_stops.begin(), _stops.end(), 
+		[t](const auto &a)
+		{
+			return (a.first < t);
+		}
+	);
+	if (stop == _stops.begin())
+		return (_stops.front().second);
+	if (stop == _stops.end())
+		return (_stops.back().second);
+	// basic return (no blending)
+	return (stop->second);
+}
+
