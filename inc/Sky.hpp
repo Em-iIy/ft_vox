@@ -33,6 +33,10 @@ class	Sky
 		~Sky();
 
 		void	load(const SkyDTO &dto);
+		void	update(const float deltaTime);
+		void	togglePause();
+		float	getTime() const;
+
 	private:
 		SkyTimeSettings	_timeSettings;
 
@@ -41,4 +45,9 @@ class	Sky
 		SkyGradient		_gradientStop1;
 		SkyGradient		_gradientStop2;
 		SkyGradient		_gradientStop3;
+
+		float			_time = {};
+		bool			_paused = false;
+
+		float			_getTotalTime() const;
 };

@@ -79,6 +79,7 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
 	_input.addOnPressCallback(GLFW_KEY_TAB, [this]() {_input.toggleWireFrame();});
 	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_renderer.togglePause();});
+	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_sky.togglePause();});
 	_input.addOnPressCallback(GLFW_KEY_KP_0, [this]() {_renderer.setLightingMode(0);});
 	_input.addOnPressCallback(GLFW_KEY_KP_1, [this]() {_renderer.setLightingMode(1);});
 	_input.addOnPressCallback(GLFW_KEY_KP_2, [this]() {_renderer.setLightingMode(2);});
@@ -115,6 +116,7 @@ void	VoxEngine::mainLoop()
 		Window::update();
 		_chunkManager.update();
 		_renderer.update();
+		_sky.update(Window::get_delta_time());
 		updateFrustum(_renderer.getProjection(), _renderer.getView());
 		updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
 

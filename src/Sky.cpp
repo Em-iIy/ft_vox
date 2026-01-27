@@ -29,3 +29,28 @@ void	Sky::load(const SkyDTO &dto)
 	_gradientStop2.load(dto.stop2, dto.timeSettings);
 	_gradientStop3.load(dto.stop3, dto.timeSettings);
 }
+
+void	Sky::update(const float deltaTime)
+{
+	if (_paused == true)
+		return ;
+	_time += deltaTime;
+	
+	if (_time > _getTotalTime())
+		_time = -_getTotalTime();
+}
+
+void	Sky::togglePause()
+{
+	_paused = !_paused;
+}
+
+float	Sky::getTime() const
+{
+	return (_time);
+}
+
+float	Sky::_getTotalTime() const
+{
+	return (_timeSettings.dayLen + _timeSettings.nightLen);
+}
