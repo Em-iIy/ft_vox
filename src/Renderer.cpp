@@ -684,7 +684,8 @@ void	Renderer::updateUnderWater()
 
 void	Renderer::updateSunPos()
 {
-	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(_time), cosf(_time)));
+	float	skyTime = _engine.getSky().getTimePercent() * 2.0f * M_PI;
+	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(skyTime), cosf(skyTime)));
 	_sunPos = _sunDir * 256.0f;
 }
 
