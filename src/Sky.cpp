@@ -15,7 +15,6 @@ Sky::Sky(const SkyDTO &dto)
 	load(dto);
 }
 
-
 Sky::~Sky()
 {
 }
@@ -37,7 +36,7 @@ void	Sky::update(const float deltaTime)
 	_time += deltaTime;
 	
 	if (_time > _getTotalTime())
-		_time = -_getTotalTime();
+		_time -= _getTotalTime();
 }
 
 void	Sky::togglePause()
@@ -48,6 +47,11 @@ void	Sky::togglePause()
 float	Sky::getTime() const
 {
 	return (_time);
+}
+
+float	Sky::getTimePercent() const
+{
+	return (_time / _getTotalTime());
 }
 
 float	Sky::_getTotalTime() const

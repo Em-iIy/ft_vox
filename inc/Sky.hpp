@@ -36,15 +36,16 @@ class	Sky
 		void	update(const float deltaTime);
 		void	togglePause();
 		float	getTime() const;
-
-	private:
-		SkyTimeSettings	_timeSettings;
+		float	getTimePercent() const;
 
 		// Holds the colors for all times of the day for it's specific stop
 		SkyGradient		_gradientStop0;
 		SkyGradient		_gradientStop1;
 		SkyGradient		_gradientStop2;
 		SkyGradient		_gradientStop3;
+
+	private:
+		SkyTimeSettings	_timeSettings;
 
 		float			_time = {};
 		bool			_paused = false;
