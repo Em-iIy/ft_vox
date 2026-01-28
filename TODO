@@ -11,11 +11,19 @@
 	+ shaders
 
 - Skybox
-	- texture
+	x texture
+	- spere mesh
+	- render
+		+ colors
+			+ gradient
+			+ transition through stages
 		- stars
+			- voronoi noise
 		- sun
 		- moon
-	- render
+		- aurora
+			- noise texture
+		
 
 + Lighting
 	+ sunlight
@@ -76,6 +84,7 @@
 				+ frequency
 		+ seed
 		- load map
+		+ sky
 	+ reload
 
 
