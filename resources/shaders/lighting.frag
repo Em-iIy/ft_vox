@@ -85,5 +85,5 @@ void	main()
 
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
 	if (uIsWater == false)
-		FragColor.rgb *= pow(SSAO, 2);
+		FragColor.rgb *= SSAO;
 }
