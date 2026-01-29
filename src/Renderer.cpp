@@ -105,6 +105,61 @@ void	Renderer::initMeshes()
 		0, 3, 2
 	};
 	_quadMesh = Mesh(quadVertices, quadIndices);
+
+	std::vector<Vertex>		sphereVertices;
+	std::vector<uint32_t>	sphereIndices;
+
+	constexpr float	PI = M_PI;
+	constexpr float	PI_2 = 2.0f * PI;
+	const int		stacks = 64;
+	const int		slices = 64;
+	const float		radius = 1.0f;
+
+	for (int i = 0; i <= stacks; ++i)
+	{
+		float	stack = static_cast<float>(i) / stacks;
+		float	phi = stack * PI;
+
+		for (int j = 0; j <= slices; ++j)
+		{
+			float	slice = static_cast<float>(j) / slices;
+			float	theta = slice * PI_2;
+
+			mlm::vec3	pos(
+				radius * std::sin(phi) * std::cos(theta),
+				radius * std::cos(phi),
+				radius * std::sin(phi) * std::sin(theta)
+			);
+
+			Vertex vert;
+			vert.pos = pos;
+			vert.normal = mlm::normalize(mlm::vec3(0.0f) - pos);
+			vert.texUV = mlm::vec2(slice, stack);
+
+			sphereVertices.push_back(vert);
+		}
+	}
+
+	const uint32_t stride = slices + 1;
+	for (int i = 0; i < stacks; ++i)
+	{
+		for (int j = 0; j < slices; ++j)
+		{
+			uint32_t a = i * stride + j;
+			uint32_t b = a + stride;
+			uint32_t c = a + 1;
+			uint32_t d = b + 1;
+
+			sphereIndices.push_back(a);
+			sphereIndices.push_back(b);
+			sphereIndices.push_back(c);
+
+			sphereIndices.push_back(b);
+			sphereIndices.push_back(c);
+			sphereIndices.push_back(d);
+		}
+	}
+	_sphereMesh = Mesh(sphereVertices, sphereIndices);
 }
 
 void	Renderer::initFrameBuffers()
@@ -185,7 +240,7 @@ void	Renderer::initFrameBuffers()
 
 void	Renderer::initSsaoSamples()
 {
-	std::array<mlm::vec3, 16>		ssaoSamples;
+	std::array<mlm::vec3, 8>		ssaoSamples;
 
 	rng::fgen	gen = rng::generator(0.0f, 1.0f);
 
@@ -274,6 +329,7 @@ void	Renderer::cleanMeshes()
 {
 	// _cubeMesh.del()
 	// _quadMesh.del()
+	// _sphereMesh.del()
 }
 
 void	Renderer::cleanFrameBuffers()
@@ -514,7 +570,6 @@ void	Renderer::renderSkyBox()
 
 	Sky &sky = _engine.getSky();
 	float timePercent = sky.getTimePercent();
-	std::cout << timePercent << std::endl;
 
 	_skyShader.set_vec4("uStops", mlm::vec4(0.38f, 0.47f, 0.61f, 1.0f));
 	_skyShader.set_vec4("uColors[0]", sky._gradientStop0.sampleAt(timePercent));
@@ -529,7 +584,7 @@ void	Renderer::renderSkyBox()
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
-	_cubeMesh.draw(_skyShader);
+	_sphereMesh.draw(_skyShader);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 

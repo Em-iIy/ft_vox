@@ -75,6 +75,7 @@ class Renderer {
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
+		Mesh			_sphereMesh;
 
 		VoxEngine		&_engine;
 		ChunkManager	&_manager;
