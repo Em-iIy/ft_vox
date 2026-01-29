@@ -114,11 +114,11 @@ void	VoxEngine::mainLoop()
 	{
 		_input.handleKeys();
 		Window::update();
-		_chunkManager.update();
-		_renderer.update();
-		_sky.update(Window::get_delta_time());
+		_renderer.update(); // Maybe this order fixed the culling issue (test more!)
 		updateFrustum(_renderer.getProjection(), _renderer.getView());
 		updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
+		_chunkManager.update();
+		_sky.update(Window::get_delta_time());
 
 		_renderer.render();
 
