@@ -30,8 +30,15 @@ out vec4	FragColor;
 
 vec3	sun(vec3 dir, vec3 sunDir)
 {
-	float	f = pow(max(dot(dir, uSunDir), 0.0), 128);
-	vec3	color = vec3(1.0, 0.6, 0.7) * smoothstep(0.65, 0.9, f * 0.8);
+	float	f = pow(max(dot(dir, sunDir), 0.0), 128);
+	vec3	color = vec3(1.0, 1.0, 0.0) * smoothstep(0.65, 0.9, f);
+	return (color);
+}
+
+vec3	moon(vec3 dir, vec3 moonDir)
+{
+	float	f = pow(max(dot(dir, moonDir), 0.0), 256);
+	vec3	color = vec3(0.8, 0.9, 1.0) * smoothstep(0.9, 1.0, f);
 	return (color);
 }
 
@@ -61,4 +68,5 @@ void	main()
 	}
 	FragColor = color;
 	FragColor.xyz += sun(dir, uSunDir);
+	FragColor.xyz += moon(dir, -uSunDir);
 }
