@@ -1,9 +1,9 @@
 {
 	"timeSettings": {
-		"sunriseLen": 1,
-		"dayLen": 5,
-		"sunsetLen": 1,
-		"nightLen": 5
+		"sunriseLen": 10,
+		"dayLen": 50,
+		"sunsetLen": 10,
+		"nightLen": 50
 	},
 	"gradientStop0": {
 		"sunriseCol": [1, 0.27451, 0.27451, 1],

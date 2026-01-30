@@ -565,8 +565,8 @@ void	Renderer::renderSkyBox()
 	_skyShader.use();
 	_skyShader.set_mat4("uProjection", _projection);
 	_skyShader.set_mat4("uView", _view);
-	_skyShader.set_mat4("uModel", model);
-	_skyShader.set_float("uTime", _time);
+
+	_skyShader.set_vec3("uSunDir", _sunDir);
 
 	Sky &sky = _engine.getSky();
 	float timePercent = sky.getTimePercent();

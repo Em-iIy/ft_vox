@@ -1,10 +1,10 @@
 #version 430 core
 
-uniform float	uTime;
-
 uniform vec4	uColors[4];
 uniform vec4	uStops;
 uniform int		uStopCount;
+
+uniform vec3	uSunDir;
 
 in vec3		viewDir;
 
@@ -27,6 +27,13 @@ out vec4	FragColor;
 // 	}
 // 	FragColor = vec4(color * upFactor, upFactor);
 // }
+
+vec3	sun(vec3 dir, vec3 sunDir)
+{
+	float	f = pow(max(dot(dir, uSunDir), 0.0), 128);
+	vec3	color = vec3(1.0, 0.6, 0.7) * smoothstep(0.65, 0.9, f * 0.8);
+	return (color);
+}
 
 void	main()
 {
@@ -53,4 +60,5 @@ void	main()
 		}
 	}
 	FragColor = color;
+	FragColor.xyz += sun(dir, uSunDir);
 }

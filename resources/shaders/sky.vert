@@ -5,7 +5,6 @@ layout (location = 1) in vec3	inNormal;
 layout (location = 2) in vec2	inTexUV;
 
 uniform mat4	uProjection;
-uniform mat4	uModel;
 uniform mat4	uView;
 
 out	vec3	viewDir;
