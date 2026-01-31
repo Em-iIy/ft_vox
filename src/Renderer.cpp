@@ -372,12 +372,11 @@ void	Renderer::render()
 	SSAOPass();
 	terrainLightingPass();
 	waterLightingPass();
-	renderSkyBox();
+	renderSky();
 	renderFinal();
 
 	return ;
 
-	renderSun();
 	renderUI();
 }
 
@@ -562,7 +561,13 @@ void	Renderer::waterLightingPass()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void	Renderer::renderSkyBox()
+void	Renderer::renderSky()
+{
+	renderSkyColor();
+	renderSolarBodies();
+}
+
+void	Renderer::renderSkyColor()
 {
 	FrameBuffer::unbind();
 	_skyShader.use();
@@ -586,11 +591,9 @@ void	Renderer::renderSkyBox()
 	_sphereMesh.draw(_skyShader);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	
-	renderSun();
 }
 
-void	Renderer::renderSun()
+void	Renderer::renderSolarBodies()
 {
 	FrameBuffer::unbind();
 

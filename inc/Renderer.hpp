@@ -49,10 +49,11 @@ class Renderer {
 		void			SSAOPass();
 		void			terrainLightingPass();
 		void			waterLightingPass();
-		void			renderSkyBox();
+		void			renderSky();
+		void			renderSkyColor();
+		void			renderSolarBodies();
 		void			renderFinal();
 
-		void			renderSun();
 		void			renderUI();
 
 		mlm::vec3		_bgColor;
