@@ -16,9 +16,22 @@ struct	SkyTimeSettings
 	float	nightLen = {};
 };
 
+struct SolarBody
+{
+	mlm::vec4	diskColor;
+	float		diskFactor;
+	float		diskSize;
+	mlm::vec4	glowColor;
+	float		glowFactor;
+	float		glowShaprness;
+};
+
+
 struct	SkyDTO
 {
 	SkyTimeSettings	timeSettings;
+	SolarBody		sun;
+	SolarBody		moon;
 	GradientDTO		stop0;
 	GradientDTO		stop1;
 	GradientDTO		stop2;
@@ -43,6 +56,10 @@ class	Sky
 		SkyGradient		_gradientStop1;
 		SkyGradient		_gradientStop2;
 		SkyGradient		_gradientStop3;
+
+		// Settings for how the sun and moon looks
+		SolarBody		_sun;
+		SolarBody		_moon;
 
 	private:
 		SkyTimeSettings	_timeSettings;

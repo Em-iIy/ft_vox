@@ -1,9 +1,25 @@
 {
 	"timeSettings": {
-		"sunriseLen": 10,
-		"dayLen": 50,
-		"sunsetLen": 10,
-		"nightLen": 50
+		"sunriseLen": 1,
+		"dayLen": 5,
+		"sunsetLen": 1,
+		"nightLen": 5
+	},
+	"sun": {
+		"diskColor": [1.0, 1.0, 0.0, 1.0],
+		"diskFactor": 0.8,
+		"diskSize": 0.002,
+		"glowColor": [1.0, 0.7, 0.3, 1.0],
+		"glowFactor": 0.2,
+		"glowShaprness": 64
+	},
+	"moon": {
+		"diskColor": [0.8, 0.9, 1.0, 1.0],
+		"diskFactor": 1.0,
+		"diskSize": 0.0005,
+		"glowColor": [0.2, 0.2, 0.9, 1.0],
+		"glowFactor": 0.2,
+		"glowShaprness": 128
 	},
 	"gradientStop0": {
 		"sunriseCol": [1, 0.27451, 0.27451, 1],

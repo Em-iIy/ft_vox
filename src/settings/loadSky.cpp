@@ -18,6 +18,16 @@ static void	loadVec4(mlm::vec4 &target, JSON::NodePtr node)
 	}
 }
 
+static void	loadSolarBody(SolarBody &target, JSON::NodePtr node)
+{
+	loadVec4(target.diskColor, node->get("diskColor"));
+	target.diskFactor = node->get("diskFactor")->getNumber();
+	target.diskSize = node->get("diskSize")->getNumber();
+	loadVec4(target.glowColor, node->get("glowColor"));
+	target.glowFactor = node->get("glowFactor")->getNumber();
+	target.glowShaprness = node->get("glowShaprness")->getNumber();
+}
+
 static void	loadGradient(GradientDTO &target, JSON::NodePtr node)
 {
 	loadVec4(target.sunriseCol, node->get("sunriseCol"));
@@ -46,6 +56,9 @@ SkyDTO		Settings::loadSky()
 		JSON::NodePtr	root = terrainGeneratorJSON.getRoot();
 
 		loadTimeSettings(skyDTO.timeSettings, root->get("timeSettings"));
+
+		loadSolarBody(skyDTO.sun, root->get("sun"));
+		loadSolarBody(skyDTO.moon, root->get("moon"));
 
 		loadGradient(skyDTO.stop0, root->get("gradientStop0"));
 		loadGradient(skyDTO.stop1, root->get("gradientStop1"));

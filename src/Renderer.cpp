@@ -593,11 +593,28 @@ void	Renderer::renderSkyBox()
 void	Renderer::renderSun()
 {
 	FrameBuffer::unbind();
+
+	Sky &sky = _engine.getSky();
+	
 	_solarBodiesShader.use();
 	_solarBodiesShader.set_mat4("uProjection", _projection);
 	_solarBodiesShader.set_mat4("uView", _view);
 
 	_solarBodiesShader.set_vec3("uSunDir", _sunDir);
+
+	_solarBodiesShader.set_vec4("uSunDiskColor", sky._sun.diskColor);
+	_solarBodiesShader.set_float("uSunDiskFactor", sky._sun.diskFactor);
+	_solarBodiesShader.set_float("uSunDiskSize", sky._sun.diskSize);
+	_solarBodiesShader.set_vec4("uSunGlowColor", sky._sun.glowColor);
+	_solarBodiesShader.set_float("uSunGlowFactor", sky._sun.glowFactor);
+	_solarBodiesShader.set_float("uSunGlowSharpness", sky._sun.glowShaprness);
+
+	_solarBodiesShader.set_vec4("uMoonDiskColor", sky._moon.diskColor);
+	_solarBodiesShader.set_float("uMoonDiskFactor", sky._moon.diskFactor);
+	_solarBodiesShader.set_float("uMoonDiskSize", sky._moon.diskSize);
+	_solarBodiesShader.set_vec4("uMoonGlowColor", sky._moon.glowColor);
+	_solarBodiesShader.set_float("uMoonGlowFactor", sky._moon.glowFactor);
+	_solarBodiesShader.set_float("uMoonGlowSharpness", sky._moon.glowShaprness);
 
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 

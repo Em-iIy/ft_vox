@@ -23,6 +23,9 @@ void	Sky::load(const SkyDTO &dto)
 {
 	_timeSettings = dto.timeSettings;
 
+	_sun = dto.sun;
+	_moon = dto.moon;
+
 	_gradientStop0.load(dto.stop0, dto.timeSettings);
 	_gradientStop1.load(dto.stop1, dto.timeSettings);
 	_gradientStop2.load(dto.stop2, dto.timeSettings);
