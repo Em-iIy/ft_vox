@@ -61,6 +61,9 @@ void	Renderer::initShaders()
 	// Shader for the skybox
 	_skyShader = Shader("./resources/shaders/sky.vert", "./resources/shaders/sky.frag");
 
+	// Shader for the skybox
+	_solarBodiesShader = Shader("./resources/shaders/sky.vert", "./resources/shaders/solarBodies.frag");
+
 	// General UI/Debug shaders
 	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
 	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
@@ -323,6 +326,7 @@ void	Renderer::cleanShaders()
 	_cubeShader.del();
 	_depthShader.del();
 	_skyShader.del();
+	_solarBodiesShader.del();
 }
 
 void	Renderer::cleanMeshes()
@@ -561,7 +565,6 @@ void	Renderer::waterLightingPass()
 void	Renderer::renderSkyBox()
 {
 	FrameBuffer::unbind();
-	mlm::mat4	model = mlm::scale(mlm::mat4(1.0f), mlm::vec3(0.5f));
 	_skyShader.use();
 	_skyShader.set_mat4("uProjection", _projection);
 	_skyShader.set_mat4("uView", _view);
@@ -578,18 +581,33 @@ void	Renderer::renderSkyBox()
 	_skyShader.set_vec4("uColors[3]", sky._gradientStop3.sampleAt(timePercent));
 	_skyShader.set_int("uStopCount", 4);
 
-	bool wireFrameMode = _engine.getInput().getWireFrameMode();
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	_sphereMesh.draw(_skyShader);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
+	
+	renderSun();
+}
 
-	if (wireFrameMode)
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+void	Renderer::renderSun()
+{
+	FrameBuffer::unbind();
+	_solarBodiesShader.use();
+	_solarBodiesShader.set_mat4("uProjection", _projection);
+	_solarBodiesShader.set_mat4("uView", _view);
+
+	_solarBodiesShader.set_vec3("uSunDir", _sunDir);
+
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	_sphereMesh.draw(_solarBodiesShader);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void	Renderer::renderFinal()
@@ -617,36 +635,6 @@ void	Renderer::renderFinal()
 	// _quadShader.set_int("uRenderTex", 0);
 
 	// _quadMesh.draw(_quadShader);
-}
-
-
-void	Renderer::renderSun()
-{
-	mlm::mat4	model;
-
-	_cubeShader.use();
-	_cubeShader.set_mat4("uProjection", _projection);
-	_cubeShader.set_mat4("uView", _view);
-
-	// draw sun
-	model = mlm::translate(mlm::mat4(1.0f), _sunPos * 2.0f);
-	model = mlm::scale(model, mlm::vec3(5.0f));
-	_cubeShader.set_mat4("uModel", model);
-
-	_cubeShader.set_vec3("uColor", mlm::vec3(1.f, 1.0f, .5f));
-	_cubeShader.set_float("uAlpha", 1.0f);
-
-	_cubeMesh.draw(_cubeShader);
-
-	// draw moon
-	model = mlm::translate(mlm::mat4(1.0f), -1.0f * _sunPos);
-	model = mlm::scale(model, mlm::vec3(2.0f));
-	_cubeShader.set_mat4("uModel", model);
-
-	_cubeShader.set_vec3("uColor", mlm::vec3(1.f, 1.0f, 1.0f));
-	_cubeShader.set_float("uAlpha", 1.0f);
-
-	_cubeMesh.draw(_cubeShader);
 }
 
 void	Renderer::renderUI()

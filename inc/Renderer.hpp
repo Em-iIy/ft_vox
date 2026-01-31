@@ -72,6 +72,7 @@ class Renderer {
 		Shader			_cubeShader;
 		Shader			_depthShader;
 		Shader			_skyShader;
+		Shader			_solarBodiesShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
