@@ -374,7 +374,6 @@ void	Renderer::render()
 	waterLightingPass();
 	renderSky();
 	renderFinal();
-
 	return ;
 
 	renderUI();
