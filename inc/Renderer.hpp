@@ -40,7 +40,6 @@ class Renderer {
 		void			initSsaoNoise();
 
 		void			cleanShaders();
-		void			cleanMeshes();
 		void			cleanFrameBuffers();
 
 		void			shadowPass();

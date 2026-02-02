@@ -158,8 +158,8 @@ void	Renderer::initMeshes()
 			sphereIndices.push_back(c);
 
 			sphereIndices.push_back(b);
-			sphereIndices.push_back(c);
 			sphereIndices.push_back(d);
+			sphereIndices.push_back(c);
 		}
 	}
 	_sphereMesh = Mesh(sphereVertices, sphereIndices);
@@ -310,7 +310,6 @@ void	Renderer::initSsaoNoise()
 void	Renderer::cleanup()
 {
 	cleanShaders();
-	cleanMeshes();
 	cleanFrameBuffers();
 }
 
@@ -327,13 +326,6 @@ void	Renderer::cleanShaders()
 	_depthShader.del();
 	_skyShader.del();
 	_solarBodiesShader.del();
-}
-
-void	Renderer::cleanMeshes()
-{
-	// _cubeMesh.del()
-	// _quadMesh.del()
-	// _sphereMesh.del()
 }
 
 void	Renderer::cleanFrameBuffers()
@@ -507,7 +499,6 @@ void	Renderer::terrainLightingPass()
 	glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
 	_lightingShader.set_int("uSSAO", 4);
 
-	// _lightingShader.set_vec3("uLightPos", _sunDir)
 	_lightingShader.set_vec3("uLightDir", _sunDir);
 	_lightingShader.set_mat4("uLightView", _lightView);
 	_lightingShader.set_mat4("uLightProjection", _lightProjection);
@@ -544,7 +535,6 @@ void	Renderer::waterLightingPass()
 	glBindTexture(GL_TEXTURE_2D, _ssaoBlurFrameBuffer.getColorTexture(0));
 	_lightingShader.set_int("uSSAO", 4);
 
-	// _lightingShader.set_vec3("uLightPos", _sunDir)
 	_lightingShader.set_vec3("uLightDir", _sunDir);
 	_lightingShader.set_mat4("uLightView", _lightView);
 	_lightingShader.set_mat4("uLightProjection", _lightProjection);
@@ -562,70 +552,41 @@ void	Renderer::waterLightingPass()
 
 void	Renderer::renderSky()
 {
+	glDisable(GL_DEPTH_TEST);
 	renderSkyColor();
 	renderSolarBodies();
+	glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::renderSkyColor()
 {
 	FrameBuffer::unbind();
+
 	_skyShader.use();
 	_skyShader.set_mat4("uProjection", _projection);
 	_skyShader.set_mat4("uView", _view);
 
-	_skyShader.set_vec3("uSunDir", _sunDir);
-
 	Sky &sky = _engine.getSky();
-	float timePercent = sky.getTimePercent();
+	_skyShader.set_vec3("uSunDir", _sunDir);
+	sky.setGradient(_skyShader);
 
-	_skyShader.set_vec4("uStops", mlm::vec4(0.38f, 0.47f, 0.61f, 1.0f));
-	_skyShader.set_vec4("uColors[0]", sky._gradientStop0.sampleAt(timePercent));
-	_skyShader.set_vec4("uColors[1]", sky._gradientStop1.sampleAt(timePercent));
-	_skyShader.set_vec4("uColors[2]", sky._gradientStop2.sampleAt(timePercent));
-	_skyShader.set_vec4("uColors[3]", sky._gradientStop3.sampleAt(timePercent));
-	_skyShader.set_int("uStopCount", 4);
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
 	_sphereMesh.draw(_skyShader);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::renderSolarBodies()
 {
 	FrameBuffer::unbind();
 
-	Sky &sky = _engine.getSky();
-	
 	_solarBodiesShader.use();
 	_solarBodiesShader.set_mat4("uProjection", _projection);
 	_solarBodiesShader.set_mat4("uView", _view);
 
+	Sky &sky = _engine.getSky();
 	_solarBodiesShader.set_vec3("uSunDir", _sunDir);
-
-	_solarBodiesShader.set_vec4("uSunDiskColor", sky._sun.diskColor);
-	_solarBodiesShader.set_float("uSunDiskFactor", sky._sun.diskFactor);
-	_solarBodiesShader.set_float("uSunDiskSize", sky._sun.diskSize);
-	_solarBodiesShader.set_vec4("uSunGlowColor", sky._sun.glowColor);
-	_solarBodiesShader.set_float("uSunGlowFactor", sky._sun.glowFactor);
-	_solarBodiesShader.set_float("uSunGlowSharpness", sky._sun.glowShaprness);
-
-	_solarBodiesShader.set_vec4("uMoonDiskColor", sky._moon.diskColor);
-	_solarBodiesShader.set_float("uMoonDiskFactor", sky._moon.diskFactor);
-	_solarBodiesShader.set_float("uMoonDiskSize", sky._moon.diskSize);
-	_solarBodiesShader.set_vec4("uMoonGlowColor", sky._moon.glowColor);
-	_solarBodiesShader.set_float("uMoonGlowFactor", sky._moon.glowFactor);
-	_solarBodiesShader.set_float("uMoonGlowSharpness", sky._moon.glowShaprness);
+	sky.setSolarBodies(_solarBodiesShader);
 
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
 	_sphereMesh.draw(_solarBodiesShader);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

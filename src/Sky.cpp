@@ -42,6 +42,35 @@ void	Sky::update(const float deltaTime)
 		_time -= _getTotalTime();
 }
 
+void	Sky::setGradient(Shader &shader)
+{
+	float timePercent = getTimePercent();
+	
+	shader.set_vec4("uStops", mlm::vec4(0.38f, 0.47f, 0.61f, 1.0f));
+	shader.set_vec4("uColors[0]", _gradientStop0.sampleAt(timePercent));
+	shader.set_vec4("uColors[1]", _gradientStop1.sampleAt(timePercent));
+	shader.set_vec4("uColors[2]", _gradientStop2.sampleAt(timePercent));
+	shader.set_vec4("uColors[3]", _gradientStop3.sampleAt(timePercent));
+	shader.set_int("uStopCount", 4);
+}
+
+void	Sky::setSolarBodies(Shader &shader)
+{
+	shader.set_vec4("uSunDiskColor",_sun.diskColor);
+	shader.set_float("uSunDiskFactor",_sun.diskFactor);
+	shader.set_float("uSunDiskSize",_sun.diskSize);
+	shader.set_vec4("uSunGlowColor",_sun.glowColor);
+	shader.set_float("uSunGlowFactor",_sun.glowFactor);
+	shader.set_float("uSunGlowSharpness",_sun.glowShaprness);
+
+	shader.set_vec4("uMoonDiskColor",_moon.diskColor);
+	shader.set_float("uMoonDiskFactor",_moon.diskFactor);
+	shader.set_float("uMoonDiskSize",_moon.diskSize);
+	shader.set_vec4("uMoonGlowColor",_moon.glowColor);
+	shader.set_float("uMoonGlowFactor",_moon.glowFactor);
+	shader.set_float("uMoonGlowSharpness",_moon.glowShaprness);
+}
+
 void	Sky::togglePause()
 {
 	_paused = !_paused;

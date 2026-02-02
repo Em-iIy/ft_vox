@@ -18,12 +18,12 @@ struct	SkyTimeSettings
 
 struct SolarBody
 {
-	mlm::vec4	diskColor;
-	float		diskFactor;
-	float		diskSize;
-	mlm::vec4	glowColor;
-	float		glowFactor;
-	float		glowShaprness;
+	mlm::vec4	diskColor = {};
+	float		diskFactor = {};
+	float		diskSize = {};
+	mlm::vec4	glowColor = {};
+	float		glowFactor = {};
+	float		glowShaprness = {};
 };
 
 
@@ -47,9 +47,14 @@ class	Sky
 
 		void	load(const SkyDTO &dto);
 		void	update(const float deltaTime);
+		void	setGradient(Shader &shader);
+		void	setSolarBodies(Shader &shader);
 		void	togglePause();
 		float	getTime() const;
 		float	getTimePercent() const;
+
+	private:
+		SkyTimeSettings	_timeSettings;
 
 		// Holds the colors for all times of the day for it's specific stop
 		SkyGradient		_gradientStop0;
@@ -60,9 +65,6 @@ class	Sky
 		// Settings for how the sun and moon looks
 		SolarBody		_sun;
 		SolarBody		_moon;
-
-	private:
-		SkyTimeSettings	_timeSettings;
 
 		float			_time = {};
 		bool			_paused = false;
