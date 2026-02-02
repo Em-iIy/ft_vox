@@ -5,6 +5,7 @@ Created on: 29/09/2025
 
 #include "Renderer.hpp"
 #include "VoxEngine.hpp"
+#include "ShaderManager.hpp"
 
 const mlm::vec3	SKY_COLOR_DAY(0.4f, 0.7f, 0.9f);
 const mlm::vec3	SKY_COLOR_NIGHT(0.05f, 0.1f, 0.2f);
@@ -40,33 +41,33 @@ void	Renderer::init()
 void	Renderer::initShaders()
 {
 	// Draws textured quad to the screen
-	_quadShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
+	ShaderManager::loadShader(_quadShader, "./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
 
 	// Render shadow map
-	_shadowShader = Shader("./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
+	ShaderManager::loadShader(_shadowShader, "./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 
 	// SSAO and blur shaders
-	_ssaoShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag");
-	_ssaoBlurShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag");
+	ShaderManager::loadShader(_ssaoShader, "./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag", [this](){initSsaoSamples();});
+	ShaderManager::loadShader(_ssaoBlurShader, "./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag", [this](){initSsaoBlurShader();});
 
 	// Draw basic geometry to gBuffers
-	_geometryShader = Shader("./resources/shaders/geometry.vert", "./resources/shaders/geometry.frag");
+	ShaderManager::loadShader(_geometryShader, "./resources/shaders/geometry.vert", "./resources/shaders/geometry.frag");
 
 	// Final lighting shader - Combines Light with shadows and SSAO
-	_lightingShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/lighting.frag");
+	ShaderManager::loadShader(_lightingShader, "./resources/shaders/quad.vert", "./resources/shaders/lighting.frag");
 
 	// Draws water with opacity
-	_waterShader = Shader("./resources/shaders/quad.vert", "./resources/shaders/water.frag");
+	ShaderManager::loadShader(_waterShader, "./resources/shaders/quad.vert", "./resources/shaders/water.frag");
 
 	// Shader for the skybox
-	_skyShader = Shader("./resources/shaders/sky.vert", "./resources/shaders/sky.frag");
+	ShaderManager::loadShader(_skyShader, "./resources/shaders/sky.vert", "./resources/shaders/sky.frag");
 
 	// Shader for the skybox
-	_solarBodiesShader = Shader("./resources/shaders/sky.vert", "./resources/shaders/solarBodies.frag");
+	ShaderManager::loadShader(_solarBodiesShader, "./resources/shaders/sky.vert", "./resources/shaders/solarBodies.frag");
 
 	// General UI/Debug shaders
-	_cubeShader = Shader("./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
-	_depthShader = Shader("./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
+	ShaderManager::loadShader(_cubeShader, "./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
+	ShaderManager::loadShader(_depthShader, "./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
 }
 
 void	Renderer::initMeshes()
@@ -277,7 +278,10 @@ void	Renderer::initSsaoSamples()
 	_ssaoShader.set_int("uGNormal", 0);
 	_ssaoShader.set_int("uGPosition", 1);
 	_ssaoShader.set_int("uNoiseTex", 2);
+}
 
+void	Renderer::initSsaoBlurShader()
+{
 	_ssaoBlurShader.use();
 	_ssaoBlurShader.set_int("uTexture", 0);
 }
@@ -315,17 +319,7 @@ void	Renderer::cleanup()
 
 void	Renderer::cleanShaders()
 {
-	_quadShader.del();
-	_shadowShader.del();
-	_ssaoShader.del();
-	_ssaoBlurShader.del();
-	_geometryShader.del();
-	_lightingShader.del();
-	_waterShader.del();
-	_cubeShader.del();
-	_depthShader.del();
-	_skyShader.del();
-	_solarBodiesShader.del();
+	ShaderManager::unloadShaders();
 }
 
 void	Renderer::cleanFrameBuffers()

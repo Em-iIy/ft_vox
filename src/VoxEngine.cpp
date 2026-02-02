@@ -5,11 +5,12 @@ Created on: 24/07/2025
 
 #include "VoxEngine.hpp"
 #include "Settings.hpp"
+#include "ShaderManager.hpp"
 
 #include "Frustum.hpp"
 
-// const mlm::ivec2	WINDOW_SIZE(1024, 1024);
-const mlm::ivec2	WINDOW_SIZE(3840, 2160);
+const mlm::ivec2	WINDOW_SIZE(1024, 1024);
+// const mlm::ivec2	WINDOW_SIZE(3840, 2160);
 
 #define FPS
 
@@ -46,14 +47,15 @@ void	VoxEngine::init()
 	rng::seed();
 
 	init_glfw();
-	Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
-	// Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
+	// Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
+	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
 	// glfwSwapInterval(0);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
 	// Reload all chunks?
 	_input.addOnPressCallback(GLFW_KEY_R, [this]() {_chunkManager.unloadAll();});
+	_input.addOnPressCallback(GLFW_KEY_R, []() {ShaderManager::reloadShaders();});
 
 	// Camera movement (maybe move into separate setup function)
 	_input.addOnDownCallback(GLFW_KEY_W, [this]() {_camera.processKeyboard(Camera::FORWARD, get_delta_time());});

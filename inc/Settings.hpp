@@ -28,6 +28,6 @@ class Settings {
 
 	private:
 		// Setting filenames
-		static	std::map<std::string, std::string>	_paths;
+		static std::map<std::string, std::string>	_paths;
 
 };

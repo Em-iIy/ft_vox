@@ -37,6 +37,7 @@ class Renderer {
 		void			initMeshes();
 		void			initFrameBuffers();
 		void			initSsaoSamples();
+		void			initSsaoBlurShader();
 		void			initSsaoNoise();
 
 		void			cleanShaders();

@@ -28,6 +28,7 @@ FILES_SRCS = \
 			Sky.cpp \
 			SkyGradient.cpp \
 			Settings.cpp \
+			ShaderManager.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
