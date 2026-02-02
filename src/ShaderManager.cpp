@@ -20,9 +20,15 @@ ShaderManager::ShaderManager() {}
 
 void	ShaderManager::loadShader(Shader &shader, const char *vertexFileName, const char *fragmentFileName, ShaderInit init)
 {
-	// Create shader
-	shader = Shader(vertexFileName, fragmentFileName);
-
+	try
+	{
+		// Create shader
+		shader = Shader(vertexFileName, fragmentFileName);
+	}
+	catch(...)
+	{
+		std::cout << "In shader: " << vertexFileName << " " << fragmentFileName << std::endl << std::endl;
+	}
 	// Fetch stats for the shader files
 	struct stat	vs;
 	struct stat	fs;
@@ -70,7 +76,10 @@ void	ShaderManager::reloadShaders()
 					src.init();
 				}
 			}
-			catch(...){}
+			catch(...)
+			{
+				std::cout << "In shader: " << src.vertexFileName << " " << src.fragmentFileName << std::endl << std::endl;
+			}
 		}
 	}
 }
