@@ -22,7 +22,7 @@ struct AtlasDTO {
 	};
 	std::unordered_map<std::string, mlm::vec2>					textureOffsets;
 	std::string													filename;
-	int															pixelWidth;
+	float														pixelWidth;
 	std::unordered_map<Block::Type, std::vector<std::string>>	blockOffsets;
 };
 

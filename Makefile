@@ -62,6 +62,7 @@ CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
 CFLAGS += -std=c++20
 # CFLAGS += -fsanitize=address -g
+# CFLAGS += -fsanitize=undefined -g
 # CFLAGS += -fsanitize=thread -g
 LFLAGS = -lglfw
 

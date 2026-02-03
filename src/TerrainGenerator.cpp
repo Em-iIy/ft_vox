@@ -104,12 +104,12 @@ const Spline	&TerrainGenerator::getContinentalnessSpline() const
 
 float	TerrainGenerator::_noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos)
 {
-	return (settings.spline.evaluate(_octaves2D(seed, pos / settings.zoom, settings.depth, settings.step)));
+	return (settings.spline.evaluate(_octaves2D(seed, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
 }
 
 float	TerrainGenerator::_noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos)
 {
-	return (settings.spline.evaluate(_octaves3D(seed, pos / settings.zoom, settings.depth, settings.step)));
+	return (settings.spline.evaluate(_octaves3D(seed, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
 }
 
 float	TerrainGenerator::_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t depth, float step)

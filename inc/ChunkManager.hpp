@@ -32,11 +32,11 @@ class Chunk;
 class VoxEngine;
 
 struct ChunkManagerDTO {
-	int	renderDistance;
-	int	threadCount;
-	int	maxLoad;
-	int	maxGenerate;
-	int	maxMesh;
+	float	renderDistance;
+	float	threadCount;
+	float	maxLoad;
+	float	maxGenerate;
+	float	maxMesh;
 };
 
 class ChunkManager {

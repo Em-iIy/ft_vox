@@ -48,10 +48,12 @@ static void	loadTimeSettings(SkyTimeSettings &target, JSON::NodePtr node)
 
 SkyDTO		Settings::loadSky()
 {
-	SkyDTO	skyDTO;
+	SkyDTO		skyDTO;
+	std::string	filename = {};
 	try
 	{
-		JSON::Parser	terrainGeneratorJSON(_paths.at("sky"));
+		filename = _paths.at("sky");
+		JSON::Parser	terrainGeneratorJSON(filename);
 
 		JSON::NodePtr	root = terrainGeneratorJSON.getRoot();
 
@@ -68,6 +70,6 @@ SkyDTO		Settings::loadSky()
 	}
 	catch(const std::exception& e)
 	{
-		throw std::runtime_error("Settings: " + std::string(e.what()));
+		throw std::runtime_error("Settings: " + filename + ": " + std::string(e.what()));
 	}
 }

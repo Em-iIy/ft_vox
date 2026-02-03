@@ -28,6 +28,8 @@ static void	loadTextureOffsets(std::unordered_map<std::string, mlm::vec2> &targe
 
 	for (auto [key, array] : obj)
 	{
+		if (array->getList()->size() != 2)
+			throw std::runtime_error("texture offets must be 2 values");
 		mlm::vec2 temp = mlm::vec2((*array)[0]->getNumber(), (*array)[1]->getNumber());
 		target[key] = temp;
 	}
@@ -85,12 +87,25 @@ static void	validateTextures(AtlasDTO &atlasDto)
 	}
 }
 
+static void	validateBlocks(AtlasDTO &atlasDto)
+{
+	for (auto &[strType, type] : BlockStringType)
+	{
+		if (!atlasDto.blockOffsets.contains(type))
+		{
+			throw std::runtime_error("missing type `" + strType + "`");
+		}
+	}
+}
+
 AtlasDTO	Settings::loadAtlas()
 {
 	AtlasDTO	atlasDto;
+	std::string	filename = {};
 	try
 	{
-		JSON::Parser	chunkManagerJSON(_paths.at("atlas"));
+		filename = _paths.at("atlas");
+		JSON::Parser	chunkManagerJSON(filename);
 
 		JSON::NodePtr	root = chunkManagerJSON.getRoot();
 		atlasDto.filename = root->get("atlas")->get("path")->getString() + root->get("atlas")->get("name")->getString();
@@ -98,10 +113,11 @@ AtlasDTO	Settings::loadAtlas()
 		loadTextureOffsets(atlasDto.textureOffsets, root->get("textures"));
 		loadBlocks(atlasDto.blockOffsets, root->get("blocks"));
 		validateTextures(atlasDto);
+		validateBlocks(atlasDto);
 	}
 	catch(const std::exception& e)
 	{
-		throw std::runtime_error("Settings: " + std::string(e.what()));
+		throw std::runtime_error("Settings: " + filename + ": " + std::string(e.what()));
 	}
 	return (atlasDto);
 }
