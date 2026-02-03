@@ -53,6 +53,7 @@ class	Sky
 		float	getTime() const;
 		float	getTimePercent() const;
 
+		GLuint			_noiseTex;
 	private:
 		SkyTimeSettings	_timeSettings;
 
@@ -66,8 +67,11 @@ class	Sky
 		SolarBody		_sun;
 		SolarBody		_moon;
 
+
 		float			_time = {};
 		bool			_paused = false;
+
+		void			_initNoise();
 
 		float			_getTotalTime() const;
 };

@@ -46,6 +46,9 @@ class TerrainGenerator {
 		void			setContinentalnessSpline(const Spline &spline);
 		const Spline	&getContinentalnessSpline() const;
 
+		static float	noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos);
+		static float	noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos);
+
 	private:
 		uint64_t		_seed;
 		int				_seaLevel;
@@ -53,8 +56,6 @@ class TerrainGenerator {
 		NoiseSettings	_cave;
 		NoiseSettings	_continentalness;
 
-		static float	_noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos);
-		static float	_noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos);
 		static float	_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t depth, float step);
 		static float	_octaves3D(uint64_t seed, const mlm::vec3 &pos, uint64_t depth, float step);
 };

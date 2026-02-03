@@ -5,6 +5,9 @@ Created on: 26/01/2026
 
 #include "Sky.hpp"
 #include "SkyGradient.hpp"
+#include "TerrainGenerator.hpp"
+
+#include <array>
 
 Sky::Sky()
 {
@@ -30,6 +33,36 @@ void	Sky::load(const SkyDTO &dto)
 	_gradientStop1.load(dto.stop1, dto.timeSettings);
 	_gradientStop2.load(dto.stop2, dto.timeSettings);
 	_gradientStop3.load(dto.stop3, dto.timeSettings);
+
+	_initNoise();
+}
+
+void	Sky::_initNoise()
+{
+	std::array<float, 1024*1024>	noise;
+
+	NoiseSettings settings = {
+		.spline = Spline({0.0f, 0.0f, 1.0f, 1.0f}),
+		.depth = 3,
+		.step = 2.0f,
+		.zoom = 128.0f
+	};
+
+	for (int i = 0; i < 1024; ++i)
+	{
+		for (int j = 0; j < 1024; ++j)
+		{
+			noise[i * 1024 + j] = TerrainGenerator::noise2D(0, settings, mlm::vec2(static_cast<float>(i), static_cast<float>(j)));
+		}
+	}
+
+	glGenTextures(1, &_noiseTex);
+	glBindTexture(GL_TEXTURE_2D, _noiseTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 1024, 1024, 0, GL_RED, GL_FLOAT, &noise[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 void	Sky::update(const float deltaTime)

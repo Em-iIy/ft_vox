@@ -22,7 +22,7 @@ int	TerrainGenerator::getTerrainHeight(const mlm::ivec2 &pos)
 {
 	float	height = 0.0f;
 
-	height += _noise2D(_seed, _continentalness, static_cast<mlm::vec2>(pos));
+	height += noise2D(_seed, _continentalness, static_cast<mlm::vec2>(pos));
 	return (static_cast<int>(height));
 }
 
@@ -63,10 +63,10 @@ bool	TerrainGenerator::isCave(const mlm::ivec3 &pos)
 {
 	if (pos.y == 0)
 		return (false);
-	float	val1 = _noise3D(_seed, _cave, pos);
+	float	val1 = noise3D(_seed, _cave, pos);
 	if (std::abs(val1) > _caveDiameter)
 		return (false);
-	float	val2 = _noise3D(_seed + 1, _cave, pos);
+	float	val2 = noise3D(_seed + 1, _cave, pos);
 	if (std::abs(val2) > _caveDiameter)
 		return (false);
 	return (true);
@@ -102,12 +102,12 @@ const Spline	&TerrainGenerator::getContinentalnessSpline() const
 	return (_continentalness.spline);
 }
 
-float	TerrainGenerator::_noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos)
+float	TerrainGenerator::noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos)
 {
 	return (settings.spline.evaluate(_octaves2D(seed, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
 }
 
-float	TerrainGenerator::_noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos)
+float	TerrainGenerator::noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos)
 {
 	return (settings.spline.evaluate(_octaves3D(seed, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
 }
