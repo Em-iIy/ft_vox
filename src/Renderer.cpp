@@ -64,6 +64,9 @@ void	Renderer::initShaders()
 
 	// Shader for the skybox
 	ShaderManager::loadShader(_solarBodiesShader, "./resources/shaders/sky.vert", "./resources/shaders/solarBodies.frag");
+	
+	// Shader for Aurora
+	ShaderManager::loadShader(_auroraShader, "./resources/shaders/sky.vert", "./resources/shaders/aurora.frag");
 
 	// General UI/Debug shaders
 	ShaderManager::loadShader(_cubeShader, "./resources/shaders/cube.vert", "./resources/shaders/cube.frag");
@@ -202,7 +205,7 @@ void	Renderer::initFrameBuffers()
 	_terrainLightingFrameBuffer.create(size.x, size.y);
 	_terrainLightingFrameBuffer.bind();
 	_terrainLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
-	_terrainLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+	_terrainLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	_terrainLightingFrameBuffer.unbind();
 	if (_terrainLightingFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
@@ -211,7 +214,7 @@ void	Renderer::initFrameBuffers()
 	_waterLightingFrameBuffer.create(size.x, size.y);
 	_waterLightingFrameBuffer.bind();
 	_waterLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
-	_waterLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2});
+	_waterLightingFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	_waterLightingFrameBuffer.unbind();
 	if (_waterLightingFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
@@ -240,6 +243,24 @@ void	Renderer::initFrameBuffers()
 	if (_ssaoBlurFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("SSAO Blur Framebuffer missing");
 	frameBufferIds.emplace_back(_ssaoBlurFrameBuffer.getColorTexture(0), "SSAO Blur Color");
+
+	_skyFrameBuffer.create(size.x, size.y);
+	_skyFrameBuffer.bind();
+	_skyFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
+	_skyFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
+	_skyFrameBuffer.unbind();
+	if (_skyFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Sky Framebuffer missing");
+	frameBufferIds.emplace_back(_skyFrameBuffer.getColorTexture(0), "Sky Color");
+
+	_auroraFrameBuffer.create(static_cast<int>(static_cast<float>(size.x) * 0.2f), static_cast<int>(static_cast<float>(size.y) * 0.2f));
+	_auroraFrameBuffer.bind();
+	_auroraFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, false, true, false);
+	_auroraFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
+	_auroraFrameBuffer.unbind();
+	if (_auroraFrameBuffer.checkStatus() == false)
+		throw std::runtime_error("Aurora Framebuffer missing");
+	frameBufferIds.emplace_back(_auroraFrameBuffer.getColorTexture(0), "Aurora Color");
 }
 
 void	Renderer::initSsaoSamples()
@@ -288,7 +309,7 @@ void	Renderer::initSsaoBlurShader()
 
 void	Renderer::initSsaoNoise()
 {
-	std::array<mlm::vec3, 16>	ssaoNoise;
+	std::array<mlm::vec3, 8>	ssaoNoise;
 
 	rng::fgen	gen = rng::generator(0.0f, 1.0f);
 
@@ -331,6 +352,8 @@ void	Renderer::cleanFrameBuffers()
 	_waterLightingFrameBuffer.destroy();
 	_ssaoFrameBuffer.destroy();
 	_ssaoBlurFrameBuffer.destroy();
+	_skyFrameBuffer.destroy();
+	_auroraFrameBuffer.destroy();
 
 	// Clear all framebuffers ids that were stored for debug purposes
 	frameBufferIds.clear();
@@ -546,15 +569,19 @@ void	Renderer::waterLightingPass()
 
 void	Renderer::renderSky()
 {
+	_skyFrameBuffer.bind();
+	_skyFrameBuffer.clear(true, false, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+
 	glDisable(GL_DEPTH_TEST);
 	renderSkyColor();
 	renderSolarBodies();
+	renderAurora();
 	glEnable(GL_DEPTH_TEST);
 }
 
 void	Renderer::renderSkyColor()
 {
-	FrameBuffer::unbind();
+	_skyFrameBuffer.bind();
 
 	_skyShader.use();
 	_skyShader.set_mat4("uProjection", _projection);
@@ -562,6 +589,8 @@ void	Renderer::renderSkyColor()
 
 	Sky &sky = _engine.getSky();
 	_skyShader.set_vec3("uSunDir", _sunDir);
+	_skyShader.set_float("uTime", glfwGetTime());
+
 	sky.setGradient(_skyShader);
 
 	_sphereMesh.draw(_skyShader);
@@ -569,7 +598,7 @@ void	Renderer::renderSkyColor()
 
 void	Renderer::renderSolarBodies()
 {
-	FrameBuffer::unbind();
+	_skyFrameBuffer.bind();
 
 	_solarBodiesShader.use();
 	_solarBodiesShader.set_mat4("uProjection", _projection);
@@ -584,10 +613,45 @@ void	Renderer::renderSolarBodies()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+void	Renderer::renderAurora()
+{
+	// Draw aurora to scaled down framebuffer first
+	_auroraFrameBuffer.bind();
+	_auroraFrameBuffer.clear(true, false, mlm::vec4(0.0f, 0.0f, 0.0f, 0.0f));
+	glViewport(0, 0, _auroraFrameBuffer.getWidth(), _auroraFrameBuffer.getHeight());
+
+	_auroraShader.use();
+	_auroraShader.set_mat4("uProjection", _projection);
+	_auroraShader.set_mat4("uView", _view);
+
+	_auroraShader.set_vec3("uSunDir", _sunDir);
+	_auroraShader.set_float("uTime", glfwGetTime());
+
+	_sphereMesh.draw(_auroraShader);
+
+	// Draw aurora texture scaled up to the sky framebuffer
+	_skyFrameBuffer.bind();
+	glViewport(0, 0, _skyFrameBuffer.getWidth(), _skyFrameBuffer.getHeight());
+
+	_quadShader.use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _auroraFrameBuffer.getColorTexture(0));
+	_quadShader.set_int("uRenderTex", 0);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	_quadMesh.draw(_quadShader);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
 void	Renderer::renderFinal()
 {
 	FrameBuffer::unbind();
 	glDisable(GL_DEPTH_TEST);
+
+	_quadShader.use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _skyFrameBuffer.getColorTexture(0));
+	_quadShader.set_int("uRenderTex", 0);
+	_quadMesh.draw(_quadShader);
 
 	_quadShader.use();
 	glActiveTexture(GL_TEXTURE0);

@@ -53,7 +53,6 @@ class	Sky
 		float	getTime() const;
 		float	getTimePercent() const;
 
-		GLuint			_noiseTex;
 	private:
 		SkyTimeSettings	_timeSettings;
 
@@ -71,6 +70,7 @@ class	Sky
 		float			_time = {};
 		bool			_paused = false;
 
+		GLuint			_noiseTex;
 		void			_initNoise();
 
 		float			_getTotalTime() const;

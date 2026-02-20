@@ -52,6 +52,7 @@ class Renderer {
 		void			renderSky();
 		void			renderSkyColor();
 		void			renderSolarBodies();
+		void			renderAurora();
 		void			renderFinal();
 
 		void			renderUI();
@@ -74,6 +75,7 @@ class Renderer {
 		Shader			_depthShader;
 		Shader			_skyShader;
 		Shader			_solarBodiesShader;
+		Shader			_auroraShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
@@ -90,6 +92,8 @@ class Renderer {
 		FrameBuffer		_waterLightingFrameBuffer;
 		FrameBuffer		_ssaoFrameBuffer;
 		FrameBuffer		_ssaoBlurFrameBuffer;
+		FrameBuffer		_skyFrameBuffer;
+		FrameBuffer		_auroraFrameBuffer;
 		uint32_t		currentFrameBufferIdx = 0;
 		std::vector<std::pair<GLuint, std::string>>	frameBufferIds;
 

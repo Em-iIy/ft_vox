@@ -39,30 +39,46 @@ void	Sky::load(const SkyDTO &dto)
 
 void	Sky::_initNoise()
 {
-	std::array<float, 1024*1024>	noise;
+	// Use for later optimisation
+	return ;
+	const int WIDTH = 256;
+	const int HEIGHT = 256;
+	const int DEPTH = 16;
+	std::array<float, WIDTH * HEIGHT * DEPTH>	noise;
 
+			// 0.3f, 0.6f,
+			// 0.5f, 0.9f,
 	NoiseSettings settings = {
-		.spline = Spline({0.0f, 0.0f, 1.0f, 1.0f}),
+		.spline = Spline({
+			0.0f, 0.0f,
+			1.0f, 1.0f
+		}),
 		.depth = 3,
 		.step = 2.0f,
-		.zoom = 128.0f
+		.zoom = 16.0f
 	};
-
-	for (int i = 0; i < 1024; ++i)
+	rng::fgen	gen = rng::generator(0.0f, 1.0f);
+	for (int z = 0; z < DEPTH; ++z)
 	{
-		for (int j = 0; j < 1024; ++j)
+		for (int y = 0; y < HEIGHT; ++y)
 		{
-			noise[i * 1024 + j] = TerrainGenerator::noise2D(0, settings, mlm::vec2(static_cast<float>(i), static_cast<float>(j)));
+			for (int x = 0; x < WIDTH; ++x)
+			{
+				int index = x + y * WIDTH + z * WIDTH * HEIGHT;
+				noise[index] = rng::rand(gen);
+				noise[index] = TerrainGenerator::noise3D(0, settings, mlm::vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)));
+			}
 		}
 	}
 
 	glGenTextures(1, &_noiseTex);
-	glBindTexture(GL_TEXTURE_2D, _noiseTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, 1024, 1024, 0, GL_RED, GL_FLOAT, &noise[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_3D, _noiseTex);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RED, WIDTH, HEIGHT, DEPTH, 0, GL_RED, GL_FLOAT, &noise[0]);
 }
 
 void	Sky::update(const float deltaTime)
