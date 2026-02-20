@@ -52,6 +52,7 @@ class	Sky
 		void	togglePause();
 		float	getTime() const;
 		float	getTimePercent() const;
+		float	getNightTimePercent() const;
 
 	private:
 		SkyTimeSettings	_timeSettings;

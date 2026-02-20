@@ -626,6 +626,9 @@ void	Renderer::renderAurora()
 
 	_auroraShader.set_vec3("uSunDir", _sunDir);
 	_auroraShader.set_float("uTime", glfwGetTime());
+	Sky &sky = _engine.getSky();
+	float	tempNightFactor = sinf(sky.getNightTimePercent() * M_PI);
+	_auroraShader.set_float("uNightFactor", tempNightFactor);
 
 	_sphereMesh.draw(_auroraShader);
 
@@ -637,6 +640,7 @@ void	Renderer::renderAurora()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, _auroraFrameBuffer.getColorTexture(0));
 	_quadShader.set_int("uRenderTex", 0);
+
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	_quadMesh.draw(_quadShader);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -135,6 +135,12 @@ float	Sky::getTimePercent() const
 	return (_time / _getTotalTime());
 }
 
+float	Sky::getNightTimePercent() const
+{
+	float	nightTime = std::max(_time - _timeSettings.dayLen, 0.0f);
+	return (nightTime / _timeSettings.nightLen);
+}
+
 float	Sky::_getTotalTime() const
 {
 	return (_timeSettings.dayLen + _timeSettings.nightLen);

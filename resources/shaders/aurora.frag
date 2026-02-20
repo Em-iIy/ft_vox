@@ -2,6 +2,7 @@
 
 uniform sampler3D	uNoiseTex;
 uniform float		uTime;
+uniform float		uNightFactor;
 
 in vec3		viewDir;
 
@@ -140,5 +141,5 @@ void	main()
 		if (alpha > 0.95)
 			break ;
 	}
-	FragColor = vec4(color, alpha) * upFactor * sAlpha;
+	FragColor = vec4(color, alpha) * upFactor * sAlpha * smoothstep(0.0, 0.5, uNightFactor);
 }
