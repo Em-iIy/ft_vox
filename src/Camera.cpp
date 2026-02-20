@@ -78,8 +78,8 @@ void	Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPi
 void	Camera::processMouseScroll(float yOffset)
 {
 	_zoom -= yOffset;
-	if (_zoom > 90.0f)
-		_zoom = 90.0f;
+	if (_zoom > 120.0f)
+		_zoom = 120.0f;
 	else if (_zoom < 1.0f)
 		_zoom = 1.0f;
 	std::cout << _zoom << std::endl;
