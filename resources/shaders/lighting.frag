@@ -11,12 +11,19 @@ uniform sampler2D	uGPosition;
 uniform sampler2D	uShadowMap;
 uniform sampler2D	uSSAO;
 
+uniform sampler2D	uSky;
+
 uniform mat4		uProjection;
 uniform mat4		uView;
 
 uniform mat4		uLightProjection;
 uniform mat4		uLightView;
 uniform vec3		uLightDir;
+
+uniform float		uFogNear;
+uniform float		uFogFar;
+uniform vec3		uFogColor;
+uniform bool		uUnderWaterFog;
 
 uniform bool		uIsWater;
 
@@ -44,8 +51,8 @@ float	shadowMapCalculation(vec4 worldPos)
 		for (int y = -2; y <= 2; ++y)
 		{
 			float pcfDepth = texture(uShadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r; 
-			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;        
-		}    
+			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+		}
 	}
 	shadow /= 25.0;
 
@@ -66,6 +73,17 @@ void	main()
 	vec3	color = color4.rgb;
 	vec3	normal = normalize(texture(uGNormal, vertTexUV).xyz);
 	vec3	fragPos = texture(uGPosition, vertTexUV).xyz;
+
+	float	fogFactor = smoothstep(uFogNear, uFogFar, length(fragPos));
+	vec3	fogColor = uUnderWaterFog ? uFogColor : (texture(uSky, vertTexUV)).rgb;
+
+	// Early return if fog factor is too high to see any shading
+	if (fogFactor > 0.9999)
+	{
+		FragColor = vec4(fogColor, 1.0);
+		return ;
+	}
+
 	float	SSAO = texture(uSSAO, vertTexUV).r;
 
 	mat4	inverseView = inverse(uView);
@@ -86,4 +104,6 @@ void	main()
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
 	if (uIsWater == false)
 		FragColor.rgb *= SSAO;
+
+	FragColor.rgb = mix(FragColor.rgb, fogColor, fogFactor);
 }
