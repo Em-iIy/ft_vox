@@ -52,7 +52,7 @@ const float	sAlpha = 0.7;
 const int	sSampleCount = 60;
 const float	sSampleOpacity = 0.18;
 const float	startHeight = 2.1;
-const float	endHeight = 4.8;
+const float	endHeight = 6.8;
 
 const vec3	sTopCol = vec3(0.0, 1.0, 0.2);
 const vec3	sBottomCol = vec3(0.0, 1.0, 0.6);
@@ -141,5 +141,6 @@ void	main()
 		if (alpha > 0.95)
 			break ;
 	}
-	FragColor = vec4(color, alpha) * upFactor * sAlpha * smoothstep(0.0, 0.5, uNightFactor);
+	FragColor = vec4(color, alpha * upFactor * sAlpha) * smoothstep(0.0, 0.5, uNightFactor);
+	// FragColor.a = 1.0;
 }
