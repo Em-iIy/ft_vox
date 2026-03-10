@@ -24,7 +24,12 @@ FILES_SRCS = \
 			TerrainGenerator.cpp \
 			loadTerrainGenerator.cpp \
 			loadAtlas.cpp \
+			loadSky.cpp \
+			loadEngine.cpp \
+			Sky.cpp \
+			SkyGradient.cpp \
 			Settings.cpp \
+			ShaderManager.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
@@ -58,6 +63,7 @@ CFLAGS = -Wall -Wextra -Werror
 CFLAGS += -O3
 CFLAGS += -std=c++20
 # CFLAGS += -fsanitize=address -g
+# CFLAGS += -fsanitize=undefined -g
 # CFLAGS += -fsanitize=thread -g
 LFLAGS = -lglfw
 

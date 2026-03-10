@@ -1,0 +1,14 @@
+{
+	"window": {
+		"width": 1024.0,
+		"height": 1024.0,
+		"fullscreen": false,
+		"vsync": true
+	},
+	"camera": {
+		"fov": 100.0,
+		"sensitivity": 0.03,
+		"speed": 1.0,
+		"sprintMultiplier": 20.0 
+	}
+}

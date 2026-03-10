@@ -38,11 +38,11 @@ void	ChunkManager::cleanup()
 
 void	ChunkManager::init(const ChunkManagerDTO &dto)
 {
-	_renderDistance = dto.renderDistance + 1;
-	_threadCount = dto.threadCount;
-	_maxLoad = dto.maxLoad;
-	_maxGenerate = dto.maxGenerate;
-	_maxMesh = dto.maxMesh;
+	_renderDistance = static_cast<int>(dto.renderDistance + 1);
+	_threadCount = static_cast<int>(dto.threadCount);
+	_maxLoad = static_cast<int>(dto.maxLoad);
+	_maxGenerate = static_cast<int>(dto.maxGenerate);
+	_maxMesh = static_cast<int>(dto.maxMesh);
 
 	_updateCameraChunkCoord();
 	_threads.reserve(_threadCount);

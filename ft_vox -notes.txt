@@ -188,3 +188,16 @@ bottom
 
 4 5
 0 1
+
+engine settings {
+	window {
+		size
+		fullscreen
+		vsync
+	}
+	camera {
+		position
+		direction
+	}
+	
+}

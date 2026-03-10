@@ -12,6 +12,7 @@ Camera::Camera(const mlm::vec3 &pos, const mlm::vec3 &up, const float yaw, const
 	_yaw(yaw),
 	_pitch(pitch),
 	_movementSpeed(SPEED),
+	_sprintMultiplier(SPRINT_MULTIPLIER),
 	_mouseSensitivity(SENS),
 	_zoom(ZOOM)
 {
@@ -27,7 +28,7 @@ void	Camera::processKeyboard(Direction dir, float deltaTime)
 {
 	float	velocity = _movementSpeed * deltaTime;
 	if (_sprinting)
-		velocity *= SPRINT_MULTIPLIER;
+		velocity *= _sprintMultiplier;
 	mlm::vec3	worldFront;
 	switch (dir)
 	{
@@ -78,8 +79,8 @@ void	Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPi
 void	Camera::processMouseScroll(float yOffset)
 {
 	_zoom -= yOffset;
-	if (_zoom > 90.0f)
-		_zoom = 90.0f;
+	if (_zoom > 120.0f)
+		_zoom = 120.0f;
 	else if (_zoom < 1.0f)
 		_zoom = 1.0f;
 	std::cout << _zoom << std::endl;
@@ -112,6 +113,16 @@ float	Camera::getZoom() const
 const mlm::vec3	&Camera::getPos() const
 {
 	return (_pos);
+}
+
+void	Camera::loadSettings(const CameraSettings &settings)
+{
+	_zoom = settings.fov;
+	_mouseSensitivity = settings.sensitivity;
+	_movementSpeed = settings.speed;
+	_sprintMultiplier = settings.sprintMultiplier;
+
+	updateVectors();
 }
 
 const mlm::vec3	&Camera::getViewDir() const

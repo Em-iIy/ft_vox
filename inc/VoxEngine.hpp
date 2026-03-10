@@ -17,6 +17,19 @@ Created on: 24/07/2025
 #include "Renderer.hpp"
 #include "Player.hpp"
 #include "TerrainGenerator.hpp"
+#include "Sky.hpp"
+
+struct WindowSettings {
+	float	width;
+	float	height;
+	bool	fullscreen;
+	bool	vsync;
+};
+
+struct EngineDTO {
+	CameraSettings	cameraSettings;
+	WindowSettings	windowSettings;
+};
 
 class VoxEngine: public Window {
 	public:
@@ -31,6 +44,7 @@ class VoxEngine: public Window {
 		Atlas			&getAtlas();
 		Frustum			&getFrustum();
 		Frustum			&getShadowFrustum();
+		Sky				&getSky();
 
 		void			setFrustumUpdate();
 
@@ -56,4 +70,5 @@ class VoxEngine: public Window {
 		Frustum			_shadowFrustum;
 		Renderer		_renderer;
 		Player			_player;
+		Sky				_sky;
 };

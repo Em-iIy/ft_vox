@@ -5,11 +5,12 @@ Created on: 24/07/2025
 
 #include "VoxEngine.hpp"
 #include "Settings.hpp"
+#include "ShaderManager.hpp"
 
 #include "Frustum.hpp"
 
-// const mlm::ivec2	WINDOW_SIZE(1024, 1024);
-const mlm::ivec2	WINDOW_SIZE(3840, 2160);
+const mlm::ivec2	WINDOW_SIZE(1024, 1024);
+// const mlm::ivec2	WINDOW_SIZE(3840, 2160);
 
 #define FPS
 
@@ -46,14 +47,20 @@ void	VoxEngine::init()
 	rng::seed();
 
 	init_glfw();
-	Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
-	// Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
-	glfwSwapInterval(0);
+
+	EngineDTO settings = Settings::loadEngine();
+
+	Window::create_window("ft_vox", mlm::ivec2(static_cast<int>(settings.windowSettings.width), static_cast<int>(settings.windowSettings.height)), settings.windowSettings.fullscreen ? Window::FULL_SCREEN_WINDOWED : Window::WINDOWED);
+
+	if (settings.windowSettings.vsync == false)
+		glfwSwapInterval(0);
+
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
 	// Reload all chunks?
 	_input.addOnPressCallback(GLFW_KEY_R, [this]() {_chunkManager.unloadAll();});
+	_input.addOnPressCallback(GLFW_KEY_R, []() {ShaderManager::reloadShaders();});
 
 	// Camera movement (maybe move into separate setup function)
 	_input.addOnDownCallback(GLFW_KEY_W, [this]() {_camera.processKeyboard(Camera::FORWARD, get_delta_time());});
@@ -79,6 +86,7 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
 	_input.addOnPressCallback(GLFW_KEY_TAB, [this]() {_input.toggleWireFrame();});
 	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_renderer.togglePause();});
+	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_sky.togglePause();});
 	_input.addOnPressCallback(GLFW_KEY_KP_0, [this]() {_renderer.setLightingMode(0);});
 	_input.addOnPressCallback(GLFW_KEY_KP_1, [this]() {_renderer.setLightingMode(1);});
 	_input.addOnPressCallback(GLFW_KEY_KP_2, [this]() {_renderer.setLightingMode(2);});
@@ -94,8 +102,12 @@ void	VoxEngine::init()
 	{
 		throw std::runtime_error("Uh oh no atlas we lost :/");
 	}
+
+	_sky.load(Settings::loadSky());
 	
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
+	_camera.loadSettings(settings.cameraSettings);
+
 	_chunkManager.init(Settings::loadChunkManager());
 
 	_renderer.init();
@@ -111,10 +123,11 @@ void	VoxEngine::mainLoop()
 	{
 		_input.handleKeys();
 		Window::update();
-		_chunkManager.update();
-		_renderer.update();
+		_renderer.update(); // Maybe this order fixed the culling issue (test more!)
 		updateFrustum(_renderer.getProjection(), _renderer.getView());
 		updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
+		_chunkManager.update();
+		_sky.update(Window::get_delta_time());
 
 		_renderer.render();
 
@@ -186,6 +199,11 @@ Frustum	&VoxEngine::getFrustum()
 Frustum	&VoxEngine::getShadowFrustum()
 {
 	return (_shadowFrustum);
+}
+
+Sky	&VoxEngine::getSky()
+{
+	return (_sky);
 }
 
 void	VoxEngine::setFrustumUpdate()

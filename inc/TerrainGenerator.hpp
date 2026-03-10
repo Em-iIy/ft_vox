@@ -12,15 +12,14 @@ Created on: 13/10/2025
 
 struct NoiseSettings {
 	Spline	spline;
-	uint	depth = 1;
+	float	depth = 1.0f;
 	float	step = 1.0f;
 	float	zoom = 100.0f;
-	int		dimensions = 2;
 };
 
 struct TerrainGeneratorDTO {
-	uint64_t		seed;
-	int				seaLevel;
+	float			seed;
+	float			seaLevel;
 	float			caveDiameter;
 	NoiseSettings	continentalness;
 	NoiseSettings	cave;
@@ -47,6 +46,9 @@ class TerrainGenerator {
 		void			setContinentalnessSpline(const Spline &spline);
 		const Spline	&getContinentalnessSpline() const;
 
+		static float	noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos);
+		static float	noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos);
+
 	private:
 		uint64_t		_seed;
 		int				_seaLevel;
@@ -54,8 +56,6 @@ class TerrainGenerator {
 		NoiseSettings	_cave;
 		NoiseSettings	_continentalness;
 
-		static float	_noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos);
-		static float	_noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos);
 		static float	_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t depth, float step);
 		static float	_octaves3D(uint64_t seed, const mlm::vec3 &pos, uint64_t depth, float step);
 };

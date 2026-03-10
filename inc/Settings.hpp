@@ -8,6 +8,9 @@ Created on: 21/10/2025
 #include "TerrainGenerator.hpp"
 #include "ChunkManager.hpp"
 #include "Atlas.hpp"
+#include "Sky.hpp"
+#include "Camera.hpp"
+#include "VoxEngine.hpp"
 #include "json-parser/json-parser.hpp"
 
 #include <map>
@@ -23,9 +26,11 @@ class Settings {
 		static TerrainGeneratorDTO	loadTerrainGenerator();
 		static ChunkManagerDTO		loadChunkManager();
 		static AtlasDTO				loadAtlas();
+		static SkyDTO				loadSky();
+		static EngineDTO			loadEngine();
 
 	private:
 		// Setting filenames
-		static	std::map<std::string, std::string>	_paths;
+		static std::map<std::string, std::string>	_paths;
 
 };

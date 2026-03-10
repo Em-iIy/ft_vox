@@ -15,8 +15,7 @@
 			],
 			"depth": 5,
 			"step": 2.0,
-			"zoom": 400.0,
-			"dimensions": 2
+			"zoom": 400.0
 		},
 		"cave": {
 			"spline": [
@@ -25,8 +24,7 @@
 			],
 			"depth": 1,
 			"step": 1.0,
-			"zoom": 160.0,
-			"dimensions": 3
+			"zoom": 160.0
 		}
 	}
 }

@@ -11,6 +11,8 @@ uniform sampler2D	uGPosition;
 uniform sampler2D	uShadowMap;
 uniform sampler2D	uSSAO;
 
+uniform sampler2D	uSky;
+
 uniform mat4		uProjection;
 uniform mat4		uView;
 
@@ -18,11 +20,16 @@ uniform mat4		uLightProjection;
 uniform mat4		uLightView;
 uniform vec3		uLightDir;
 
+uniform float		uFogNear;
+uniform float		uFogFar;
+uniform vec3		uFogColor;
+uniform bool		uUnderWaterFog;
+
 uniform bool		uIsWater;
 
 const float	shadowStrength = 0.6;
 const float	ambientStrength = 0.4;
-const vec3	lightColor = vec3(1.0);
+const float	diffuseStrength = 1.0 - ambientStrength;
 
 float	shadowMapCalculation(vec4 worldPos)
 {
@@ -43,12 +50,21 @@ float	shadowMapCalculation(vec4 worldPos)
 		for (int y = -2; y <= 2; ++y)
 		{
 			float pcfDepth = texture(uShadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r; 
-			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;        
-		}    
+			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
+		}
 	}
 	shadow /= 25.0;
 
 	return (shadow);
+}
+
+vec3	getLightColor()
+{
+	const vec3	lightColorNoon = vec3(1.0);
+	const vec3	lightColorLow = vec3(1.0, 0.8, 0.5);
+
+	vec3	lightColor = mix(lightColorLow, lightColorNoon, abs(uLightDir.y));
+	return (lightColor);
 }
 
 vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
@@ -59,9 +75,23 @@ vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
 
 void	main()
 {
-	vec3	color = texture(uGColor, vertTexUV).xyz;
+	vec4	color4 = texture(uGColor, vertTexUV);
+	if (color4.a < 1.0)
+		discard ;
+	vec3	color = color4.rgb;
 	vec3	normal = normalize(texture(uGNormal, vertTexUV).xyz);
 	vec3	fragPos = texture(uGPosition, vertTexUV).xyz;
+
+	float	fogFactor = smoothstep(uFogNear, uFogFar, length(fragPos));
+	vec3	fogColor = uUnderWaterFog ? uFogColor : (texture(uSky, vertTexUV)).rgb;
+
+	// Early return if fog factor is too high to see any shading
+	if (fogFactor > 0.9999)
+	{
+		FragColor = vec4(fogColor, 1.0);
+		return ;
+	}
+
 	float	SSAO = texture(uSSAO, vertTexUV).r;
 
 	mat4	inverseView = inverse(uView);
@@ -71,7 +101,8 @@ void	main()
 	float	diffuseAngle = dot(normal, ViewlightDir);
 	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
 
-	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor;
+	vec3	lightColor = getLightColor();
+	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor * ambientStrength;
 	vec3	ambient = ambientStrength * lightColor;
 
 	float	shadow = shadowMapCalculation(worldPos);
@@ -81,5 +112,7 @@ void	main()
 
 	FragColor = lightCalculation(ambient, shadow, diffuse, color);
 	if (uIsWater == false)
-		FragColor *= SSAO;
+		FragColor.rgb *= SSAO;
+
+	FragColor.rgb = mix(FragColor.rgb, fogColor, fogFactor);
 }

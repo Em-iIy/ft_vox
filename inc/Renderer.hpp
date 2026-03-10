@@ -37,10 +37,10 @@ class Renderer {
 		void			initMeshes();
 		void			initFrameBuffers();
 		void			initSsaoSamples();
+		void			initSsaoBlurShader();
 		void			initSsaoNoise();
 
 		void			cleanShaders();
-		void			cleanMeshes();
 		void			cleanFrameBuffers();
 
 		void			shadowPass();
@@ -49,9 +49,12 @@ class Renderer {
 		void			SSAOPass();
 		void			terrainLightingPass();
 		void			waterLightingPass();
+		void			renderSky();
+		void			renderSkyColor();
+		void			renderSolarBodies();
+		void			renderAurora();
 		void			renderFinal();
 
-		void			renderSun();
 		void			renderUI();
 
 		mlm::vec3		_bgColor;
@@ -70,9 +73,13 @@ class Renderer {
 		Shader			_waterShader;
 		Shader			_cubeShader;
 		Shader			_depthShader;
+		Shader			_skyShader;
+		Shader			_solarBodiesShader;
+		Shader			_auroraShader;
 
 		Mesh			_cubeMesh;
 		Mesh			_quadMesh;
+		Mesh			_sphereMesh;
 
 		VoxEngine		&_engine;
 		ChunkManager	&_manager;
@@ -85,6 +92,8 @@ class Renderer {
 		FrameBuffer		_waterLightingFrameBuffer;
 		FrameBuffer		_ssaoFrameBuffer;
 		FrameBuffer		_ssaoBlurFrameBuffer;
+		FrameBuffer		_skyFrameBuffer;
+		FrameBuffer		_auroraFrameBuffer;
 		uint32_t		currentFrameBufferIdx = 0;
 		std::vector<std::pair<GLuint, std::string>>	frameBufferIds;
 

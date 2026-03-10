@@ -21,8 +21,8 @@ bool	Atlas::load()
 		return (false);
 	
 	mlm::vec2	offsetFormat(0.0f);
-	offsetFormat.x = static_cast<float>(atlasDto.pixelWidth) / static_cast<float>(bmp.width);
-	offsetFormat.y = static_cast<float>(atlasDto.pixelWidth) / static_cast<float>(bmp.height);
+	offsetFormat.x = atlasDto.pixelWidth / static_cast<float>(bmp.width);
+	offsetFormat.y = atlasDto.pixelWidth / static_cast<float>(bmp.height);
 
 	for (auto &[type, textureOffsetNames] : atlasDto.blockOffsets)
 	{
