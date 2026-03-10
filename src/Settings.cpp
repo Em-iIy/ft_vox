@@ -15,6 +15,7 @@ const std::vector<std::string>	requiredPaths = {
 	"renderer",
 	"atlas",
 	"sky",
+	"engine",
 };
 
 Settings::Settings() {}

@@ -1,4 +1,11 @@
 {
+	"fogSettings": {
+		"fogNear": 120.0,
+		"fogFar": 160.0,
+		"waterNear": 0.0,
+		"waterFar": 80.0,
+		"waterColor": [0.0, 0.0, 0.5, 1.0]
+	},
 	"timeSettings": {
 		"sunriseLen": 1,
 		"dayLen": 5,

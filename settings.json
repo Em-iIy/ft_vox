@@ -18,5 +18,9 @@
 	"sky": {
 		"path": "resources/settings/",
 		"name": "sky.json"
+	},
+	"engine": {
+		"path": "resources/settings/",
+		"name": "engine.json"
 	}
 }

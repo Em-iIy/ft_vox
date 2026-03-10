@@ -7,13 +7,6 @@ Created on: 29/09/2025
 #include "VoxEngine.hpp"
 #include "ShaderManager.hpp"
 
-const mlm::vec3	WATER_COLOR(0.0f, 0.0f, 0.5f);
-
-const float		FOG_WATER_NEAR = 0.0f;
-const float		FOG_WATER_FAR = 80.0f;
-const float		FOG_NEAR = 120.0f;
-const float		FOG_FAR = 160.0f;
-
 const float		CLIPPING_NEAR = 0.25f;
 const float		CLIPPING_FAR = 640.0f;
 
@@ -526,12 +519,8 @@ void	Renderer::terrainLightingPass()
 	
 	_lightingShader.set_mat4("uView", _view);
 
-	const float fogNear = _isUnderwater ? FOG_WATER_NEAR : FOG_NEAR;
-	const float fogFar = _isUnderwater ? FOG_WATER_FAR : FOG_FAR;
-	_lightingShader.set_float("uFogNear", fogNear);
-	_lightingShader.set_float("uFogFar", fogFar);
-	_lightingShader.set_bool("uUnderWaterFog", _isUnderwater);
-	_lightingShader.set_vec3("uFogColor", WATER_COLOR);
+	Sky &sky = _engine.getSky();
+	sky.setFog(_lightingShader, _isUnderwater);
 
 	_lightingShader.set_bool("uIsWater", false);
 
@@ -573,13 +562,8 @@ void	Renderer::waterLightingPass()
 	
 	_lightingShader.set_mat4("uView", _view);
 
-	const float fogNear = _isUnderwater ? FOG_WATER_NEAR : FOG_NEAR;
-	const float fogFar = _isUnderwater ? FOG_WATER_FAR : FOG_FAR;
-	_lightingShader.set_float("uFogNear", fogNear);
-	_lightingShader.set_float("uFogFar", fogFar);
-	_lightingShader.set_bool("uUnderWaterFog", _isUnderwater);
-	_lightingShader.set_vec3("uFogColor", WATER_COLOR);
-
+	Sky &sky = _engine.getSky();
+	sky.setFog(_lightingShader, _isUnderwater);
 
 	_lightingShader.set_bool("uIsWater", true);
 

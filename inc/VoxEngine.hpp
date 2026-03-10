@@ -19,6 +19,18 @@ Created on: 24/07/2025
 #include "TerrainGenerator.hpp"
 #include "Sky.hpp"
 
+struct WindowSettings {
+	float	width;
+	float	height;
+	bool	fullscreen;
+	bool	vsync;
+};
+
+struct EngineDTO {
+	CameraSettings	cameraSettings;
+	WindowSettings	windowSettings;
+};
+
 class VoxEngine: public Window {
 	public:
 		VoxEngine();

@@ -14,6 +14,13 @@ const float	SENS 	= 0.03f;
 const float	ZOOM 	= 100.0f;
 const float	SPRINT_MULTIPLIER = 20.0f;
 
+struct CameraSettings {
+	float		fov;
+	float		sensitivity;
+	float		speed;
+	float		sprintMultiplier;
+};
+
 class Camera {
 	public:
 		enum Direction {
@@ -33,6 +40,7 @@ class Camera {
 		const mlm::vec3	&getViewDir() const;
 
 		void			setPos(const mlm::vec3 &pos);
+		void			loadSettings(const CameraSettings &settings);
 
 		void			processKeyboard(Direction dir, float deltaTime);
 		void			processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
@@ -51,6 +59,7 @@ class Camera {
 		float			_pitch;
 
 		float			_movementSpeed;
+		float			_sprintMultiplier;
 		float			_mouseSensitivity;
 		float			_zoom;
 

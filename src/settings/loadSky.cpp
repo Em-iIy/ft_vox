@@ -46,6 +46,15 @@ static void	loadTimeSettings(SkyTimeSettings &target, JSON::NodePtr node)
 	target.nightLen = node->get("nightLen")->getNumber();
 }
 
+static void	loadFogSettings(FogSettings &target, JSON::NodePtr node)
+{
+	target.fogNear = node->get("fogNear")->getNumber();
+	target.fogFar = node->get("fogFar")->getNumber();
+	target.waterNear = node->get("waterNear")->getNumber();
+	target.waterFar = node->get("waterFar")->getNumber();
+	loadVec4(target.waterColor, node->get("waterColor"));
+}
+
 SkyDTO		Settings::loadSky()
 {
 	SkyDTO		skyDTO;
@@ -57,6 +66,7 @@ SkyDTO		Settings::loadSky()
 
 		JSON::NodePtr	root = terrainGeneratorJSON.getRoot();
 
+		loadFogSettings(skyDTO.fogSettings, root->get("fogSettings"));
 		loadTimeSettings(skyDTO.timeSettings, root->get("timeSettings"));
 
 		loadSolarBody(skyDTO.sun, root->get("sun"));

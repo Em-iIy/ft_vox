@@ -25,6 +25,7 @@ FILES_SRCS = \
 			loadTerrainGenerator.cpp \
 			loadAtlas.cpp \
 			loadSky.cpp \
+			loadEngine.cpp \
 			Sky.cpp \
 			SkyGradient.cpp \
 			Settings.cpp \

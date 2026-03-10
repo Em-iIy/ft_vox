@@ -47,8 +47,11 @@ void	VoxEngine::init()
 	rng::seed();
 
 	init_glfw();
+
+	EngineDTO settings = Settings::loadEngine();
+
 	// Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
-	Window::create_window("ft_vox", WINDOW_SIZE, Window::WINDOWED);
+	Window::create_window("ft_vox", mlm::ivec2(static_cast<int>(settings.windowSettings.width), static_cast<int>(settings.windowSettings.height)), settings.windowSettings.fullscreen ? Window::FULL_SCREEN_WINDOWED : Window::WINDOWED);
 	// glfwSwapInterval(0);
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
@@ -101,6 +104,8 @@ void	VoxEngine::init()
 	_sky.load(Settings::loadSky());
 	
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
+	_camera.loadSettings(settings.cameraSettings);
+
 	_chunkManager.init(Settings::loadChunkManager());
 
 	_renderer.init();

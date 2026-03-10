@@ -24,6 +24,7 @@ Sky::~Sky()
 
 void	Sky::load(const SkyDTO &dto)
 {
+	_fogSettings = dto.fogSettings;
 	_timeSettings = dto.timeSettings;
 
 	_sun = dto.sun;
@@ -118,6 +119,16 @@ void	Sky::setSolarBodies(Shader &shader)
 	shader.set_vec4("uMoonGlowColor",_moon.glowColor);
 	shader.set_float("uMoonGlowFactor",_moon.glowFactor);
 	shader.set_float("uMoonGlowSharpness",_moon.glowShaprness);
+}
+
+void	Sky::setFog(Shader &shader, bool isUnderwater)
+{
+	const float fogNear = isUnderwater ? _fogSettings.waterNear : _fogSettings.fogNear;
+	const float fogFar = isUnderwater ? _fogSettings.waterFar : _fogSettings.fogFar;
+	shader.set_float("uFogNear", fogNear);
+	shader.set_float("uFogFar", fogFar);
+	shader.set_bool("uUnderWaterFog", isUnderwater);
+	shader.set_vec3("uFogColor", _fogSettings.waterColor);
 }
 
 void	Sky::togglePause()

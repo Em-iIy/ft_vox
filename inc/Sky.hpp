@@ -7,16 +7,25 @@ Created on: 26/01/2026
 
 #include "SkyGradient.hpp"
 
+struct	FogSettings
+{
+	float		fogNear = {};
+	float		fogFar = {};
+	float		waterNear = {};
+	float		waterFar = {};
+	mlm::vec4	waterColor = {};
+};
+
 struct	SkyTimeSettings
 {
-	// Length of differnt times of day in seconds
+	// Length of different times of day in seconds
 	float	sunriseLen = {};
 	float	dayLen = {};
 	float	sunsetLen = {};
 	float	nightLen = {};
 };
 
-struct SolarBody
+struct	SolarBody
 {
 	mlm::vec4	diskColor = {};
 	float		diskFactor = {};
@@ -29,6 +38,7 @@ struct SolarBody
 
 struct	SkyDTO
 {
+	FogSettings		fogSettings;
 	SkyTimeSettings	timeSettings;
 	SolarBody		sun;
 	SolarBody		moon;
@@ -49,12 +59,14 @@ class	Sky
 		void	update(const float deltaTime);
 		void	setGradient(Shader &shader);
 		void	setSolarBodies(Shader &shader);
+		void	setFog(Shader &shader, bool isUnderwater);
 		void	togglePause();
 		float	getTime() const;
 		float	getTimePercent() const;
 		float	getNightTimePercent() const;
 
 	private:
+		FogSettings		_fogSettings;
 		SkyTimeSettings	_timeSettings;
 
 		// Holds the colors for all times of the day for it's specific stop
