@@ -50,9 +50,11 @@ void	VoxEngine::init()
 
 	EngineDTO settings = Settings::loadEngine();
 
-	// Window::create_window("ft_vox", WINDOW_SIZE, Window::FULL_SCREEN_WINDOWED);
 	Window::create_window("ft_vox", mlm::ivec2(static_cast<int>(settings.windowSettings.width), static_cast<int>(settings.windowSettings.height)), settings.windowSettings.fullscreen ? Window::FULL_SCREEN_WINDOWED : Window::WINDOWED);
-	// glfwSwapInterval(0);
+
+	if (settings.windowSettings.vsync == false)
+		glfwSwapInterval(0);
+
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
