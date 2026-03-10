@@ -30,7 +30,6 @@ uniform bool		uIsWater;
 const float	shadowStrength = 0.6;
 const float	ambientStrength = 0.4;
 const float	diffuseStrength = 1.0 - ambientStrength;
-const vec3	lightColor = vec3(1.0);
 
 float	shadowMapCalculation(vec4 worldPos)
 {
@@ -57,6 +56,15 @@ float	shadowMapCalculation(vec4 worldPos)
 	shadow /= 25.0;
 
 	return (shadow);
+}
+
+vec3	getLightColor()
+{
+	const vec3	lightColorNoon = vec3(1.0);
+	const vec3	lightColorLow = vec3(1.0, 0.8, 0.5);
+
+	vec3	lightColor = mix(lightColorLow, lightColorNoon, abs(uLightDir.y));
+	return (lightColor);
 }
 
 vec4	lightCalculation(vec3 ambient, float shadow, vec3 diffuse, vec3 texColor)
@@ -93,6 +101,7 @@ void	main()
 	float	diffuseAngle = dot(normal, ViewlightDir);
 	float	horizonFade = clamp((uLightDir.y + 0.1) / 0.3, 0.0, 1.0);
 
+	vec3	lightColor = getLightColor();
 	vec3	diffuse = max(diffuseAngle, 0.0) * horizonFade * lightColor * ambientStrength;
 	vec3	ambient = ambientStrength * lightColor;
 
