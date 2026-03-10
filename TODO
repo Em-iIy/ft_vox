@@ -12,17 +12,17 @@
 
 - Skybox
 	x texture
-	- spere mesh
-	- render
+	+ spere mesh
+	+ render
 		+ colors
 			+ gradient
 			+ transition through stages
 		- stars
 			- voronoi noise
-		- sun
-		- moon
-		- aurora
-			- noise texture
+		+ sun
+		+ moon
+		+ aurora
+			x noise texture
 		
 
 + Lighting
@@ -32,7 +32,7 @@
 		? colors
 	+ fog
 
-- Chunk management
++ Chunk management
 	+ make chunks accessible from other chunks
 	+ lists
 		+ update
@@ -44,7 +44,7 @@
 	+ pass camera to update visibility
 	+ prioritize generating chunks closer to the player
 	+ frustum culling
-	- save chunk to file
+	x save chunk to file
 	+ multithreaded
 	+ placing blocks
 		+ switch block types
@@ -65,15 +65,15 @@
 	+ caves
 		+ 3D perlin noise
 
-- Setup input
++ Setup input
 	+ move camera
-	- make input tied to window
+	x make input tied to window
 	+ switch to callbacks (std::bind)
 	+ deltaTime (put in glu?)
 
-- Settings
-	- create configs
-		- input verification
++ Settings
+	+ create configs
+		+ input verification
 		x chunk dimensions
 		+ render distance
 		+ terrain generation
@@ -83,7 +83,7 @@
 				+ amplitude
 				+ frequency
 		+ seed
-		- load map
+		x load map
 		+ sky
 	+ reload
 
