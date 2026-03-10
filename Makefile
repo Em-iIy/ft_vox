@@ -19,6 +19,9 @@ FILES_SRCS = \
 			AABB.cpp \
 			Frustum.cpp \
 			Renderer.cpp \
+			RendererClean.cpp \
+			RendererInit.cpp \
+			RendererUpdate.cpp \
 			Player.cpp \
 			Coords.cpp \
 			TerrainGenerator.cpp \
@@ -43,6 +46,7 @@ DIR_JSP = $(DIR_LIB)json-parser/
 vpath %.cpp \
 	$(DIR_SRCS) \
 	$(DIR_SRCS)settings/ \
+	$(DIR_SRCS)renderer/ \
 
 # ----------------------------------------Sources
 SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
@@ -111,8 +115,8 @@ run-tsan:
 .PHONY: run-tsan
 
 lines:
-# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp resources/shaders/* 
-	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
+# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp resources/shaders/* 
+	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
 .PHONY: lines
 # ----------------------------------------Cleaning
 clean:
