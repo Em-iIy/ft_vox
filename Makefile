@@ -53,6 +53,7 @@ vpath %.cpp \
 	$(DIR_SRCS)settings/ \
 	$(DIR_SRCS)renderer/ \
 	$(DIR_SRCS)chunkManager/ \
+	$(DIR_SRCS)mathUtils/ \
 
 # ----------------------------------------Sources
 SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
