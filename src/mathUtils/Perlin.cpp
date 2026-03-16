@@ -12,7 +12,7 @@ void	Perlin::setSeed(uint64_t seed)
 	_seed = seed;
 }
 
-float	Perlin::getValue(float x, float y) const
+float	Perlin::getValue(float x, float y)
 {
 	mlm::vec2	pos(x, y);
 	int			x0 = static_cast<int>(std::floor(x));
@@ -37,7 +37,7 @@ float	Perlin::getValue(float x, float y) const
 	return (value);
 }
 
-float	Perlin::getValue(float x, float y, float z) const
+float	Perlin::getValue(float x, float y, float z)
 {
 	mlm::vec3	pos(x, y, z);
 	// std::cout << _hash(x, y, z) << std::endl;
@@ -90,19 +90,33 @@ float	Perlin::_smoothStep(float t) const
 	return (t * t * t * (t * (t * 6 - 15) + 10));
 }
 
-mlm::vec2	Perlin::_gradient(int x, int y) const
+mlm::vec2	Perlin::_gradient(int x, int y)
 {
 	uint64_t	hash = _hash(x, y);
+	auto		it = _2dGradients.find(hash);
+
+	if (it != _2dGradients.end())
+		return (it->second);
+
 	float		angle = mlm::radians(static_cast<float>(hash % 360));
-	return (mlm::vec2(std::cos(angle), std::sin(angle)));
+	mlm::vec2	ret(std::cos(angle), std::sin(angle));
+	_2dGradients[hash] = ret;
+	return (ret);
 }
 
-mlm::vec3	Perlin::_gradient(int x, int y, int z) const
+mlm::vec3	Perlin::_gradient(int x, int y, int z)
 {
 	uint64_t	hash = _hash(x, y, z);
+	auto		it = _3dGradients.find(hash);
+
+	if (it != _3dGradients.end())
+		return (it->second);
+
 	float theta = static_cast<float>(hash & 0xFFFFFFFFULL) / static_cast<float>(0xFFFFFFFFULL) * 2.0f * M_PI;
 	float phi   = static_cast<float>(hash >> 32) / static_cast<float>(0xFFFFFFFFULL) * M_PI;
-	return (mlm::vec3(std::cos(theta) * std::sin(phi), std::sin(theta) * std::sin(phi), std::cos(phi)));
+	mlm::vec3	ret(std::cos(theta) * std::sin(phi), std::sin(theta) * std::sin(phi), std::cos(phi));
+	_3dGradients[hash] = ret;
+	return (ret);
 }
 
 uint64_t	Perlin::_hash(int x, int y) const

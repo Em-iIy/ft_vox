@@ -67,7 +67,7 @@ void	Sky::_initNoise()
 			{
 				int index = x + y * WIDTH + z * WIDTH * HEIGHT;
 				noise[index] = rng::rand(gen);
-				noise[index] = TerrainGenerator::noise3D(0, settings, mlm::vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)));
+				// noise[index] = TerrainGenerator::noise3D(0, settings, mlm::vec3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)));
 			}
 		}
 	}

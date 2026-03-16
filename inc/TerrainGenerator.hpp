@@ -9,6 +9,13 @@ Created on: 13/10/2025
 
 #include "Spline.hpp"
 #include "Block.hpp"
+#include "Perlin.hpp"
+
+struct perlinSamplers {
+	Perlin	height;
+	Perlin	cave1;
+	Perlin	cave2;
+};
 
 struct NoiseSettings {
 	Spline	spline;
@@ -31,11 +38,14 @@ class TerrainGenerator {
 		TerrainGenerator(const TerrainGeneratorDTO &dto);
 		~TerrainGenerator();
 
-		int				getTerrainHeight(const mlm::ivec2 &pos);
-		int				getTerrainHeight(const mlm::ivec3 &pos);
+		int				getTerrainHeight(perlinSamplers &samplers, const mlm::ivec2 &pos);
+		int				getTerrainHeight(perlinSamplers &samplers, const mlm::ivec3 &pos);
 
-		Block			getBlock(const mlm::ivec3 &pos, int terrainHeight);
-		bool			isCave(const mlm::ivec3 &pos);
+
+		Block			getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos, int terrainHeight);
+		bool			isCave(perlinSamplers &samplers, const mlm::ivec3 &pos);
+
+		perlinSamplers	getSamplers();
 
 		void			setSeed(uint64_t seed);
 		uint64_t		getSeed() const;
@@ -46,8 +56,8 @@ class TerrainGenerator {
 		void			setContinentalnessSpline(const Spline &spline);
 		const Spline	&getContinentalnessSpline() const;
 
-		static float	noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos);
-		static float	noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos);
+		static float	noise2D(Perlin &sampler, const NoiseSettings &settings, const mlm::vec2 &pos);
+		static float	noise3D(Perlin &sampler, const NoiseSettings &settings, const mlm::vec3 &pos);
 
 	private:
 		uint64_t		_seed;
@@ -56,8 +66,8 @@ class TerrainGenerator {
 		NoiseSettings	_cave;
 		NoiseSettings	_continentalness;
 
-		static float	_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t depth, float step);
-		static float	_octaves3D(uint64_t seed, const mlm::vec3 &pos, uint64_t depth, float step);
+		static float	_octaves2D(Perlin &sampler, const mlm::vec2 &pos, uint64_t depth, float step);
+		static float	_octaves3D(Perlin &sampler, const mlm::vec3 &pos, uint64_t depth, float step);
 };
 
 using TerrainGeneratorPtr = std::shared_ptr<TerrainGenerator>;

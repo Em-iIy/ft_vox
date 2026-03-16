@@ -219,16 +219,19 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 void	Chunk::generate(TerrainGeneratorPtr generator)
 {
 	_busyMtx.lock();
+	
+	perlinSamplers samplers = generator->getSamplers();
+
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
 	{
 		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
 		{
-			int	terrainHeight = generator->getTerrainHeight(mlm::ivec2(x + _worldPos.x, z + _worldPos.z));
+			int	terrainHeight = generator->getTerrainHeight(samplers, mlm::ivec2(x + _worldPos.x, z + _worldPos.z));
 			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
 			{
 				mlm::ivec3	pos = _worldPos + mlm::ivec3(x, y, z);
 				uint64_t	index = index3D(x, y, z);
-				Block		block = generator->getBlock(pos, terrainHeight);
+				Block		block = generator->getBlock(samplers, pos, terrainHeight);
 				_blockMtx.lock();
 				blocks[index] = block;
 				_blockMtx.unlock();

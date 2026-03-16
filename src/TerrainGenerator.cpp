@@ -18,20 +18,20 @@ TerrainGenerator::~TerrainGenerator()
 {
 }
 
-int	TerrainGenerator::getTerrainHeight(const mlm::ivec2 &pos)
+int	TerrainGenerator::getTerrainHeight(perlinSamplers &samplers, const mlm::ivec2 &pos)
 {
 	float	height = 0.0f;
 
-	height += noise2D(_seed, _continentalness, static_cast<mlm::vec2>(pos));
+	height += noise2D(samplers.height, _continentalness, static_cast<mlm::vec2>(pos));
 	return (static_cast<int>(height));
 }
 
-int	TerrainGenerator::getTerrainHeight(const mlm::ivec3 &pos)
+int	TerrainGenerator::getTerrainHeight(perlinSamplers &samplers, const mlm::ivec3 &pos)
 {
-	return (getTerrainHeight(mlm::ivec2(pos.x, pos.z)));
+	return (getTerrainHeight(samplers, mlm::ivec2(pos.x, pos.z)));
 }
 
-Block	TerrainGenerator::getBlock(const mlm::ivec3 &pos, int terrainHeight)
+Block	TerrainGenerator::getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos, int terrainHeight)
 {
 	Block::Type	type = Block::STONE;
 	bool		underwater = false;
@@ -49,7 +49,7 @@ Block	TerrainGenerator::getBlock(const mlm::ivec3 &pos, int terrainHeight)
 
 	// Only check for caves if block type is solid
 	if (type != Block::AIR)
-		if (isCave(pos))
+		if (isCave(samplers, pos))
 			type = Block::AIR;
 
 	if (type == Block::AIR && underwater)
@@ -59,17 +59,26 @@ Block	TerrainGenerator::getBlock(const mlm::ivec3 &pos, int terrainHeight)
 	return (ret);
 }
 
-bool	TerrainGenerator::isCave(const mlm::ivec3 &pos)
+bool	TerrainGenerator::isCave(perlinSamplers &samplers, const mlm::ivec3 &pos)
 {
 	if (pos.y == 0)
 		return (false);
-	float	val1 = noise3D(_seed, _cave, pos);
+	float	val1 = noise3D(samplers.cave1, _cave, pos);
 	if (std::abs(val1) > _caveDiameter)
 		return (false);
-	float	val2 = noise3D(_seed + 1, _cave, pos);
+	float	val2 = noise3D(samplers.cave2, _cave, pos);
 	if (std::abs(val2) > _caveDiameter)
 		return (false);
 	return (true);
+}
+
+perlinSamplers	TerrainGenerator::getSamplers()
+{
+	perlinSamplers	ret;
+	ret.height.setSeed(_seed);
+	ret.cave1.setSeed(_seed);
+	ret.cave2.setSeed(_seed + 1);
+	return (ret);
 }
 
 void	TerrainGenerator::setSeed(uint64_t seed)
@@ -102,27 +111,25 @@ const Spline	&TerrainGenerator::getContinentalnessSpline() const
 	return (_continentalness.spline);
 }
 
-float	TerrainGenerator::noise2D(uint64_t seed, const NoiseSettings &settings, const mlm::vec2 &pos)
+float	TerrainGenerator::noise2D(Perlin &sampler, const NoiseSettings &settings, const mlm::vec2 &pos)
 {
-	return (settings.spline.evaluate(_octaves2D(seed, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
+	return (settings.spline.evaluate(_octaves2D(sampler, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
 }
 
-float	TerrainGenerator::noise3D(uint64_t seed, const NoiseSettings &settings, const mlm::vec3 &pos)
+float	TerrainGenerator::noise3D(Perlin &sampler, const NoiseSettings &settings, const mlm::vec3 &pos)
 {
-	return (settings.spline.evaluate(_octaves3D(seed, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
+	return (settings.spline.evaluate(_octaves3D(sampler, pos / settings.zoom, static_cast<uint64_t>(settings.depth), settings.step)));
 }
 
-float	TerrainGenerator::_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t depth, float step)
+float	TerrainGenerator::_octaves2D(Perlin &sampler, const mlm::vec2 &pos, uint64_t depth, float step)
 {
 	float	ret = 0.0f;
 	float	amplitude = 1.0f;
 	float	frequency = 1.0f;
-	Perlin	noise;
 
-	noise.setSeed(seed);
 	for (; depth > 0; --depth)
 	{
-		float	temp = noise.getValue(pos.x * frequency, pos.y * frequency) / amplitude;
+		float	temp = sampler.getValue(pos.x * frequency, pos.y * frequency) / amplitude;
 		if (std::abs(temp) > std::numeric_limits<float>::epsilon())
 			ret += temp;
 		else
@@ -133,17 +140,15 @@ float	TerrainGenerator::_octaves2D(uint64_t seed, const mlm::vec2 &pos, uint64_t
 	return (ret);
 }
 
-float	TerrainGenerator::_octaves3D(uint64_t seed, const mlm::vec3 &pos, uint64_t depth, float step)
+float	TerrainGenerator::_octaves3D(Perlin &sampler, const mlm::vec3 &pos, uint64_t depth, float step)
 {
 	float	ret = 0.0f;
 	float	amplitude = 1.0f;
 	float	frequency = 1.0f;
-	Perlin	noise;
 
-	noise.setSeed(seed);
 	for (; depth > 0; --depth)
 	{
-		float	temp = noise.getValue(pos.x * frequency, pos.y * frequency, pos.z * frequency) / amplitude;
+		float	temp = sampler.getValue(pos.x * frequency, pos.y * frequency, pos.z * frequency) / amplitude;
 		if (std::abs(temp) > std::numeric_limits<float>::epsilon())
 			ret += temp;
 		else
