@@ -47,11 +47,22 @@ void	VoxEngine::init()
 
 	EngineDTO settings = Settings::loadEngine();
 
+	initWindow(settings);
+	initInput();
+	initResources(settings);
+	initComponents();
+}
+
+void	VoxEngine::initWindow(EngineDTO &settings)
+{
 	Window::create_window("ft_vox", mlm::ivec2(static_cast<int>(settings.windowSettings.width), static_cast<int>(settings.windowSettings.height)), settings.windowSettings.fullscreen ? Window::FULL_SCREEN_WINDOWED : Window::WINDOWED);
 
 	if (settings.windowSettings.vsync == false)
 		glfwSwapInterval(0);
+}
 
+void	VoxEngine::initInput()
+{
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
@@ -94,6 +105,12 @@ void	VoxEngine::init()
 
 	mlm::vec2	size = static_cast<mlm::vec2>(Window::get_size());
 	glfwSetCursorPos(Window::get_window(), size.x / 2.0f, size.y / 2.0f);
+}
+
+void	VoxEngine::initResources(EngineDTO &settings)
+{
+	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
+	_camera.loadSettings(settings.cameraSettings);
 
 	if (_atlas.load() == false)
 	{
@@ -101,12 +118,11 @@ void	VoxEngine::init()
 	}
 
 	_sky.load(Settings::loadSky());
-	
-	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
-	_camera.loadSettings(settings.cameraSettings);
+}
 
+void	VoxEngine::initComponents()
+{
 	_chunkManager.init(Settings::loadChunkManager());
-
 	_renderer.init();
 }
 
@@ -140,11 +156,6 @@ void	VoxEngine::mainLoop()
 		}
 		#endif
 	}
-}
-
-void	VoxEngine::input()
-{
-
 }
 
 void	VoxEngine::cleanup()

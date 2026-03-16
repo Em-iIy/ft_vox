@@ -48,12 +48,14 @@ class VoxEngine: public Window {
 
 		void			setFrustumUpdate();
 
-
 	private:
 		void			init();
+		void			initWindow(EngineDTO &settings);
+		void			initInput();
+		void			initResources(EngineDTO &settings);
+		void			initComponents();
 
 		void			mainLoop();
-		void			input();
 
 		void			cleanup();
 
