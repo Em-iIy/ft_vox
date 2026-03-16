@@ -9,9 +9,6 @@ Created on: 24/07/2025
 
 #include "Frustum.hpp"
 
-const mlm::ivec2	WINDOW_SIZE(1024, 1024);
-// const mlm::ivec2	WINDOW_SIZE(3840, 2160);
-
 #define FPS
 
 mlm::vec3	randVec3()
@@ -95,8 +92,8 @@ void	VoxEngine::init()
 	_input.addOnPressCallback(GLFW_KEY_LEFT, [this]() {_renderer.swapFrameBuffer(-1);});
 	_input.addOnPressCallback(GLFW_KEY_RIGHT, [this]() {_renderer.swapFrameBuffer(1);});
 
-
-	glfwSetCursorPos(Window::get_window(), WINDOW_SIZE.x / 2.0f, WINDOW_SIZE.y / 2.0f);
+	mlm::vec2	size = static_cast<mlm::vec2>(Window::get_size());
+	glfwSetCursorPos(Window::get_window(), size.x / 2.0f, size.y / 2.0f);
 
 	if (_atlas.load() == false)
 	{
@@ -123,7 +120,7 @@ void	VoxEngine::mainLoop()
 	{
 		_input.handleKeys();
 		Window::update();
-		_renderer.update(); // Maybe this order fixed the culling issue (test more!)
+		_renderer.update();
 		updateFrustum(_renderer.getProjection(), _renderer.getView());
 		updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
 		_chunkManager.update();
