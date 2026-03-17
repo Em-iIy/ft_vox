@@ -62,13 +62,13 @@ void	Renderer::initShaders()
 void	Renderer::initMeshes()
 {
 	std::vector<Vertex>		cubeVertices = {
-		{mlm::vec3(-1.0f, -1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, -1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(-1.0f, 1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, 1.0f, -1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(-1.0f, -1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(1.0f, -1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
-		{mlm::vec3(-1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(1.0f, 0.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
+		{mlm::vec3(0.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(1.0f, 1.0f, 1.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 	};
 	std::vector<uint32_t>	cubeIndices = {

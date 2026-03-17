@@ -32,8 +32,6 @@ void	Renderer::render()
 	waterLightingPass();
 	renderSky();
 	renderFinal();
-	return ;
-
 	renderUI();
 }
 
@@ -355,34 +353,8 @@ void	Renderer::renderUI()
 
 		_cubeShader.set_vec3("uColor", mlm::vec3(0.0f));
 		_cubeShader.set_float("uAlpha", 0.2f);
-
+		
 		_cubeMesh.draw(_cubeShader);
-	}
-
-	{
-		_depthShader.use();
-
-		mlm::mat4	proj(1.0f);
-		_depthShader.set_mat4("uProjection", proj);
-
-		mlm::mat4	view(1.0f);
-		_depthShader.set_mat4("uView", view);
-
-		mlm::mat4	model(1.0f);
-		model = mlm::translate(model, mlm::vec3(0.8f, 0.8f, -0.5f));
-		model = mlm::scale(model, mlm::vec3(0.2f));
-		_depthShader.set_mat4("uModel", model);
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _shadowFrameBuffer.getDepthTexture());
-		_depthShader.set_int("uTexture", 0);
-
-		bool wireFrameMode = _engine.getInput().getWireFrameMode();
-		if (wireFrameMode)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		_quadMesh.draw(_depthShader);
-		if (wireFrameMode)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 }
 
