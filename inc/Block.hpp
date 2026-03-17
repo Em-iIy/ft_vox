@@ -15,6 +15,7 @@ class Block {
 			GRASS,
 			STONE,
 			WATER,
+			SAND,
 		};
 
 		Block();

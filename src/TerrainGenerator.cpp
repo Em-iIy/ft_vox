@@ -35,6 +35,7 @@ Block	TerrainGenerator::getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos
 {
 	Block::Type	type = Block::STONE;
 	bool		underwater = false;
+	bool		sand = (terrainHeight > _seaLevel - 2 && terrainHeight <= _seaLevel + 2);
 
 	if (pos.y > terrainHeight)
 		type = Block::AIR;
@@ -42,10 +43,23 @@ Block	TerrainGenerator::getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos
 	if (pos.y <= _seaLevel && terrainHeight < _seaLevel)
 		underwater = true;
 	
+
+	// if (terrainHeight > _seaLevel - 2 && terrainHeight <= _seaLevel + 2)
 	if (pos.y == terrainHeight)
-		type = underwater ? Block::DIRT : Block::GRASS;
+	{
+
+		if (sand)
+			type = Block::SAND;
+		else
+			type = underwater ? Block::DIRT : Block::GRASS;
+	}
 	else if (pos.y < terrainHeight && pos.y > terrainHeight - 4)
-		type = Block::DIRT;
+	{
+		if (sand)
+			type = Block::SAND;
+		else
+			type = Block::DIRT;
+	}
 
 	// Only check for caves if block type is solid
 	if (type != Block::AIR)

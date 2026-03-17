@@ -10,7 +10,8 @@ const std::unordered_map<std::string, Block::Type>	BlockStringType = {
 	{"Block::DIRT", Block::DIRT},
 	{"Block::GRASS", Block::GRASS},
 	{"Block::STONE", Block::STONE},
-	{"Block::WATER", Block::WATER}
+	{"Block::WATER", Block::WATER},
+	{"Block::SAND", Block::SAND}
 };
 
 const std::unordered_map<std::string, AtlasDTO::SIDE>	BlockSide = {

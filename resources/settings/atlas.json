@@ -10,7 +10,8 @@
 		"Block::GRASS::TOP": [0, 7],
 		"Block::GRASS::SIDE": [0, 6],
 		"Block::STONE": [2, 7],
-		"Block::WATER": [3, 7]
+		"Block::WATER": [3, 7],
+		"Block::SAND": [1, 6]
 	},
 	"blocks": {
 		"Block::AIR": {
@@ -52,6 +53,14 @@
 			"NORTH": "Block::WATER",
 			"SOUTH": "Block::WATER",
 			"BOTTOM": "Block::WATER"
+		},
+		"Block::SAND": {
+			"TOP": "Block::SAND",
+			"EAST": "Block::SAND",
+			"WEST": "Block::SAND",
+			"NORTH": "Block::SAND",
+			"SOUTH": "Block::SAND",
+			"BOTTOM": "Block::SAND"
 		}
 	}
 }
