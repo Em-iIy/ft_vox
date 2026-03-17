@@ -295,7 +295,7 @@ void	Renderer::initSsaoBlurShader()
 
 void	Renderer::initSsaoNoise()
 {
-	std::array<mlm::vec3, 8>	ssaoNoise;
+	std::array<mlm::vec3, 16>	ssaoNoise;
 
 	rng::fgen	gen = rng::generator(0.0f, 1.0f);
 
