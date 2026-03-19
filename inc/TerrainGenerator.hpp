@@ -15,6 +15,7 @@ struct perlinSamplers {
 	Perlin	height;
 	Perlin	cave1;
 	Perlin	cave2;
+	Perlin	sand;
 };
 
 struct NoiseSettings {
@@ -30,6 +31,9 @@ struct TerrainGeneratorDTO {
 	float			caveDiameter;
 	NoiseSettings	continentalness;
 	NoiseSettings	cave;
+	float			sandBeachThreshold;
+	float			sandSeaThreshold;
+	NoiseSettings	sand;
 };
 
 class TerrainGenerator {
@@ -44,6 +48,7 @@ class TerrainGenerator {
 
 		Block			getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos, int terrainHeight);
 		bool			isCave(perlinSamplers &samplers, const mlm::ivec3 &pos);
+		bool			isSand(perlinSamplers &samplers, const mlm::ivec2 &pos, int terrainHeight);
 
 		perlinSamplers	getSamplers();
 
@@ -64,6 +69,9 @@ class TerrainGenerator {
 		int				_seaLevel;
 		float			_caveDiameter;
 		NoiseSettings	_cave;
+		float			_sandBeachThreshold;
+		float			_sandSeaThreshold;
+		NoiseSettings	_sand;
 		NoiseSettings	_continentalness;
 
 		static float	_octaves2D(Perlin &sampler, const mlm::vec2 &pos, uint64_t depth, float step);

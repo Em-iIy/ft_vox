@@ -63,10 +63,13 @@ TerrainGeneratorDTO	Settings::loadTerrainGenerator()
 		terrainDto.seed = root->get("seed")->getNumber();
 		terrainDto.seaLevel = root->get("seaLevel")->getNumber();
 		terrainDto.caveDiameter = root->get("caveDiameter")->getNumber();
+		terrainDto.sandBeachThreshold = root->get("sandBeachThreshold")->getNumber();
+		terrainDto.sandSeaThreshold = root->get("sandSeaThreshold")->getNumber();
 
 		JSON::NodePtr	NoiseSettings = root->get("noiseSettings");
 		loadNoiseSettings(terrainDto.continentalness, NoiseSettings->get("continentalness"));
 		loadNoiseSettings(terrainDto.cave, NoiseSettings->get("cave"));
+		loadNoiseSettings(terrainDto.sand, NoiseSettings->get("sand"));
 		
 		validateSettings(terrainDto);
 		return (terrainDto);

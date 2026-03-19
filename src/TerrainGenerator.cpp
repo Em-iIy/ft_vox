@@ -10,7 +10,15 @@ TerrainGenerator::TerrainGenerator()
 {
 }
 
-TerrainGenerator::TerrainGenerator(const TerrainGeneratorDTO &dto): _seed(dto.seed), _seaLevel(dto.seaLevel), _caveDiameter(dto.caveDiameter), _cave(dto.cave), _continentalness(dto.continentalness)
+TerrainGenerator::TerrainGenerator(const TerrainGeneratorDTO &dto):
+	_seed(dto.seed),
+	_seaLevel(dto.seaLevel),
+	_caveDiameter(dto.caveDiameter),
+	_cave(dto.cave),
+	_sandBeachThreshold(dto.sandBeachThreshold),
+	_sandSeaThreshold(dto.sandSeaThreshold),
+	_sand(dto.sand),
+	_continentalness(dto.continentalness)
 {
 }
 
@@ -35,7 +43,7 @@ Block	TerrainGenerator::getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos
 {
 	Block::Type	type = Block::STONE;
 	bool		underwater = false;
-	bool		sand = (terrainHeight > _seaLevel - 2 && terrainHeight <= _seaLevel + 2);
+	bool		sand = isSand(samplers, mlm::ivec2(pos.x, pos.z), terrainHeight);
 
 	if (pos.y > terrainHeight)
 		type = Block::AIR;
@@ -43,8 +51,6 @@ Block	TerrainGenerator::getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos
 	if (pos.y <= _seaLevel && terrainHeight < _seaLevel)
 		underwater = true;
 	
-
-	// if (terrainHeight > _seaLevel - 2 && terrainHeight <= _seaLevel + 2)
 	if (pos.y == terrainHeight)
 	{
 
@@ -86,12 +92,22 @@ bool	TerrainGenerator::isCave(perlinSamplers &samplers, const mlm::ivec3 &pos)
 	return (true);
 }
 
+bool	TerrainGenerator::isSand(perlinSamplers &samplers, const mlm::ivec2 &pos, int terrainHeight)
+{
+	if (terrainHeight > _seaLevel + 2)
+		return (false);
+	float	threshold = (terrainHeight > _seaLevel - 2) ? _sandBeachThreshold : _sandSeaThreshold;
+	float	val = noise2D(samplers.sand, _sand, pos);
+	return (val > threshold);
+}
+
 perlinSamplers	TerrainGenerator::getSamplers()
 {
 	perlinSamplers	ret;
 	ret.height.setSeed(_seed);
 	ret.cave1.setSeed(_seed);
 	ret.cave2.setSeed(_seed + 1);
+	ret.sand.setSeed(_seed);
 	return (ret);
 }
 

@@ -2,6 +2,8 @@
 	"seed": 4242,
 	"seaLevel": 110,
 	"caveDiameter": 0.02,
+	"sandBeachThreshold": 0.0,
+	"sandSeaThreshold": 0.2,
 	"noiseSettings": {
 		"continentalness": {
 			"spline": [
@@ -10,7 +12,7 @@
 				-0.2, 95.0,
 				0.0, 108.0,
 				0.25, 120.0,
-				0.45, 180.0,
+				0.55, 160.0,
 				1.00, 200.0
 			],
 			"depth": 5,
@@ -25,6 +27,15 @@
 			"depth": 1,
 			"step": 1.0,
 			"zoom": 160.0
+		},
+		"sand": {
+			"spline": [
+				-1.0, -1.0,
+				1.0, 1.0
+			],
+			"depth": 1,
+			"step": 1.0,
+			"zoom": 40.0
 		}
 	}
 }
