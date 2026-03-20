@@ -26,12 +26,15 @@ void	Settings::loadPaths(int argc, char **argv)
 		throw std::runtime_error("Settings: Missing settings file");
 	try
 	{
+		// Load JSON from main settings file
 		JSON::Parser	settingsJSON(argv[1]);
 
+		// Loop through all the different paths inside the root JSON object
 		JSON::NodePtr	settingsRoot = settingsJSON.getRoot();
 		JSON::ObjectPtr	rootObj = settingsRoot->getObject();
 		for (auto &[key, val] : *rootObj)
 		{
+			// Construct the paths and store in map
 			_paths[key] = val->get("path")->getString() + val->get("name")->getString();
 		}
 		ensurePaths();
@@ -49,6 +52,7 @@ void	Settings::ensurePaths()
 		complete = false;
 	else
 	{
+		// Query the list of required paths to see if they exist in the map from the settings file
 		for (const std::string &path : requiredPaths)
 		{
 			if (!_paths.contains(path))

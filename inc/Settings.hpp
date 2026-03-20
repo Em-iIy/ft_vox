@@ -15,6 +15,13 @@ Created on: 21/10/2025
 
 #include <map>
 
+/*
+	'Static' class that keeps track off all the different types of settings files
+		with the associated paths.
+	
+	It provides loading functions that parse the settings files, and return the required
+		DTO struct to then be loaded into their own resource.
+*/
 class Settings {
 	public:
 		Settings();

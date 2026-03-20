@@ -55,7 +55,12 @@ void	VoxEngine::init()
 
 void	VoxEngine::initWindow(EngineDTO &settings)
 {
-	Window::create_window("ft_vox", mlm::ivec2(static_cast<int>(settings.windowSettings.width), static_cast<int>(settings.windowSettings.height)), settings.windowSettings.fullscreen ? Window::FULL_SCREEN_WINDOWED : Window::WINDOWED);
+	Window::create_window(
+		"ft_vox",
+		mlm::ivec2(static_cast<int>(settings.windowSettings.width),
+		static_cast<int>(settings.windowSettings.height)),
+		settings.windowSettings.fullscreen ? Window::FULL_SCREEN_WINDOWED : Window::WINDOWED
+	);
 
 	if (settings.windowSettings.vsync == false)
 		glfwSwapInterval(0);
@@ -66,11 +71,11 @@ void	VoxEngine::initInput()
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
 
-	// Reload all chunks?
+	// Reload all chunks and shaders
 	_input.addOnPressCallback(GLFW_KEY_R, [this]() {_chunkManager.unloadAll();});
 	_input.addOnPressCallback(GLFW_KEY_R, []() {ShaderManager::reloadShaders();});
 
-	// Camera movement (maybe move into separate setup function)
+	// Camera movement
 	_input.addOnDownCallback(GLFW_KEY_W, [this]() {_camera.processKeyboard(Camera::FORWARD, get_delta_time());});
 	_input.addOnDownCallback(GLFW_KEY_S, [this]() {_camera.processKeyboard(Camera::BACKWARD, get_delta_time());});
 	_input.addOnDownCallback(GLFW_KEY_D, [this]() {_camera.processKeyboard(Camera::RIGHT, get_delta_time());});
@@ -82,10 +87,12 @@ void	VoxEngine::initInput()
 	_input.addOnPressCallback(GLFW_KEY_LEFT_CONTROL, [this]() {_camera.toggleSprint();});
 	_input.addOnReleaseCallback(GLFW_KEY_LEFT_CONTROL, [this]() {_camera.toggleSprint();});
 
+	// Block placing
 	_input.addOnPressCallback(GLFW_KEY_1, [this]() {_player.setActiveBlock(Block::DIRT);});
 	_input.addOnPressCallback(GLFW_KEY_2, [this]() {_player.setActiveBlock(Block::GRASS);});
 	_input.addOnPressCallback(GLFW_KEY_3, [this]() {_player.setActiveBlock(Block::STONE);});
-	_input.addOnPressCallback(GLFW_KEY_4, [this]() {_player.setActiveBlock(Block::WATER);});
+	_input.addOnPressCallback(GLFW_KEY_4, [this]() {_player.setActiveBlock(Block::SAND);});
+	_input.addOnPressCallback(GLFW_KEY_5, [this]() {_player.setActiveBlock(Block::WATER);});
 	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_LEFT, [this]() {_chunkManager.placeBlock(_player.getActiveBlock());});
 	_input.addOnDownCallback(GLFW_MOUSE_BUTTON_MIDDLE, [this]() {_chunkManager.setBlock(_camera.getPos(), _player.getActiveBlock());});
 	_input.addOnPressCallback(GLFW_MOUSE_BUTTON_RIGHT, [this]() {_chunkManager.deleteBlock();});
@@ -93,13 +100,9 @@ void	VoxEngine::initInput()
 	// Random other key inputs
 	_input.addOnPressCallback(GLFW_KEY_ESCAPE, std::bind(glfwSetWindowShouldClose, get_window(), GLFW_TRUE));
 	_input.addOnPressCallback(GLFW_KEY_TAB, [this]() {_input.toggleWireFrame();});
-	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_renderer.togglePause();});
 	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_sky.togglePause();});
-	_input.addOnPressCallback(GLFW_KEY_KP_0, [this]() {_renderer.setLightingMode(0);});
-	_input.addOnPressCallback(GLFW_KEY_KP_1, [this]() {_renderer.setLightingMode(1);});
-	_input.addOnPressCallback(GLFW_KEY_KP_2, [this]() {_renderer.setLightingMode(2);});
-	_input.addOnPressCallback(GLFW_KEY_KP_3, [this]() {_renderer.setLightingMode(3);});
 
+	// Debug viewing different framebuffers
 	_input.addOnPressCallback(GLFW_KEY_LEFT, [this]() {_renderer.swapFrameBuffer(-1);});
 	_input.addOnPressCallback(GLFW_KEY_RIGHT, [this]() {_renderer.swapFrameBuffer(1);});
 
