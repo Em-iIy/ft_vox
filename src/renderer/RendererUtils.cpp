@@ -5,16 +5,6 @@ Created on: 10/03/2026
 
 #include "Renderer.hpp"
 
-void	Renderer::togglePause()
-{
-	_pause = !_pause;
-}
-
-void	Renderer::setLightingMode(int mode)
-{
-	_lightingMode = mode;
-}
-
 void	Renderer::swapFrameBuffer(int direction)
 {
 	currentFrameBufferIdx = (currentFrameBufferIdx + frameBufferIds.size() + direction) % frameBufferIds.size();

@@ -9,7 +9,7 @@ Created on: 29/09/2025
 
 void	Renderer::update()
 {
-	updateTime();
+	// updateTime();
 	updateProjection();
 	updateView();
 	updateLightProjection();
@@ -357,4 +357,3 @@ void	Renderer::renderUI()
 		_cubeMesh.draw(_cubeShader);
 	}
 }
-

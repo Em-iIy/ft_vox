@@ -42,9 +42,3 @@ void	Renderer::updateSunPos()
 	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(skyTime), cosf(skyTime)));
 	_sunPos = _sunDir * 256.0f;
 }
-
-void	Renderer::updateTime()
-{
-	if (!_pause)
-		_time += _engine.get_delta_time() / 5.0f;
-}

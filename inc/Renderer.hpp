@@ -28,8 +28,6 @@ class Renderer {
 		mlm::mat4		&getLightView();
 		mlm::vec3		&getSunPos();
 
-		void			togglePause();
-		void			setLightingMode(int mode);
 		void			swapFrameBuffer(int direction);
 
 	private:
@@ -59,10 +57,6 @@ class Renderer {
 
 		mlm::vec3		_bgColor;
 		bool			_isUnderwater = false;
-
-		float			_time = 0;
-		bool			_pause = false;
-		int				_lightingMode = 0;
 
 		Shader			_quadShader;
 		Shader			_shadowShader;
@@ -113,7 +107,4 @@ class Renderer {
 		void			updateLightView();
 		void			updateUnderWater();
 		void			updateSunPos();
-		void			updateTime();
-
-		// void	renderText();
 };
