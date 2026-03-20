@@ -231,11 +231,14 @@ void	ChunkManager::_updateShadowRenderList()
 void	ChunkManager::_updateCameraChunkCoord()
 {
 	const mlm::ivec2 &cameraChunkCoord = getChunkCoord(_engine.getCamera().getPos());
+	// Check if the camera entered a new chunk
 	if (cameraChunkCoord != _cameraChunkCoord)
 	{
 		_cameraChunkCoord = cameraChunkCoord;
-		_updateVisibility = true;
 
+		// Update chunk visibility lists
+		_updateVisibility = true;
+		// Set the new min and max rendered chunk coordinates
 		_renderMin = _cameraChunkCoord - mlm::ivec2(_renderDistance);
 		_renderMax = _cameraChunkCoord + mlm::ivec2(_renderDistance);
 	}

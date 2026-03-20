@@ -18,6 +18,7 @@ void	Renderer::init()
 	initSsaoSamples();
 	initSsaoNoise();
 	
+	// Enable default values for depth testing, backface culling and blending
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -61,6 +62,7 @@ void	Renderer::initShaders()
 
 void	Renderer::initMeshes()
 {
+	// Create mesh for highlighting current block
 	std::vector<Vertex>		cubeVertices = {
 		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
 		{mlm::vec3(1.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
@@ -87,6 +89,7 @@ void	Renderer::initMeshes()
 	};
 	_cubeMesh = Mesh(cubeVertices, cubeIndices);
 
+	// Create mesh for all textures/post processing effects
 	std::vector<Vertex>		quadVertices = {
 		{mlm::vec3(-1.0f, -1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f, 0.0f)},
 		{mlm::vec3(1.0f, -1.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(1.0f, 0.0f)},
@@ -99,6 +102,7 @@ void	Renderer::initMeshes()
 	};
 	_quadMesh = Mesh(quadVertices, quadIndices);
 
+	// Create mesh for sky "box" (sphere)
 	std::vector<Vertex>		sphereVertices;
 	std::vector<uint32_t>	sphereIndices;
 
@@ -273,10 +277,11 @@ void	Renderer::initSsaoSamples()
 
 		ssaoSamples[i] = sample;
 	}
+
+	// Set uniforms in shader
 	_ssaoShader.use();
 	_ssaoShader.set_int("uSampleCount", ssaoSamples.size());
 
-	// replace with ssbo
 	for (uint32_t i = 0; i < ssaoSamples.size(); i++)
 		_ssaoShader.set_vec3("uSamples[" + std::to_string(i) + "]", ssaoSamples[i]);
 

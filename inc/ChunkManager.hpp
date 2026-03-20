@@ -125,6 +125,7 @@ class ChunkManager {
 		void																_updateRenderList();
 		void																_updateShadowRenderList();
 
+		// Update the chunk coordinates of the camera if they have changed
 		void																_updateCameraChunkCoord();
 		
 		bool																_loadChunk(const mlm::ivec2 &chunkCoord);
