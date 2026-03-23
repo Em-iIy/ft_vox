@@ -22,6 +22,7 @@ void	Frustum::update(const mlm::mat4 &m)
 
 bool	Frustum::isBoxVisible(const AABB &box) const
 {
+	// Check if one of the box's points is on the positive side of each of the frustum's planes
 	for (const Plane &plane : _planes)
 	{
 		mlm::vec3 p = box.getPositiveVertex(plane.getNormal());

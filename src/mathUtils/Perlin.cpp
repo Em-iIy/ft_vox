@@ -14,36 +14,38 @@ void	Perlin::setSeed(uint64_t seed)
 
 float	Perlin::getValue(float x, float y)
 {
+	// Get the integer coordinates around the position
 	mlm::vec2	pos(x, y);
 	int			x0 = static_cast<int>(std::floor(x));
 	int			x1 = x0 + 1;
 	int			y0 = static_cast<int>(std::floor(y));
 	int			y1 = y0 + 1;
 
+	// Create pseudo random gradient vectors for each coordinate
 	mlm::vec2	g00 = _gradient(x0, y0);
 	mlm::vec2	g01 = _gradient(x0, y1);
 	mlm::vec2	g10 = _gradient(x1, y0);
 	mlm::vec2	g11 = _gradient(x1, y1);
 
+	// Find the dot product between position and all the gradient vectors
 	float		d00 = mlm::dot(pos - mlm::vec2(x0, y0), g00);
 	float		d01 = mlm::dot(pos - mlm::vec2(x0, y1), g01);
 	float		d10 = mlm::dot(pos - mlm::vec2(x1, y0), g10);
 	float		d11 = mlm::dot(pos - mlm::vec2(x1, y1), g11);
 
+	// Find the 't' values of each axis for the lerping step
 	float		sx = _smoothStep(x - static_cast<float>(x0));
 	float		sy = _smoothStep(y - static_cast<float>(y0));
 
+	// Lerp each axis
 	float		value = std::lerp(std::lerp(d00, d10, sx), std::lerp(d01, d11, sx), sy);
 	return (value);
 }
 
 float	Perlin::getValue(float x, float y, float z)
 {
+	// Get the integer coordinates around the position
 	mlm::vec3	pos(x, y, z);
-	// std::cout << _hash(x, y, z) << std::endl;
-	// std::cout << _hash(x, y) << std::endl;
-	// std::cout << _hash(y, z) << std::endl;
-	// return (_hash(x, y, z));
 	int			x0 = static_cast<int>(std::floor(x));
 	int			x1 = x0 + 1;
 	int			y0 = static_cast<int>(std::floor(y));
@@ -51,6 +53,7 @@ float	Perlin::getValue(float x, float y, float z)
 	int			z0 = static_cast<int>(std::floor(z));
 	int			z1 = z0 + 1;
 
+	// Create pseudo random gradient vectors for each coordinate
 	mlm::vec3	g000 = _gradient(x0, y0, z0);
 	mlm::vec3	g001 = _gradient(x0, y0, z1);
 	mlm::vec3	g010 = _gradient(x0, y1, z0);
@@ -60,6 +63,7 @@ float	Perlin::getValue(float x, float y, float z)
 	mlm::vec3	g110 = _gradient(x1, y1, z0);
 	mlm::vec3	g111 = _gradient(x1, y1, z1);
 
+	// Find the dot product between position and all the gradient vectors
 	float		d000 = mlm::dot(pos - mlm::vec3(x0, y0, z0), g000);
 	float		d001 = mlm::dot(pos - mlm::vec3(x0, y0, z1), g001);
 	float		d010 = mlm::dot(pos - mlm::vec3(x0, y1, z0), g010);
@@ -69,18 +73,22 @@ float	Perlin::getValue(float x, float y, float z)
 	float		d110 = mlm::dot(pos - mlm::vec3(x1, y1, z0), g110);
 	float		d111 = mlm::dot(pos - mlm::vec3(x1, y1, z1), g111);
 	
+	// Find the 't' values of each axis for the lerping step
 	float		sx = _smoothStep(x - static_cast<float>(x0));
 	float		sy = _smoothStep(y - static_cast<float>(y0));
 	float		sz = _smoothStep(z - static_cast<float>(z0));
 
+	// Lerp x axis
 	float		xLerp00 = std::lerp(d000, d100, sx);
 	float		xLerp01 = std::lerp(d001, d101, sx);
 	float		xLerp10 = std::lerp(d010, d110, sx);
 	float		xLerp11 = std::lerp(d011, d111, sx);
 
+	// Lerp y axis
 	float		yLerp0 = std::lerp(xLerp00, xLerp10, sy);
 	float		yLerp1 = std::lerp(xLerp01, xLerp11, sy);
 
+	// Lerp z axis
 	float		value = std::lerp(yLerp0, yLerp1, sz);
 	return (value);
 }
@@ -93,13 +101,17 @@ float	Perlin::_smoothStep(float t) const
 mlm::vec2	Perlin::_gradient(int x, int y)
 {
 	uint64_t	hash = _hash(x, y);
-	auto		it = _2dGradients.find(hash);
 
+	// Check if the hash has already been cached
+	auto		it = _2dGradients.find(hash);
 	if (it != _2dGradients.end())
 		return (it->second);
 
+	// Construct vector based on angle from hash
 	float		angle = mlm::radians(static_cast<float>(hash % 360));
 	mlm::vec2	ret(std::cos(angle), std::sin(angle));
+
+	// Cache the constructed vector
 	_2dGradients[hash] = ret;
 	return (ret);
 }
@@ -107,14 +119,20 @@ mlm::vec2	Perlin::_gradient(int x, int y)
 mlm::vec3	Perlin::_gradient(int x, int y, int z)
 {
 	uint64_t	hash = _hash(x, y, z);
-	auto		it = _3dGradients.find(hash);
 
+	// Check if the hash has already been cached
+	auto		it = _3dGradients.find(hash);
 	if (it != _3dGradients.end())
 		return (it->second);
 
+	// Create 2 angles to have access to 3 dimensions
 	float theta = static_cast<float>(hash & 0xFFFFFFFFULL) / static_cast<float>(0xFFFFFFFFULL) * 2.0f * M_PI;
 	float phi   = static_cast<float>(hash >> 32) / static_cast<float>(0xFFFFFFFFULL) * M_PI;
+
+	// Construct vector based on angles from hash
 	mlm::vec3	ret(std::cos(theta) * std::sin(phi), std::sin(theta) * std::sin(phi), std::cos(phi));
+
+	// Cache the constructed vector
 	_3dGradients[hash] = ret;
 	return (ret);
 }

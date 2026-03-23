@@ -37,8 +37,7 @@ void	Spline::setPoints(const std::vector<mlm::vec2> &points)
 		throw std::runtime_error("Spline must contain at least 2 points");
 	
 	_points = points;
-	// for (const mlm::vec2 &point : _points)
-	// 	std::cout << point << std::endl;
+	// Sort points based on x value
 	std::sort(_points.begin(), _points.end(),
 		[](const mlm::vec2 &a, const mlm::vec2 &b)
 		{
@@ -49,23 +48,28 @@ void	Spline::setPoints(const std::vector<mlm::vec2> &points)
 
 float	Spline::evaluate(float t) const
 {
+	// Return 'extremes' if t falls outside point range
 	if (t < _points.front().x)
 		return (_points.front().y);
 	if (t > _points.back().x)
 		return (_points.back().y);
-	
+
+	// Find appropriate point for t
 	uint64_t i = 1;
 	for (;i < _points.size(); ++i)
 		if (_points[i].x > t)
 			break ;
-	
+
+	// Get the 2 points below and 1 point after the found point
 	const mlm::vec2	&p0 = (i > 1) ? _points[i - 2] : _points[0];
 	const mlm::vec2	&p1 = _points[i - 1];
 	const mlm::vec2	&p2 = _points[i];
 	const mlm::vec2	&p3 = (i + 1 < _points.size()) ? _points[i + 1] : _points.back();
 
+	// Find t going from p1 to p2
 	const float	localT = (t - p1.x) / (p2.x - p1.x);
 
+	// Create curve
 	return (catmullRom(p0.y, p1.y, p2.y, p3.y, localT));
 }
 
