@@ -6,8 +6,10 @@ Created on: 10/03/2026
 #include "Renderer.hpp"
 #include "VoxEngine.hpp"
 
-const float		CLIPPING_NEAR = 0.25f;
+const float		CLIPPING_NEAR = 0.1f;
 const float		CLIPPING_FAR = 640.0f;
+const float		SUN_DISTANCE = 256.0f;
+const float		SHADOW_WIDTH = 160.0f;
 
 void	Renderer::updateProjection()
 {
@@ -22,7 +24,7 @@ void	Renderer::updateView()
 
 void	Renderer::updateLightProjection()
 {
-	_lightProjection = mlm::ortho(-160.0f, 160.0f, -160.0f, 160.0f, 0.1f, 512.0f);
+	_lightProjection = mlm::ortho(-SHADOW_WIDTH, SHADOW_WIDTH, -SHADOW_WIDTH, SHADOW_WIDTH, CLIPPING_NEAR, SUN_DISTANCE * 2.0f);
 }
 
 void	Renderer::updateLightView()
@@ -40,5 +42,5 @@ void	Renderer::updateSunPos()
 {
 	float	skyTime = _engine.getSky().getTimePercent() * 2.0f * M_PI;
 	_sunDir = mlm::normalize(mlm::vec3(0.3f, sinf(skyTime), cosf(skyTime)));
-	_sunPos = _sunDir * 256.0f;
+	_sunPos = _sunDir * SUN_DISTANCE;
 }
