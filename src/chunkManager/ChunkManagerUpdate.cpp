@@ -9,12 +9,17 @@ Created on: 10/03/2026
 
 void	ChunkManager::update()
 {
+	// Update chunk states
 	_updateLoadList();
 	_updateGenerateList();
 	_updateMeshList();
 	_updateUnloadList();
 	_updateUploadList();
+
+	// Determine what chunks go where
 	_updateVisibleList();
+
+	// Update rendering lists
 	_updateRenderList();
 	_updateShadowRenderList();
 	_updateCameraChunkCoord();
@@ -45,6 +50,7 @@ void	ChunkManager::_updateGenerateList()
 			break ;
 		if (chunk && chunk->getState() == Chunk::LOADED)
 		{
+			// Only generate chunk if it isn't in the queue
 			if (chunk->_busy == false)
 			{
 				chunk->_busy = true;
@@ -65,40 +71,44 @@ void	ChunkManager::_updateMeshList()
 		mlm::ivec2(1, 0),
 		mlm::ivec2(-1, 0),
 	};
-	int	remeshCount = 0;
+	int	meshCount = 0;
 	for (std::shared_ptr<Chunk> chunk : chunkMeshList)
 	{
-		if (remeshCount >= _maxMesh)
+		if (meshCount >= _maxMesh)
 			break ;
-		if (chunk && (chunk->getState() == Chunk::GENERATED || chunk->_dirty == true))
+		// Is chunk valid target for meshing
+		if (!chunk || (chunk->getState() != Chunk::GENERATED && chunk->_dirty == false))
+			continue ;
+
+		// Check whether all neighboring chunks are generated before meshing
+		uint64_t	neighborSetupCount = 0;
+		for (const mlm::ivec2 &neighbor : neighbors)
 		{
-			uint64_t	neighborSetupCount = 0;
-			for (const mlm::ivec2 &neighbor : neighbors)
-			{
-				chunksMtx.lock();
-				std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
-				chunksMtx.unlock();
-				if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::DIRTY)
-					break ;
-				neighborSetupCount++;
-			}
-			if (neighborSetupCount == neighbors.size())
-			{
-				if (chunk->_busy == false)
-				{
-					chunk->_busy = true;
-					_addToQueue(chunk, ChunkTask::Type::MESH);
-				}
-				remeshCount++;
-				_updateVisibility = true;
-			}
+			chunksMtx.lock();
+			std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
+			chunksMtx.unlock();
+			// If neighbor is only loaded at best don't count it
+			if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::DIRTY)
+				break ;
+			neighborSetupCount++;
 		}
+		if (neighborSetupCount < neighbors.size())
+			continue;
+		// Only mesh chunk if it isn't in the queue
+		if (chunk->_busy == false)
+		{
+			chunk->_busy = true;
+			_addToQueue(chunk, ChunkTask::Type::MESH);
+		}
+		meshCount++;
+		_updateVisibility = true;
 	}
 	chunkMeshList.clear();
 }
 
 void	ChunkManager::_updateUnloadList()
 {
+	// Unload all chunks set for unloading
 	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
 	{
 		if (chunk && chunk->getState() != Chunk::UNLOADED)
@@ -115,6 +125,7 @@ void	ChunkManager::_updateUnloadList()
 
 void	ChunkManager::_updateUploadList()
 {
+	// Upload all chunks with meshes ready to be sent to GPU
 	for (std::shared_ptr<Chunk> chunk : chunkUploadList)
 	{
 		if (chunk)
@@ -142,13 +153,15 @@ void	ChunkManager::_updateVisibleList()
 			&& (chunkCoord.x <= _renderMax.x && chunkCoord.y <= _renderMax.y)
 		)
 			continue ;
+		// Don't unload yet if chunk is in the task queue
 		if (chunk->_busy == true)
 			continue ;
 		chunk->_busy = true;
 		chunkUnloadList.push_back(chunk);
 	}
 	chunksMtx.unlock();
-	// loop through all chunk coordinates within render distance
+	// Loop through all chunk coordinates within render distance
+	// Starting at the camera chunk and expanding out from there
 	for (int dist = 0; dist <= _renderDistance; ++dist)
 	{
 		for (int x = -dist; x <= dist; ++x)
@@ -162,34 +175,34 @@ void	ChunkManager::_updateVisibleList()
 				chunksMtx.lock();
 				std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
 				chunksMtx.unlock();
+				// Load chunk if it isn't contained in the chunk map
 				if (chunk == nullptr)
 				{
 					chunkLoadList.push_back(chunkCoord);
+					continue ;
 				}
-				else
+				// Place chunk in the correct list based on the current state
+				switch (chunk->getState())
 				{
-					switch (chunk->getState())
-					{
-					case Chunk::LOADED:
-						chunkGenerateList.push_back(chunk);
-						break ;
-					case Chunk::GENERATED:
-						chunkMeshList.push_back(chunk);
-						break ;
-					case Chunk::MESHED:
-						chunkUploadList.push_back(chunk);
-						break ;
-					case Chunk::UPLOADED:
-						chunkVisibleList.push_back(chunk);
-						break ;
-					default:
-						break;
-					}
-					if (chunk->_dirty == true)
-						chunkMeshList.push_back(chunk);
-					if (chunk->_readyToUpload == true)
-						chunkUploadList.push_back(chunk);
+				case Chunk::LOADED:
+					chunkGenerateList.push_back(chunk);
+					break ;
+				case Chunk::GENERATED:
+					chunkMeshList.push_back(chunk);
+					break ;
+				case Chunk::MESHED:
+					chunkUploadList.push_back(chunk);
+					break ;
+				case Chunk::UPLOADED:
+					chunkVisibleList.push_back(chunk);
+					break ;
+				default:
+					break;
 				}
+				if (chunk->_dirty == true)
+					chunkMeshList.push_back(chunk);
+				if (chunk->_readyToUpload == true)
+					chunkUploadList.push_back(chunk);
 			}
 		}
 	}
@@ -204,8 +217,10 @@ void	ChunkManager::_updateRenderList()
 	{
 		if (chunk->getState() == Chunk::UPLOADED)
 		{
+			// Create AABB around the chunk mesh
 			const auto [min, max] = chunk->getMinMax();
 			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
+			// Check if any of the edges of the AABB falls inside the frustum
 			if (_engine.getFrustum().isBoxVisible(AABB(min + chunkToCamPos, max + chunkToCamPos)) == true)
 				chunkRenderList.push_back(chunk);
 		}
@@ -220,8 +235,10 @@ void	ChunkManager::_updateShadowRenderList()
 	{
 		if (chunk->getState() == Chunk::UPLOADED)
 		{
+			// Create AABB around the chunk mesh
 			const auto [min, max] = chunk->getMinMax();
 			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
+			// Check if any of the edges of the AABB falls inside the frustum
 			if (_engine.getShadowFrustum().isBoxVisible(AABB(min + chunkToCamPos, max + chunkToCamPos)) == true)
 				chunkShadowRenderList.push_back(chunk);
 		}

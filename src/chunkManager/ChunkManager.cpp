@@ -14,13 +14,14 @@ int	getChunkCount();
 
 bool	ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 {
-	// if loadable from file
-	// load from file
-	// else
 	chunksMtx.lock();
 	if (chunks[chunkCoord] != nullptr)
+	{
+		chunksMtx.unlock();
 		return (false);
+	}
 	chunksMtx.unlock();
+
 	std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(chunkCoord, *this);
 	chunksMtx.lock();
 	chunks[chunkCoord] = std::move(chunk);
@@ -40,9 +41,9 @@ void	ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 
 void	ChunkManager::_ThreadRoutine()
 {
-	// std::cout << "starting thread" << std::endl;
 	while(_running)
 	{
+		// Periodically check for tasks in the queue
 		_queueMtx.lock();
 		if (_queue.empty())
 		{
@@ -50,14 +51,20 @@ void	ChunkManager::_ThreadRoutine()
 			usleep(100);
 			continue ;
 		}
+
+		// Access task from queue
 		ChunkTask task = _popFromQueue();
 		_queueMtx.unlock();
+
+		// Attempt to convert the tasks chunk weak_ptr to shared_ptr
 		std::shared_ptr<Chunk> chunk = task.ptr.lock();
+		// If this returns nullptr, the chunk has since been unloaded
 		if (!chunk)
 		{
 			std::cout << "tried to access unloaded chunk!" << std::endl;
 			continue ;
 		}
+		// Run appropiate task
 		switch (task.type)
 		{
 			case ChunkTask::Type::GENERATE:
@@ -91,12 +98,10 @@ void	ChunkManager::renderChunks(Shader &shader)
 	// _queueMtx.lock();
 	// std::cerr << "queue size: " << _queue.size() << std::endl;
 	// _queueMtx.unlock();
-	// glEnable(GL_CULL_FACE);
 	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
 	}
-	// glDisable(GL_CULL_FACE);
 }
 
 void	ChunkManager::renderChunksShadows(Shader &shader)

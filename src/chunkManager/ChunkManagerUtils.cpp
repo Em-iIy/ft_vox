@@ -7,12 +7,19 @@ Created on: 10/03/2026
 #include "Coords.hpp"
 #include "Settings.hpp"
 
+// Check weather the y coordinate is in valid range
+static bool	checkValidYCoordinate(const float y)
+{
+	return (y < 0 || static_cast<uint64_t>(y) >= CHUNK_SIZE_Y);
+}
+
 void	ChunkManager::unloadAll()
 {
 	chunksMtx.lock();
 	chunks.clear();
 	try
 	{
+		// Reload the terrain generator from settings
 		TerrainGeneratorPtr newGenerator = std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator());
 		_generator.store(newGenerator);
 	}
@@ -20,7 +27,6 @@ void	ChunkManager::unloadAll()
 	{
 		std::cerr << e.what() << '\n';
 	}
-	
 	chunksMtx.unlock();
 	_updateVisibility = true;
 }
@@ -32,7 +38,7 @@ Expected<Block, int>	ChunkManager::getBlock(const mlm::vec3 &blockCoord)
 
 Expected<Block, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 {
-	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
+	if (checkValidYCoordinate(blockCoord.y))
 		return (1);
 	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
 	chunksMtx.lock();
@@ -52,7 +58,7 @@ void	ChunkManager::setBlock(const mlm::vec3 &blockCoord, Block block)
 
 void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 {
-	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
+	if (checkValidYCoordinate(blockCoord.y))
 		return ;
 	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
 	chunksMtx.lock();
@@ -65,7 +71,8 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 	bool updated = chunk->setBlock(blockChunkCoord, block);
 	if (updated == false)
 		return ;
-	// std::cout << "set block: " << blockCoord << " " << blockChunkCoord << std::endl;
+
+	// If on chunk boundary -> set neighbor dirty flag for remeshing
 	if (blockChunkCoord.x == 0)
 	{
 		chunksMtx.lock();
@@ -90,6 +97,7 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 		chunks[chunkCoord + mlm::ivec2(0, 1)]->_dirty = true;
 		chunksMtx.unlock();
 	}
+	// Set chunk dirty flag for remeshing
 	chunk->_dirty = true;
 	_updateVisibility = true;
 }
@@ -101,14 +109,17 @@ Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::vec3 &blockCoor
 
 Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::ivec3 &blockCoord)
 {
-	if (blockCoord.y < 0 || static_cast<uint64_t>(blockCoord.y) >= CHUNK_SIZE_Y)
+	if (checkValidYCoordinate(blockCoord.y))
 		return (1);
+	
+	// Fetch chunk
 	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
 	chunksMtx.lock();
 	std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
 	chunksMtx.unlock();
 	if (!chunk)
 		return (0);
+
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
 	Block::Type				blockType = chunk->getBlockType(blockChunkCoord);
 	return (blockType);
@@ -142,10 +153,12 @@ Expected<mlm::ivec3, bool>	ChunkManager::castRayIncluding()
 
 	for (int step = 0; step < stepDepth; ++step)
 	{
+		// Get position of the ray at the new depth
 		mlm::vec3	rayWorldPos = cameraPos + cameraViewDir * (step * stepSize);
+		// Check if the block at this position is transparent
 		mlm::ivec3	rayWorldCoord = getWorldCoord(rayWorldPos);
 		if (!isBlockTransparent(rayWorldCoord))
-			return (rayWorldCoord);
+			return (rayWorldCoord); // return the block coordinate
 	}
 	return (false);
 }
@@ -160,10 +173,12 @@ Expected<mlm::ivec3, bool>	ChunkManager::castRayExcluding()
 	mlm::ivec3	ret = getWorldCoord(cameraPos);
 	for (int step = 0; step < stepDepth; ++step)
 	{
+		// Get position of the ray at the new depth
 		mlm::vec3	rayWorldPos = cameraPos + cameraViewDir * (step * stepSize);
+		// Check if the block at this position is transparent
 		mlm::ivec3	rayWorldCoord = getWorldCoord(rayWorldPos);
 		if (!isBlockTransparent(rayWorldCoord))
-			return (ret);
+			return (ret); // return previous block coordinate
 		ret = rayWorldCoord;
 	}
 	return (false);
@@ -171,6 +186,7 @@ Expected<mlm::ivec3, bool>	ChunkManager::castRayExcluding()
 
 void	ChunkManager::placeBlock(Block block)
 {
+	// Get the block coordinate before the looked at block
 	Expected<mlm::ivec3, bool>	rayWorldCoord = castRayExcluding();
 	if (rayWorldCoord.hasValue() && rayWorldCoord.value() != getWorldCoord(_engine.getCamera().getPos()))
 	{
@@ -180,6 +196,7 @@ void	ChunkManager::placeBlock(Block block)
 
 void	ChunkManager::deleteBlock()
 {
+	// Get the block coordinate of the looked at block
 	Expected<mlm::ivec3, bool>	rayWorldCoord = castRayIncluding();
 	if (rayWorldCoord.hasValue())
 	{
