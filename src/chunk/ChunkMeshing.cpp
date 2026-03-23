@@ -1,15 +1,11 @@
 /*
 Created by: Emily (Em_iIy) Winnink
-Created on: 06/08/2025
+Created on: 23/03/2026
 */
 
 #include "Chunk.hpp"
-#include "Perlin.hpp"
-#include "Spline.hpp"
 #include "VoxEngine.hpp"
 #include "Coords.hpp"
-
-std::atomic<int> chunk_count = 0;
 
 enum Faces {
 	TOP,
@@ -38,35 +34,6 @@ enum UvCorners {
 	TOP_RIGHT,
 };
 
-int	getChunkCount()
-{
-	return (chunk_count);
-}
-
-Chunk::Chunk(ChunkManager &manager): _manager(manager)
-{
-	std::cout << "default constructor" << std::endl;
-}
-
-Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)
-{
-	_worldPos = mlm::ivec3(CHUNK_SIZE_X * _chunkPos.x, 0, CHUNK_SIZE_Z * _chunkPos.y);
-	setState(LOADED);
-	chunk_count++;
-}
-
-Chunk::~Chunk()
-{
-	_busyMtx.lock();
-	if (getState() == UPLOADED || getState() == DIRTY)
-	{
-		_mesh.del();
-		_waterMesh.del();
-	}
-	_busyMtx.unlock();
-	chunk_count--;
-}
-
 static bool		shouldDrawFace(Expected<Block, int> &neighborResult, Block &block)
 {
 	if (!neighborResult.hasValue())
@@ -83,6 +50,7 @@ static bool		shouldDrawFace(Expected<Block, int> &neighborResult, Block &block)
 	return (false);
 }
 
+// Added vertex to vertices while keeping track of the min and max values found so far
 void	Chunk::pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert)
 {
 	const mlm::vec3 &vec = vert.pos;
@@ -216,53 +184,6 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	}
 }
 
-void	Chunk::generate(TerrainGeneratorPtr generator)
-{
-	_busyMtx.lock();
-	
-	perlinSamplers samplers = generator->getSamplers();
-
-	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
-	{
-		for (uint64_t z = 0; z < CHUNK_SIZE_Z; ++z)
-		{
-			int	terrainHeight = generator->getTerrainHeight(samplers, mlm::ivec2(x + _worldPos.x, z + _worldPos.z));
-			for (uint64_t y = 0; y < CHUNK_SIZE_Y; ++y)
-			{
-				mlm::ivec3	pos = _worldPos + mlm::ivec3(x, y, z);
-				uint64_t	index = index3D(x, y, z);
-				Block		block = generator->getBlock(samplers, pos, terrainHeight);
-				_blockMtx.lock();
-				blocks[index] = block;
-				_blockMtx.unlock();
-			}
-		}
-	}
-	setState(GENERATED);
-	_busyMtx.unlock();
-	_busy = false;
-}
-
-void	Chunk::draw(Shader &shader)
-{
-	mlm::mat4 model(1.0f);
-	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
-	shader.set_mat4("uModel", model);
-	_busyMtx.lock();
-	_mesh.draw(shader);
-	_busyMtx.unlock();
-}
-
-void	Chunk::drawWater(Shader &shader)
-{
-	mlm::mat4 model(1.0f);
-	model = mlm::translate(model, static_cast<mlm::vec3>(_worldPos) - _manager.getEngine().getCamera().getPos());
-	shader.set_mat4("uModel", model);
-	_busyMtx.lock();
-	_waterMesh.draw(shader);
-	_busyMtx.unlock();
-}
-
 void	Chunk::mesh()
 {
 	// float start = glfwGetTime();
@@ -301,74 +222,4 @@ void	Chunk::mesh()
 	_busyMtx.unlock();
 	_busy = false;
 	// std::cout << glfwGetTime() - start << std::endl;
-}
-
-void	Chunk::upload()
-{
-	if (_readyToUpload == false)
-		return ;
-	_busyMtx.lock();
-	_mesh.setup_mesh();
-	_waterMesh.setup_mesh();
-	_busyMtx.unlock();
-	_readyToUpload = false;
-	setState(UPLOADED);
-}
-
-Block	Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
-{
-	_blockMtx.lock();
-	Block ret = blocks[index3D(blockChunkCoord)];
-	_blockMtx.unlock();
-	return (ret);
-}
-
-bool	Chunk::setBlock(const mlm::ivec3 &blockChunkCoord, Block block)
-{
-	bool ret = true;
-	_blockMtx.lock();
-	Block &target = blocks[index3D(blockChunkCoord)];
-	if (target.getType() == block.getType())
-		ret = false;
-	target = block;
-	_blockMtx.unlock();
-	return (ret);
-}
-
-Block::Type	Chunk::getBlockType(const mlm::ivec3 &blockChunkCoord)
-{
-	_blockMtx.lock();
-	Block::Type ret = blocks[index3D(blockChunkCoord)].getType();
-	_blockMtx.unlock();
-	return (ret);
-}
-
-std::pair<mlm::vec3 &, mlm::vec3 &>	Chunk::getMinMax()
-{
-	return (std::make_pair(std::reference_wrapper(_min), std::reference_wrapper(_max)));
-}
-
-mlm::ivec2	Chunk::getChunkPos()
-{
-	return (_chunkPos);
-}
-
-mlm::ivec3	Chunk::getWorldPos()
-{
-	return (_worldPos);
-}
-
-void	Chunk::setState(const Chunk::State state)
-{
-	_stateMtx.lock();
-	_state = state;
-	_stateMtx.unlock();
-}
-
-Chunk::State	Chunk::getState()
-{
-	_stateMtx.lock();
-	State ret = _state;
-	_stateMtx.unlock();
-	return (ret);
 }

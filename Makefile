@@ -9,6 +9,9 @@ FILES_SRCS = \
 			Input.cpp \
 			Block.cpp \
 			Chunk.cpp \
+			ChunkGenerating.cpp \
+			ChunkMeshing.cpp \
+			ChunkUtils.cpp \
 			Perlin.cpp \
 			ChunkManager.cpp \
 			ChunkManagerClean.cpp \
@@ -52,6 +55,7 @@ vpath %.cpp \
 	$(DIR_SRCS) \
 	$(DIR_SRCS)settings/ \
 	$(DIR_SRCS)renderer/ \
+	$(DIR_SRCS)chunk/ \
 	$(DIR_SRCS)chunkManager/ \
 	$(DIR_SRCS)mathUtils/ \
 
@@ -122,8 +126,8 @@ run-tsan:
 .PHONY: run-tsan
 
 lines:
-# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunkManager/*.cpp resources/shaders/* 
-	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunkManager/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
+# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunk/*.cpp src/chunkManager/*.cpp resources/shaders/* 
+	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunk/*.cpp src/chunkManager/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
 .PHONY: lines
 # ----------------------------------------Cleaning
 clean:
