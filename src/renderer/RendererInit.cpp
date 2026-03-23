@@ -210,7 +210,8 @@ void	Renderer::initFrameBuffers()
 		throw std::runtime_error("Water Framebuffer missing");
 	frameBufferIds.emplace_back(_waterLightingFrameBuffer.getColorTexture(0), "Water Lighting Color");
 
-	_shadowFrameBuffer.create(std::max(size.x * 2, 4096), std::max(size.y * 2, 4096));
+	// The shadow framebuffer is as big as possible to have less artifacts
+	_shadowFrameBuffer.create(size.x * 4, size.y * 4);
 	_shadowFrameBuffer.bind();
 	_shadowFrameBuffer.ensureDepthTexture(GL_DEPTH_COMPONENT, GL_FLOAT, true, GL_CLAMP_TO_BORDER, mlm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	_shadowFrameBuffer.setDrawBuffers({});
@@ -243,7 +244,9 @@ void	Renderer::initFrameBuffers()
 		throw std::runtime_error("Sky Framebuffer missing");
 	frameBufferIds.emplace_back(_skyFrameBuffer.getColorTexture(0), "Sky Color");
 
-	_auroraFrameBuffer.create(static_cast<int>(static_cast<float>(size.x) * 0.2f), static_cast<int>(static_cast<float>(size.y) * 0.2f));
+	// Aurora framebuffer is scaled down to save on performance, and later upscaled
+	const float	auroraScale = 0.2f;
+	_auroraFrameBuffer.create(static_cast<int>(static_cast<float>(size.x) * auroraScale), static_cast<int>(static_cast<float>(size.y) * auroraScale));
 	_auroraFrameBuffer.bind();
 	_auroraFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, false, true, false);
 	_auroraFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
