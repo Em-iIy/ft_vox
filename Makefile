@@ -5,6 +5,8 @@ NAME = ft_vox
 FILES_SRCS = \
 			main.cpp \
 			VoxEngine.cpp \
+			VoxEngineInit.cpp \
+			VoxEngineUtils.cpp \
 			Camera.cpp \
 			Input.cpp \
 			Block.cpp \
@@ -58,6 +60,7 @@ vpath %.cpp \
 	$(DIR_SRCS)chunk/ \
 	$(DIR_SRCS)chunkManager/ \
 	$(DIR_SRCS)mathUtils/ \
+	$(DIR_SRCS)engine/ \
 
 # ----------------------------------------Sources
 SRCS = $(FILES_SRCS:%=$(DIR_SRCS)%)
@@ -126,8 +129,8 @@ run-tsan:
 .PHONY: run-tsan
 
 lines:
-# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunk/*.cpp src/chunkManager/*.cpp resources/shaders/* 
-	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunk/*.cpp src/chunkManager/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
+# 	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunk/*.cpp src/chunkManager/*.cpp src/mathUtils/*.cpp src/engine/*.cpp resources/shaders/* 
+	wc -l src/*.cpp inc/*.hpp src/settings/*.cpp src/renderer/*.cpp src/chunk/*.cpp src/chunkManager/*.cpp src/mathUtils/*.cpp src/engine/*.cpp resources/shaders/* lib/glu/src/*.cpp lib/json-parser/src/*.cpp lib/glu/inc/utils/*.hpp lib/glu/inc/bmp/bmp.h lib/glu/lib/bmp/bmp.cpp lib/glu/lib/emlm/src/*.cpp lib/glu/lib/emlm/mlm/*.hpp
 .PHONY: lines
 # ----------------------------------------Cleaning
 clean:

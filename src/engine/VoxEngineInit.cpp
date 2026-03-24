@@ -1,43 +1,17 @@
 /*
 Created by: Emily (Em_iIy) Winnink
-Created on: 24/07/2025
+Created on: 24/03/2026
 */
 
 #include "VoxEngine.hpp"
 #include "Settings.hpp"
 #include "ShaderManager.hpp"
 
-#include "Frustum.hpp"
-
-#define FPS
-
-mlm::vec3	randVec3()
-{
-	static rng::fgen	gen = rng::generator(-1.0f, 1.0f);
-
-	return (
-		mlm::vec3(
-			rng::rand(gen),
-			rng::rand(gen),
-			rng::rand(gen)
-		)
-	);
-}
-
-mlm::ivec3	getWorldCoord(const mlm::vec3 &coord);
-
 VoxEngine::VoxEngine(): _chunkManager(*this), _renderer(*this, _chunkManager, _camera)
 {}
 
 VoxEngine::~VoxEngine()
 {}
-
-void	VoxEngine::run()
-{
-	init();
-	mainLoop();
-	cleanup();
-}
 
 void	VoxEngine::init()
 {
@@ -127,97 +101,4 @@ void	VoxEngine::initComponents()
 {
 	_chunkManager.init(Settings::loadChunkManager());
 	_renderer.init();
-}
-
-void	VoxEngine::mainLoop()
-{
-	#ifdef FPS
-	int frame = 0;
-	float time = glfwGetTime();
-	#endif
-	while (!glfwWindowShouldClose(Window::get_window()))
-	{
-		_input.handleKeys();
-		Window::update();
-		_renderer.update();
-		updateFrustum(_renderer.getProjection(), _renderer.getView());
-		updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
-		_chunkManager.update();
-		_sky.update(Window::get_delta_time());
-
-		_renderer.render();
-
-		glfwSwapBuffers(Window::get_window());
-		glfwPollEvents();
-		#ifdef FPS
-		frame++;
-		if (frame == 120)
-		{
-			std::cout << "fps: " << 1.0f / ((glfwGetTime() - time) / static_cast<float>(frame)) << std::endl;
-			time = glfwGetTime();
-			frame = 0;
-		}
-		#endif
-	}
-}
-
-void	VoxEngine::cleanup()
-{
-	_chunkManager.cleanup();
-	_renderer.cleanup();
-	_atlas.del();
-	glfwTerminate();
-}
-
-void	VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
-{
-	if (!_updateFrustum)
-		return ;
-	_frustum.update(projection * view);
-	_updateFrustum = false;
-}
-
-void	VoxEngine::updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
-{
-	_shadowFrustum.update(projection * view);
-}
-
-Camera	&VoxEngine::getCamera()
-{
-	return (_camera);
-}
-
-Input	&VoxEngine::getInput()
-{
-	return (_input);
-}
-
-ChunkManager	&VoxEngine::getManager()
-{
-	return (_chunkManager);
-}
-
-Atlas	&VoxEngine::getAtlas()
-{
-	return (_atlas);
-}
-
-Frustum	&VoxEngine::getFrustum()
-{
-	return (_frustum);
-}
-
-Frustum	&VoxEngine::getShadowFrustum()
-{
-	return (_shadowFrustum);
-}
-
-Sky	&VoxEngine::getSky()
-{
-	return (_sky);
-}
-
-void	VoxEngine::setFrustumUpdate()
-{
-	_updateFrustum = true;
 }

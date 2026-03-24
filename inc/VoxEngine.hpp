@@ -57,6 +57,7 @@ class VoxEngine: public Window {
 
 		void			mainLoop();
 
+		void			update();
 		void			cleanup();
 
 		void			updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view);
