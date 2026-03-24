@@ -43,6 +43,7 @@ FILES_SRCS = \
 			SkyGradient.cpp \
 			Settings.cpp \
 			ShaderManager.cpp \
+			Logger.cpp \
 
 FILES_OBJS = $(FILES_SRCS:.cpp=.o)
 
