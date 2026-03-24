@@ -5,12 +5,6 @@ Created on: 10/03/2026
 
 #include "Renderer.hpp"
 
-void	Renderer::swapFrameBuffer(int direction)
-{
-	currentFrameBufferIdx = (currentFrameBufferIdx + frameBufferIds.size() + direction) % frameBufferIds.size();
-	std::cout << "Swapped framebuffer to <" << frameBufferIds[currentFrameBufferIdx].first << ">: " << frameBufferIds[currentFrameBufferIdx].second << std::endl;
-}
-
 mlm::mat4	&Renderer::getProjection()
 {
 	return (_projection);

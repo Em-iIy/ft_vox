@@ -10,12 +10,12 @@ Created on: 29/09/2025
 void	Renderer::update()
 {
 	// updateTime();
-	updateProjection();
-	updateView();
-	updateLightProjection();
-	updateLightView();
-	updateUnderWater();
-	updateSunPos();
+	_updateProjection();
+	_updateView();
+	_updateLightProjection();
+	_updateLightView();
+	_updateUnderWater();
+	_updateSunPos();
 }
 
 void	Renderer::render()
@@ -23,19 +23,19 @@ void	Renderer::render()
 	FrameBuffer::unbind();
 	FrameBuffer::clear(true, true, mlm::vec4(_bgColor, 0.0f));
 
-	shadowPass();
-	terrainGeometryPass();
-	waterGeometryPass();
-	SSAOPass();
-	renderSkyColor();
-	terrainLightingPass();
-	waterLightingPass();
-	renderSky();
-	renderFinal();
-	renderUI();
+	_shadowPass();
+	_terrainGeometryPass();
+	_waterGeometryPass();
+	_SSAOPass();
+	_renderSkyColor();
+	_terrainLightingPass();
+	_waterLightingPass();
+	_renderSky();
+	_renderFinal();
+	_renderUI();
 }
 
-void	Renderer::shadowPass()
+void	Renderer::_shadowPass()
 {
 	_shadowShader.use();
 	_shadowShader.set_mat4("uLightProjection", _lightProjection);
@@ -51,13 +51,13 @@ void	Renderer::shadowPass()
 	glViewport(0, 0, size.x, size.y);
 }
 
-void	Renderer::terrainGeometryPass()
+void	Renderer::_terrainGeometryPass()
 {
 	_geometryShader.use();
 
 	_geometryShader.set_mat4("uProjection", _projection);
 	_geometryShader.set_mat4("uView", _view);
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	_engine.getAtlas().bind();
 	_geometryShader.set_int("uAtlas", 0);
@@ -79,13 +79,13 @@ void	Renderer::terrainGeometryPass()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void	Renderer::waterGeometryPass()
+void	Renderer::_waterGeometryPass()
 {
 	_geometryShader.use();
 
 	_geometryShader.set_mat4("uProjection", _projection);
 	_geometryShader.set_mat4("uView", _view);
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	_engine.getAtlas().bind();
 	_geometryShader.set_int("uAtlas", 0);
@@ -112,7 +112,7 @@ void	Renderer::waterGeometryPass()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void	Renderer::SSAOPass()
+void	Renderer::_SSAOPass()
 {
 	_ssaoShader.use();
 
@@ -142,7 +142,7 @@ void	Renderer::SSAOPass()
 	_quadMesh.draw(_ssaoBlurShader);
 }
 
-void	Renderer::terrainLightingPass()
+void	Renderer::_terrainLightingPass()
 {
 	_lightingShader.use();
 
@@ -170,7 +170,7 @@ void	Renderer::terrainLightingPass()
 	_lightingShader.set_vec3("uLightDir", _sunDir);
 	_lightingShader.set_mat4("uLightView", _lightView);
 	_lightingShader.set_mat4("uLightProjection", _lightProjection);
-	
+
 	_lightingShader.set_mat4("uView", _view);
 
 	Sky &sky = _engine.getSky();
@@ -185,7 +185,7 @@ void	Renderer::terrainLightingPass()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void	Renderer::waterLightingPass()
+void	Renderer::_waterLightingPass()
 {
 	_lightingShader.use();
 
@@ -213,7 +213,7 @@ void	Renderer::waterLightingPass()
 	_lightingShader.set_vec3("uLightDir", _sunDir);
 	_lightingShader.set_mat4("uLightView", _lightView);
 	_lightingShader.set_mat4("uLightProjection", _lightProjection);
-	
+
 	_lightingShader.set_mat4("uView", _view);
 
 	Sky &sky = _engine.getSky();
@@ -228,17 +228,17 @@ void	Renderer::waterLightingPass()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void	Renderer::renderSky()
+void	Renderer::_renderSky()
 {
 	_skyFrameBuffer.bind();
 
 	glDisable(GL_DEPTH_TEST);
-	renderSolarBodies();
-	renderAurora();
+	_renderSolarBodies();
+	_renderAurora();
 	glEnable(GL_DEPTH_TEST);
 }
 
-void	Renderer::renderSkyColor()
+void	Renderer::_renderSkyColor()
 {
 	_skyFrameBuffer.bind();
 
@@ -255,7 +255,7 @@ void	Renderer::renderSkyColor()
 	_sphereMesh.draw(_skyShader);
 }
 
-void	Renderer::renderSolarBodies()
+void	Renderer::_renderSolarBodies()
 {
 	_skyFrameBuffer.bind();
 
@@ -272,7 +272,7 @@ void	Renderer::renderSolarBodies()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void	Renderer::renderAurora()
+void	Renderer::_renderAurora()
 {
 	// Draw aurora to scaled down framebuffer first
 	_auroraFrameBuffer.bind();
@@ -305,7 +305,7 @@ void	Renderer::renderAurora()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void	Renderer::renderFinal()
+void	Renderer::_renderFinal()
 {
 	FrameBuffer::unbind();
 	glDisable(GL_DEPTH_TEST);
@@ -330,15 +330,9 @@ void	Renderer::renderFinal()
 	_quadMesh.draw(_waterShader);
 
 	glEnable(GL_DEPTH_TEST);
-	// _quadShader.use();
-	// glActiveTexture(GL_TEXTURE0);
-	// glBindTexture(GL_TEXTURE_2D, frameBufferIds[currentFrameBufferIdx].first);
-	// _quadShader.set_int("uRenderTex", 0);
-
-	// _quadMesh.draw(_quadShader);
 }
 
-void	Renderer::renderUI()
+void	Renderer::_renderUI()
 {
 	Expected<mlm::ivec3, bool>	rayWorldCoord = _manager.castRayIncluding();
 	if (rayWorldCoord.hasValue())
@@ -353,8 +347,7 @@ void	Renderer::renderUI()
 
 		_cubeShader.set_vec3("uColor", mlm::vec3(0.0f));
 		_cubeShader.set_float("uAlpha", 0.2f);
-		
+
 		_cubeMesh.draw(_cubeShader);
 	}
 }
-

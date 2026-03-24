@@ -28,32 +28,30 @@ class Renderer {
 		mlm::mat4		&getLightView();
 		mlm::vec3		&getSunPos();
 
-		void			swapFrameBuffer(int direction);
-
 	private:
-		void			initShaders();
-		void			initMeshes();
-		void			initFrameBuffers();
-		void			initSsaoSamples();
-		void			initSsaoBlurShader();
-		void			initSsaoNoise();
+		void			_initShaders();
+		void			_initMeshes();
+		void			_initFrameBuffers();
+		void			_initSsaoSamples();
+		void			_initSsaoBlurShader();
+		void			_initSsaoNoise();
 
-		void			cleanShaders();
-		void			cleanFrameBuffers();
+		void			_cleanShaders();
+		void			_cleanFrameBuffers();
 
-		void			shadowPass();
-		void			terrainGeometryPass();
-		void			waterGeometryPass();
-		void			SSAOPass();
-		void			terrainLightingPass();
-		void			waterLightingPass();
-		void			renderSky();
-		void			renderSkyColor();
-		void			renderSolarBodies();
-		void			renderAurora();
-		void			renderFinal();
+		void			_shadowPass();
+		void			_terrainGeometryPass();
+		void			_waterGeometryPass();
+		void			_SSAOPass();
+		void			_terrainLightingPass();
+		void			_waterLightingPass();
+		void			_renderSky();
+		void			_renderSkyColor();
+		void			_renderSolarBodies();
+		void			_renderAurora();
+		void			_renderFinal();
 
-		void			renderUI();
+		void			_renderUI();
 
 		mlm::vec3		_bgColor;
 		bool			_isUnderwater = false;
@@ -88,8 +86,6 @@ class Renderer {
 		FrameBuffer		_ssaoBlurFrameBuffer;
 		FrameBuffer		_skyFrameBuffer;
 		FrameBuffer		_auroraFrameBuffer;
-		uint32_t		currentFrameBufferIdx = 0;
-		std::vector<std::pair<GLuint, std::string>>	frameBufferIds;
 
 		GLuint			_ssaoNoiseTex;
 
@@ -101,10 +97,10 @@ class Renderer {
 		mlm::vec3		_sunDir;
 		mlm::vec3		_sunPos;
 
-		void			updateProjection();
-		void			updateView();
-		void			updateLightProjection();
-		void			updateLightView();
-		void			updateUnderWater();
-		void			updateSunPos();
+		void			_updateProjection();
+		void			_updateView();
+		void			_updateLightProjection();
+		void			_updateLightView();
+		void			_updateUnderWater();
+		void			_updateSunPos();
 };

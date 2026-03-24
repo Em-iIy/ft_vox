@@ -5,15 +5,15 @@ Created on: 24/03/2026
 
 #include "VoxEngine.hpp"
 
-void	VoxEngine::updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
+void	VoxEngine::_updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
 {
-	if (!_updateFrustum)
+	if (!_frustumUpdate)
 		return ;
 	_frustum.update(projection * view);
-	_updateFrustum = false;
+	_frustumUpdate = false;
 }
 
-void	VoxEngine::updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
+void	VoxEngine::_updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view)
 {
 	_shadowFrustum.update(projection * view);
 }
@@ -55,5 +55,5 @@ Sky	&VoxEngine::getSky()
 
 void	VoxEngine::setFrustumUpdate()
 {
-	_updateFrustum = true;
+	_frustumUpdate = true;
 }

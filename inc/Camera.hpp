@@ -33,7 +33,7 @@ class Camera {
 		};
 
 		Camera(const mlm::vec3 &pos = mlm::vec3(0.0f), const mlm::vec3 &up = mlm::vec3(0.0f, 1.0f, 0.0f), const float yaw = YAW, const float pitch = PITCH);
-		
+
 		mlm::mat4		getViewMatrix() const;
 		float			getZoom() const;
 		const mlm::vec3	&getPos() const;
@@ -47,7 +47,7 @@ class Camera {
 		void			processMouseScroll(float yOffset);
 
 		void			toggleSprint();
-	
+
 	private:
 		mlm::vec3		_pos;
 		mlm::vec3		_worldUp;
@@ -65,5 +65,5 @@ class Camera {
 
 		bool			_sprinting = false;
 
-		void			updateVectors();
+		void			_updateVectors();
 };

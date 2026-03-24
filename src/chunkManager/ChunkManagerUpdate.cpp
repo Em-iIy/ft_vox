@@ -28,7 +28,7 @@ void	ChunkManager::update()
 void	ChunkManager::_updateLoadList()
 {
 	int	loadCount = 0;
-	for (const mlm::ivec2 &pos : chunkLoadList)
+	for (const mlm::ivec2 &pos : _chunkLoadList)
 	{
 		if (loadCount >= _maxLoad)
 			break ;
@@ -38,13 +38,13 @@ void	ChunkManager::_updateLoadList()
 			_updateVisibility = true;
 		}
 	}
-	chunkLoadList.clear();
+	_chunkLoadList.clear();
 }
 
 void	ChunkManager::_updateGenerateList()
 {
 	int	generateCount = 0;
-	for (std::shared_ptr<Chunk> chunk : chunkGenerateList)
+	for (std::shared_ptr<Chunk> chunk : _chunkGenerateList)
 	{
 		if (generateCount >= _maxGenerate)
 			break ;
@@ -60,7 +60,7 @@ void	ChunkManager::_updateGenerateList()
 			_updateVisibility = true;
 		}
 	}
-	chunkGenerateList.clear();
+	_chunkGenerateList.clear();
 }
 
 void	ChunkManager::_updateMeshList()
@@ -72,7 +72,7 @@ void	ChunkManager::_updateMeshList()
 		mlm::ivec2(-1, 0),
 	};
 	int	meshCount = 0;
-	for (std::shared_ptr<Chunk> chunk : chunkMeshList)
+	for (std::shared_ptr<Chunk> chunk : _chunkMeshList)
 	{
 		if (meshCount >= _maxMesh)
 			break ;
@@ -84,9 +84,9 @@ void	ChunkManager::_updateMeshList()
 		uint64_t	neighborSetupCount = 0;
 		for (const mlm::ivec2 &neighbor : neighbors)
 		{
-			chunksMtx.lock();
-			std::shared_ptr<Chunk>	chunkNeighbor = chunks[chunk->getChunkPos() - neighbor];
-			chunksMtx.unlock();
+			_chunksMtx.lock();
+			std::shared_ptr<Chunk>	chunkNeighbor = _chunks[chunk->getChunkPos() - neighbor];
+			_chunksMtx.unlock();
 			// If neighbor is only loaded at best don't count it
 			if (!chunkNeighbor || chunkNeighbor->getState() < Chunk::DIRTY)
 				break ;
@@ -103,13 +103,13 @@ void	ChunkManager::_updateMeshList()
 		meshCount++;
 		_updateVisibility = true;
 	}
-	chunkMeshList.clear();
+	_chunkMeshList.clear();
 }
 
 void	ChunkManager::_updateUnloadList()
 {
 	// Unload all chunks set for unloading
-	for (std::shared_ptr<Chunk> chunk : chunkUnloadList)
+	for (std::shared_ptr<Chunk> chunk : _chunkUnloadList)
 	{
 		if (chunk && chunk->getState() != Chunk::UNLOADED)
 		{
@@ -117,16 +117,16 @@ void	ChunkManager::_updateUnloadList()
 			_updateVisibility = true;
 		}
 	}
-	if (chunkUnloadList.size() > 0)
+	if (_chunkUnloadList.size() > 0)
 	{
-		chunkUnloadList.clear();
+		_chunkUnloadList.clear();
 	}
 }
 
 void	ChunkManager::_updateUploadList()
 {
 	// Upload all chunks with meshes ready to be sent to GPU
-	for (std::shared_ptr<Chunk> chunk : chunkUploadList)
+	for (std::shared_ptr<Chunk> chunk : _chunkUploadList)
 	{
 		if (chunk)
 		{
@@ -134,17 +134,17 @@ void	ChunkManager::_updateUploadList()
 			_updateVisibility = true;
 		}
 	}
-	chunkUploadList.clear();
+	_chunkUploadList.clear();
 }
 
 void	ChunkManager::_updateVisibleList()
 {
 	if (!_updateVisibility)
 		return ;
-	chunkVisibleList.clear();
+	_chunkVisibleList.clear();
 	// Loop through all chunks, and unload all outisde of render distance
-	chunksMtx.lock();
-	for (auto &[chunkCoord, chunk]: chunks)
+	_chunksMtx.lock();
+	for (auto &[chunkCoord, chunk]: _chunks)
 	{
 		if (!chunk)
 			continue;
@@ -157,9 +157,9 @@ void	ChunkManager::_updateVisibleList()
 		if (chunk->_busy == true)
 			continue ;
 		chunk->_busy = true;
-		chunkUnloadList.push_back(chunk);
+		_chunkUnloadList.push_back(chunk);
 	}
-	chunksMtx.unlock();
+	_chunksMtx.unlock();
 	// Loop through all chunk coordinates within render distance
 	// Starting at the camera chunk and expanding out from there
 	for (int dist = 0; dist <= _renderDistance; ++dist)
@@ -172,37 +172,37 @@ void	ChunkManager::_updateVisibleList()
 				if ((x != -dist && x != dist) && (y != -dist && y != dist))
 					y = dist;
 				const mlm::ivec2		chunkCoord = _cameraChunkCoord + mlm::ivec2(x, y);
-				chunksMtx.lock();
-				std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
-				chunksMtx.unlock();
+				_chunksMtx.lock();
+				std::shared_ptr<Chunk>	chunk = _chunks[chunkCoord];
+				_chunksMtx.unlock();
 				// Load chunk if it isn't contained in the chunk map
 				if (chunk == nullptr)
 				{
-					chunkLoadList.push_back(chunkCoord);
+					_chunkLoadList.push_back(chunkCoord);
 					continue ;
 				}
 				// Place chunk in the correct list based on the current state
 				switch (chunk->getState())
 				{
 				case Chunk::LOADED:
-					chunkGenerateList.push_back(chunk);
+					_chunkGenerateList.push_back(chunk);
 					break ;
 				case Chunk::GENERATED:
-					chunkMeshList.push_back(chunk);
+					_chunkMeshList.push_back(chunk);
 					break ;
 				case Chunk::MESHED:
-					chunkUploadList.push_back(chunk);
+					_chunkUploadList.push_back(chunk);
 					break ;
 				case Chunk::UPLOADED:
-					chunkVisibleList.push_back(chunk);
+					_chunkVisibleList.push_back(chunk);
 					break ;
 				default:
 					break;
 				}
 				if (chunk->_dirty == true)
-					chunkMeshList.push_back(chunk);
+					_chunkMeshList.push_back(chunk);
 				if (chunk->_readyToUpload == true)
-					chunkUploadList.push_back(chunk);
+					_chunkUploadList.push_back(chunk);
 			}
 		}
 	}
@@ -212,8 +212,8 @@ void	ChunkManager::_updateVisibleList()
 void	ChunkManager::_updateRenderList()
 {
 	mlm::vec3	cameraPos = _engine.getCamera().getPos();
-	chunkRenderList.clear();
-	for (std::shared_ptr<Chunk> chunk : chunkVisibleList)
+	_chunkRenderList.clear();
+	for (std::shared_ptr<Chunk> chunk : _chunkVisibleList)
 	{
 		if (chunk->getState() == Chunk::UPLOADED)
 		{
@@ -222,7 +222,7 @@ void	ChunkManager::_updateRenderList()
 			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
 			// Check if any of the edges of the AABB falls inside the frustum
 			if (_engine.getFrustum().isBoxVisible(AABB(min + chunkToCamPos, max + chunkToCamPos)) == true)
-				chunkRenderList.push_back(chunk);
+				_chunkRenderList.push_back(chunk);
 		}
 	}
 }
@@ -230,8 +230,8 @@ void	ChunkManager::_updateRenderList()
 void	ChunkManager::_updateShadowRenderList()
 {
 	mlm::vec3	cameraPos = _engine.getCamera().getPos();
-	chunkShadowRenderList.clear();
-	for (std::shared_ptr<Chunk> chunk : chunkVisibleList)
+	_chunkShadowRenderList.clear();
+	for (std::shared_ptr<Chunk> chunk : _chunkVisibleList)
 	{
 		if (chunk->getState() == Chunk::UPLOADED)
 		{
@@ -240,7 +240,7 @@ void	ChunkManager::_updateShadowRenderList()
 			mlm::vec3 chunkToCamPos = static_cast<mlm::vec3>(chunk->getWorldPos()) - cameraPos;
 			// Check if any of the edges of the AABB falls inside the frustum
 			if (_engine.getShadowFrustum().isBoxVisible(AABB(min + chunkToCamPos, max + chunkToCamPos)) == true)
-				chunkShadowRenderList.push_back(chunk);
+				_chunkShadowRenderList.push_back(chunk);
 		}
 	}
 }

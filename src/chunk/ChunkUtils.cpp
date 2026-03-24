@@ -9,7 +9,7 @@ Created on: 23/03/2026
 Block	Chunk::getBlock(const mlm::ivec3 &blockChunkCoord)
 {
 	_blockMtx.lock();
-	Block ret = blocks[index3D(blockChunkCoord)];
+	Block ret = _blocks[index3D(blockChunkCoord)];
 	_blockMtx.unlock();
 	return (ret);
 }
@@ -18,7 +18,7 @@ bool	Chunk::setBlock(const mlm::ivec3 &blockChunkCoord, Block block)
 {
 	bool ret = true;
 	_blockMtx.lock();
-	Block &target = blocks[index3D(blockChunkCoord)];
+	Block &target = _blocks[index3D(blockChunkCoord)];
 	if (target.getType() == block.getType())
 		ret = false;
 	target = block;
@@ -29,7 +29,7 @@ bool	Chunk::setBlock(const mlm::ivec3 &blockChunkCoord, Block block)
 Block::Type	Chunk::getBlockType(const mlm::ivec3 &blockChunkCoord)
 {
 	_blockMtx.lock();
-	Block::Type ret = blocks[index3D(blockChunkCoord)].getType();
+	Block::Type ret = _blocks[index3D(blockChunkCoord)].getType();
 	_blockMtx.unlock();
 	return (ret);
 }

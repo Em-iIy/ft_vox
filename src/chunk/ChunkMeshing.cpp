@@ -51,7 +51,7 @@ static bool		shouldDrawFace(Expected<Block, int> &neighborResult, Block &block)
 }
 
 // Added vertex to vertices while keeping track of the min and max values found so far
-void	Chunk::pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert)
+void	Chunk::_pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert)
 {
 	const mlm::vec3 &vec = vert.pos;
 	_min.x = std::min(_min.x, vec.x);
@@ -64,7 +64,7 @@ void	Chunk::pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &v
 	vertices.push_back(vert);
 }
 
-void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
+void	Chunk::_addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 {
 	static const mlm::ivec3	neighbors[] = {
 		mlm::ivec3(0, 1, 0),
@@ -120,67 +120,67 @@ void	Chunk::addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 	if (shouldDrawFace(blockNeighbors[TOP], block) == true)
 	{
 		mlm::vec3	normal = normals[TOP] * 0.9f;
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[TOP] + uvCorners[TOP_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[TOP] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[TOP] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[TOP] + uvCorners[TOP_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[TOP] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_RIGHT],		normal, offsets[TOP] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[TOP] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[TOP] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[TOP] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[TOP] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[TOP] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_RIGHT],		normal, offsets[TOP] + uvCorners[TOP_RIGHT]});
 	}
 	// back face
 	if (shouldDrawFace(blockNeighbors[BACK], block) == true)
 	{
 		mlm::vec3	normal = normals[BACK] * 0.7f;
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[BACK] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[BACK] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BACK] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BACK] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[BACK] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_RIGHT],		normal, offsets[BACK] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[BACK] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[BACK] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BACK] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BACK] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[BACK] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_RIGHT],		normal, offsets[BACK] + uvCorners[TOP_LEFT]});
 	}
 	// front face
 	if (shouldDrawFace(blockNeighbors[FRONT], block) == true)
 	{
 		mlm::vec3	normal = normals[FRONT] * 0.7f;
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[FRONT] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[FRONT] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[FRONT] + uvCorners[TOP_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[FRONT] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[FRONT] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[FRONT] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[FRONT] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[FRONT] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[FRONT] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[FRONT] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[FRONT] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[FRONT] + uvCorners[TOP_LEFT]});
 	}
 	// left face
 	if (shouldDrawFace(blockNeighbors[LEFT], block) == true)
 	{
 		mlm::vec3	normal = normals[LEFT] * 0.8f;
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[LEFT] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_LEFT],		normal, offsets[LEFT] + uvCorners[TOP_LEFT]});
 	}
 	// right face
 	if (shouldDrawFace(blockNeighbors[RIGHT], block) == true)
 	{
 		mlm::vec3	normal = normals[RIGHT] * 0.8f;
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[RIGHT] + uvCorners[TOP_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_TOP_RIGHT],		normal, offsets[RIGHT] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[RIGHT] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[RIGHT] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[RIGHT] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_TOP_RIGHT],		normal, offsets[RIGHT] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_TOP_RIGHT],	normal, offsets[RIGHT] + uvCorners[TOP_LEFT]});
 	}
 	// bottom face
 	if (shouldDrawFace(blockNeighbors[BOTTOM], block) == true)
 	{
 		mlm::vec3	normal = normals[BOTTOM] * 0.9f;
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[TOP_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_LEFT]});
-		pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[TOP_RIGHT]});
-		pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[TOP_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_LEFT]});
+		_pushBackVertexWrapper(vertices, {positions[BACK_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[BOTTOM_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_RIGHT],	normal, offsets[BOTTOM] + uvCorners[TOP_RIGHT]});
+		_pushBackVertexWrapper(vertices, {positions[FRONT_BOTTOM_LEFT],	normal, offsets[BOTTOM] + uvCorners[TOP_LEFT]});
 	}
 }
 
@@ -199,14 +199,14 @@ void	Chunk::mesh()
 				uint64_t	index = index3D(x, y, z);
 				mlm::ivec3	pos(x, y, z);
 				_blockMtx.lock();
-				Block		&block = blocks[index];
+				Block		&block = _blocks[index];
 				_blockMtx.unlock();
 				if (block.getEnabled())
 				{
 					if (block.getType() == Block::WATER)
-						addCube(waterVertices, pos);
+						_addCube(waterVertices, pos);
 					else
-						addCube(vertices, pos);
+						_addCube(vertices, pos);
 				}
 			}
 		}
@@ -215,8 +215,6 @@ void	Chunk::mesh()
 	_waterMesh.get_vertices() = waterVertices;
 	if (getState() < MESHED)
 		setState(MESHED);
-	// if (_dirty == true)
-	// 	std::cout << "remeshed: " << _chunkPos << std::endl;
 	_dirty = false;
 	_readyToUpload = true;
 	_busyMtx.unlock();

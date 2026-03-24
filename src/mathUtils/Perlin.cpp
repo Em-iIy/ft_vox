@@ -72,7 +72,7 @@ float	Perlin::getValue(float x, float y, float z)
 	float		d101 = mlm::dot(pos - mlm::vec3(x1, y0, z1), g101);
 	float		d110 = mlm::dot(pos - mlm::vec3(x1, y1, z0), g110);
 	float		d111 = mlm::dot(pos - mlm::vec3(x1, y1, z1), g111);
-	
+
 	// Find the 't' values of each axis for the lerping step
 	float		sx = _smoothStep(x - static_cast<float>(x0));
 	float		sy = _smoothStep(y - static_cast<float>(y0));
@@ -148,7 +148,7 @@ uint64_t	Perlin::_hash(int x, int y) const
 	ret *= 0xC4CEB9FE1A85EC53ULL;
 	ret ^= (ret >> 33);
 	return (ret);
-}	
+}
 
 uint64_t	Perlin::_hash(int x, int y, int z) const
 {

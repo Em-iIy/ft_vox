@@ -14,18 +14,18 @@ int	getChunkCount();
 
 bool	ChunkManager::_loadChunk(const mlm::ivec2 &chunkCoord)
 {
-	chunksMtx.lock();
-	if (chunks[chunkCoord] != nullptr)
+	_chunksMtx.lock();
+	if (_chunks[chunkCoord] != nullptr)
 	{
-		chunksMtx.unlock();
+		_chunksMtx.unlock();
 		return (false);
 	}
-	chunksMtx.unlock();
+	_chunksMtx.unlock();
 
 	std::shared_ptr<Chunk>	chunk = std::make_shared<Chunk>(chunkCoord, *this);
-	chunksMtx.lock();
-	chunks[chunkCoord] = std::move(chunk);
-	chunksMtx.unlock();
+	_chunksMtx.lock();
+	_chunks[chunkCoord] = std::move(chunk);
+	_chunksMtx.unlock();
 	return (true);
 }
 
@@ -34,9 +34,9 @@ void	ChunkManager::_unloadChunk(std::shared_ptr<Chunk> &chunk)
 	if (!chunk)
 		return ;
 	const mlm::ivec2	&chunkCoord = chunk->getChunkPos();
-	chunksMtx.lock();
-	chunks.erase(chunkCoord);
-	chunksMtx.unlock();
+	_chunksMtx.lock();
+	_chunks.erase(chunkCoord);
+	_chunksMtx.unlock();
 }
 
 void	ChunkManager::_ThreadRoutine()
@@ -98,7 +98,7 @@ void	ChunkManager::renderChunks(Shader &shader)
 	// _queueMtx.lock();
 	// std::cerr << "queue size: " << _queue.size() << std::endl;
 	// _queueMtx.unlock();
-	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
+	for (auto it = _chunkRenderList.rbegin(); it != _chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
 	}
@@ -106,7 +106,7 @@ void	ChunkManager::renderChunks(Shader &shader)
 
 void	ChunkManager::renderChunksShadows(Shader &shader)
 {
-	for (auto it = chunkShadowRenderList.rbegin(); it != chunkShadowRenderList.rend(); it++)
+	for (auto it = _chunkShadowRenderList.rbegin(); it != _chunkShadowRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);
 	}
@@ -114,7 +114,7 @@ void	ChunkManager::renderChunksShadows(Shader &shader)
 
 void	ChunkManager::renderWater(Shader &shader)
 {
-	for (auto it = chunkRenderList.rbegin(); it != chunkRenderList.rend(); it++)
+	for (auto it = _chunkRenderList.rbegin(); it != _chunkRenderList.rend(); it++)
 	{
 		(*it)->drawWater(shader);
 	}
@@ -122,5 +122,5 @@ void	ChunkManager::renderWater(Shader &shader)
 
 void	ChunkManager::renderClear()
 {
-	chunkRenderList.clear();
+	_chunkRenderList.clear();
 }

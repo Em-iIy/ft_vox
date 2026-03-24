@@ -12,12 +12,11 @@ Created on: 03/09/2025
 
 #include <array>
 
-
 class Frustum {
 	public:
-		void	update(const mlm::mat4 &m);
-		bool	isBoxVisible(const AABB &box) const;
-	
+		void					update(const mlm::mat4 &m);
+		bool					isBoxVisible(const AABB &box) const;
+
 	private:
 		std::array<Plane, 6>	_planes;
 };

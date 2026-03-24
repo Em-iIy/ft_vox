@@ -20,7 +20,7 @@ bool	Atlas::load()
 	bmp_t	bmp = load_bmp(atlasDto.filename.c_str());
 	if (!bmp.data)
 		return (false);
-	
+
 	// Define the size of each texture in the atlas in texture coordinates
 	mlm::vec2	offsetFormat(0.0f);
 	offsetFormat.x = atlasDto.pixelWidth / static_cast<float>(bmp.width);
@@ -34,7 +34,7 @@ bool	Atlas::load()
 		// Transform offsets into texture coordinates
 		for (const std::string &textureOffsetName : textureOffsetNames)
 			temp.push_back(atlasDto.textureOffsets.at(textureOffsetName) * offsetFormat);
-		
+
 		_offsets.insert({type, temp});
 	}
 

@@ -13,12 +13,12 @@ class Plane {
 		Plane(const mlm::vec3 &n, float d);
 		Plane(const mlm::vec4 &eq);
 
-		void		normalize();
-		float		distance(const mlm::vec3 &p) const;
+		void			normalize();
+		float			distance(const mlm::vec3 &p) const;
 
 		const mlm::vec3	&getNormal() const;
-	
+
 	private:
-		mlm::vec3	_normal;
-		float		_d;
+		mlm::vec3		_normal;
+		float			_d;
 };

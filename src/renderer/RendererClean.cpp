@@ -11,16 +11,16 @@ Renderer::~Renderer()
 
 void	Renderer::cleanup()
 {
-	cleanShaders();
-	cleanFrameBuffers();
+	_cleanShaders();
+	_cleanFrameBuffers();
 }
 
-void	Renderer::cleanShaders()
+void	Renderer::_cleanShaders()
 {
 	ShaderManager::unloadShaders();
 }
 
-void	Renderer::cleanFrameBuffers()
+void	Renderer::_cleanFrameBuffers()
 {
 	_terrainGeometryFrameBuffer.destroy();
 	_waterGeometryFrameBuffer.destroy();
@@ -31,7 +31,4 @@ void	Renderer::cleanFrameBuffers()
 	_ssaoBlurFrameBuffer.destroy();
 	_skyFrameBuffer.destroy();
 	_auroraFrameBuffer.destroy();
-
-	// Clear all framebuffers ids that were stored for debug purposes
-	frameBufferIds.clear();
 }

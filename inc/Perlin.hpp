@@ -14,7 +14,7 @@ class Perlin {
 		void									setSeed(uint64_t seed);
 		float									getValue(float x, float y);
 		float									getValue(float x, float y, float z);
-		
+
 	private:
 		uint64_t								_seed = 1;
 		std::unordered_map<uint64_t, mlm::vec2>	_2dGradients;

@@ -13,17 +13,17 @@ class ChunkMesh {
 		~ChunkMesh();
 		ChunkMesh(const std::vector<Vertex> &vertices);
 
-		void	draw(Shader &shader);
-		
-		void	setup_mesh();
-		std::vector<Vertex>	&get_vertices();
+		void					draw(Shader &shader);
 
-		void	del();
-	
+		void					setup_mesh();
+		std::vector<Vertex>		&get_vertices();
+
+		void					del();
+
 	private:
 		std::vector<Vertex>		_vertices;
-		
-		VAO		_vao;
-		VBO		_vbo;
+
+		VAO						_vao;
+		VBO						_vbo;
 
 };

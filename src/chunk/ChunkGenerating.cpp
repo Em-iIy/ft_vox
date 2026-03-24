@@ -9,7 +9,7 @@ Created on: 23/03/2026
 void	Chunk::generate(TerrainGeneratorPtr generator)
 {
 	_busyMtx.lock();
-	
+
 	perlinSamplers samplers = generator->getSamplers();
 
 	for (uint64_t x = 0; x < CHUNK_SIZE_X; ++x)
@@ -23,7 +23,7 @@ void	Chunk::generate(TerrainGeneratorPtr generator)
 				uint64_t	index = index3D(x, y, z);
 				Block		block = generator->getBlock(samplers, pos, terrainHeight);
 				_blockMtx.lock();
-				blocks[index] = block;
+				_blocks[index] = block;
 				_blockMtx.unlock();
 			}
 		}

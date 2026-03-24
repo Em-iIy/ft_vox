@@ -44,7 +44,6 @@ class	Expected {
 
 		~Expected() {}
 
-
 		bool	hasValue() const
 		{
 			return (_hasVal);
@@ -64,7 +63,6 @@ class	Expected {
 			return (_error);
 		}
 
-
 		constexpr T	*operator->() const
 		{
 			if (!_hasVal)
@@ -79,7 +77,6 @@ class	Expected {
 				throw std::exception();
 			return (_val);
 		}
-
 
 	private:
 		bool	_hasVal;

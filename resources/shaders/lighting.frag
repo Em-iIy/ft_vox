@@ -49,7 +49,7 @@ float	shadowMapCalculation(vec4 worldPos)
 	{
 		for (int y = -2; y <= 2; ++y)
 		{
-			float pcfDepth = texture(uShadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r; 
+			float pcfDepth = texture(uShadowMap, projectionCoords.xy + vec2(x, y) * texelSize).r;
 			shadow += (currentDepth - bias) > pcfDepth ? 1.0 : 0.0;
 		}
 	}

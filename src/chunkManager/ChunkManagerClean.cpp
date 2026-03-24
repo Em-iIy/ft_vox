@@ -15,13 +15,13 @@ void	ChunkManager::cleanup()
 	for (auto &thread : _threads)
 		thread.join();
 	// Clear chunk lists before chunk map
-	chunkLoadList.clear();
-	chunkGenerateList.clear();
-	chunkMeshList.clear();
-	chunkUnloadList.clear();
-	chunkVisibleList.clear();
-	chunkRenderList.clear();
-	chunkShadowRenderList.clear();
+	_chunkLoadList.clear();
+	_chunkGenerateList.clear();
+	_chunkMeshList.clear();
+	_chunkUnloadList.clear();
+	_chunkVisibleList.clear();
+	_chunkRenderList.clear();
+	_chunkShadowRenderList.clear();
 
-	chunks.clear();
+	_chunks.clear();
 }

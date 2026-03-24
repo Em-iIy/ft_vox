@@ -87,7 +87,7 @@ void	Sky::update(const float deltaTime)
 	if (_paused == true)
 		return ;
 	_time += deltaTime;
-	
+
 	if (_time > _getTotalTime())
 		_time -= _getTotalTime();
 }
@@ -95,7 +95,7 @@ void	Sky::update(const float deltaTime)
 void	Sky::setGradient(Shader &shader)
 {
 	float timePercent = getTimePercent();
-	
+
 	shader.set_vec4("uStops", mlm::vec4(0.38f, 0.47f, 0.61f, 1.0f));
 	shader.set_vec4("uColors[0]", _gradientStop0.sampleAt(timePercent));
 	shader.set_vec4("uColors[1]", _gradientStop1.sampleAt(timePercent));

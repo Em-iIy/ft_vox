@@ -16,7 +16,7 @@ Camera::Camera(const mlm::vec3 &pos, const mlm::vec3 &up, const float yaw, const
 	_mouseSensitivity(SENS),
 	_zoom(ZOOM)
 {
-	updateVectors();
+	_updateVectors();
 }
 
 mlm::mat4	Camera::getViewMatrix() const
@@ -73,7 +73,7 @@ void	Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPi
 			_pitch = -89.0f;
 	}
 
-	updateVectors();
+	_updateVectors();
 }
 
 void	Camera::processMouseScroll(float yOffset)
@@ -91,7 +91,7 @@ void	Camera::toggleSprint()
 	_sprinting = !_sprinting;
 }
 
-void	Camera::updateVectors()
+void	Camera::_updateVectors()
 {
 	_front = mlm::normalize(
 		mlm::vec3(
@@ -122,7 +122,7 @@ void	Camera::loadSettings(const CameraSettings &settings)
 	_movementSpeed = settings.speed;
 	_sprintMultiplier = settings.sprintMultiplier;
 
-	updateVectors();
+	_updateVectors();
 }
 
 const mlm::vec3	&Camera::getViewDir() const

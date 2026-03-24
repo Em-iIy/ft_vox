@@ -13,8 +13,7 @@ Created on: 02/02/2026
 
 using ShaderInit = std::function<void()>;
 
-struct ShaderSrc
-{
+struct ShaderSrc {
 	Shader		&shader;
 	ShaderInit	init;
 	const char	*vertexFileName;
@@ -25,14 +24,13 @@ struct ShaderSrc
 	ShaderSrc(Shader &s, ShaderInit i, const char *v, struct stat vs, const char *f, struct stat fs);
 };
 
-class ShaderManager
-{
+class ShaderManager {
 	public:
 		ShaderManager();
 
-		static void	loadShader(Shader &shader, const char *vertexFileName, const char *fragmentFileName, ShaderInit init = nullptr);
-		static void	reloadShaders();
-		static void	unloadShaders();
+		static void					loadShader(Shader &shader, const char *vertexFileName, const char *fragmentFileName, ShaderInit init = nullptr);
+		static void					reloadShaders();
+		static void					unloadShaders();
 
 	private:
 		static std::list<ShaderSrc>	_shaders;

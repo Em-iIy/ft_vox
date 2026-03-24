@@ -70,7 +70,7 @@ TerrainGeneratorDTO	Settings::loadTerrainGenerator()
 		loadNoiseSettings(terrainDto.continentalness, NoiseSettings->get("continentalness"));
 		loadNoiseSettings(terrainDto.cave, NoiseSettings->get("cave"));
 		loadNoiseSettings(terrainDto.sand, NoiseSettings->get("sand"));
-		
+
 		validateSettings(terrainDto);
 		return (terrainDto);
 	}

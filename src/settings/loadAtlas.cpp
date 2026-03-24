@@ -70,7 +70,6 @@ static void	loadBlocks(std::unordered_map<Block::Type, std::vector<std::string>>
 		{
 			throw std::runtime_error("invalid type `" + key + "`");
 		}
-		
 	}
 }
 

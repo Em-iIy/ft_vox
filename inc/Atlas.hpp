@@ -10,7 +10,6 @@ Created on: 27/08/2025
 
 #include <unordered_map>
 
-
 struct AtlasDTO {
 	enum class SIDE {
 		TOP = 0,
@@ -36,7 +35,7 @@ class Atlas {
 		const std::vector<mlm::vec2>							&getOffset(Block::Type blockType);
 		const std::vector<mlm::vec2>							&getCorners();
 		void													del();
-		
+
 	private:
 		std::unordered_map<Block::Type, std::vector<mlm::vec2>>	_offsets;
 		std::vector<mlm::vec2>									_uvCorners;

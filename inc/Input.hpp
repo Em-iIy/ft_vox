@@ -22,43 +22,40 @@ struct KeyState {
 
 class Input {
 	public:
-
 		using InputCallback = std::function<void()>;
 
-	
+		void											addOnPressCallback(int key, InputCallback callback);
+		void											onPress(int key);
+		void											addOnReleaseCallback(int key, InputCallback callback);
+		void											onRelease(int key);
+		void											addOnDownCallback(int key, InputCallback callback);
+		void											onDown(int key);
 
-		void	addOnPressCallback(int key, InputCallback callback);
-		void	onPress(int key);
-		void	addOnReleaseCallback(int key, InputCallback callback);
-		void	onRelease(int key);
-		void	addOnDownCallback(int key, InputCallback callback);
-		void	onDown(int key);
+		void											init(GLFWwindow *window, const mlm::ivec2 &windowSize);
 
-		void	init(GLFWwindow *window, const mlm::ivec2 &windowSize);
+		void											handleKeys();
 
-		void	handleKeys();
-
-		void	toggleWireFrame();
-		bool	getWireFrameMode();
+		void											toggleWireFrame();
+		bool											getWireFrameMode();
 
 		/*    Callbacks    */
-		static void	resizeCallback(GLFWwindow *window, int x, int y);
-		static void	mouseMovementCallback(GLFWwindow *window, double inXPos, double inYPos);
-		static void	mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
-		static void	mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-		static void	keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
+		static void										resizeCallback(GLFWwindow *window, int x, int y);
+		static void										mouseMovementCallback(GLFWwindow *window, double inXPos, double inYPos);
+		static void										mouseScrollCallback(GLFWwindow *window, double xOffset, double yOffset);
+		static void										mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+		static void										keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 	private:
-		std::array<KeyState, 1024>						keys;
-		std::vector<int>								monitoredKeys;
-		std::array<std::vector<InputCallback>, 1024>	onPressCallbacks;
-		std::array<std::vector<InputCallback>, 1024>	onReleaseCallbacks;
-		std::array<std::vector<InputCallback>, 1024>	onDownCallbacks;
-		
-		float	lastX = 0.0f;
-		float	lastY = 0.0f;
-		bool	firstMouse = true;
+		std::array<KeyState, 1024>						_keys;
+		std::vector<int>								_monitoredKeys;
+		std::array<std::vector<InputCallback>, 1024>	_onPressCallbacks;
+		std::array<std::vector<InputCallback>, 1024>	_onReleaseCallbacks;
+		std::array<std::vector<InputCallback>, 1024>	_onDownCallbacks;
 
-		bool		wireFrameMode = false;
-		GLFWwindow *_window;	
+		float											_lastX = 0.0f;
+		float											_lastY = 0.0f;
+		bool											_firstMouse = true;
+
+		bool											_wireFrameMode = false;
+		GLFWwindow										*_window;
 };

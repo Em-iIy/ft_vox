@@ -13,12 +13,12 @@ Created on: 24/07/2025
 
 void	VoxEngine::run()
 {
-	init();
-	mainLoop();
-	cleanup();
+	_init();
+	_mainLoop();
+	_cleanup();
 }
 
-void	VoxEngine::mainLoop()
+void	VoxEngine::_mainLoop()
 {
 	#ifdef FPS
 	int frame = 0;
@@ -26,7 +26,7 @@ void	VoxEngine::mainLoop()
 	#endif
 	while (!glfwWindowShouldClose(Window::get_window()))
 	{
-		update();
+		_update();
 
 		// Render frame and put in window
 		_renderer.render();
@@ -44,7 +44,7 @@ void	VoxEngine::mainLoop()
 	}
 }
 
-void	VoxEngine::update()
+void	VoxEngine::_update()
 {
 	// Poll for inputs and handle
 	glfwPollEvents();
@@ -57,14 +57,14 @@ void	VoxEngine::update()
 	_renderer.update();
 
 	// Update frustums
-	updateFrustum(_renderer.getProjection(), _renderer.getView());
-	updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
+	_updateFrustum(_renderer.getProjection(), _renderer.getView());
+	_updateShadowFrustum(_renderer.getLightProjection(), _renderer.getLightView());
 
 	// Update chunks (possibly redo frutsum culling !!this order is important!!)
 	_chunkManager.update();
 }
 
-void	VoxEngine::cleanup()
+void	VoxEngine::_cleanup()
 {
 	_chunkManager.cleanup();
 	_renderer.cleanup();

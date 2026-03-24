@@ -46,6 +46,6 @@ std::vector<Vertex>	&ChunkMesh::get_vertices()
 
 void	ChunkMesh::del()
 {
-	_vao.del();	
-	_vbo.del();	
+	_vao.del();
+	_vbo.del();
 }

@@ -50,7 +50,7 @@ Block	TerrainGenerator::getBlock(perlinSamplers &samplers, const mlm::ivec3 &pos
 
 	if (pos.y <= _seaLevel && terrainHeight < _seaLevel)
 		underwater = true;
-	
+
 	if (pos.y == terrainHeight)
 	{
 

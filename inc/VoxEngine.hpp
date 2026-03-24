@@ -37,7 +37,7 @@ class VoxEngine: public Window {
 		~VoxEngine();
 
 		void			run();
-	
+
 		Camera			&getCamera();
 		Input			&getInput();
 		ChunkManager	&getManager();
@@ -49,21 +49,21 @@ class VoxEngine: public Window {
 		void			setFrustumUpdate();
 
 	private:
-		void			init();
-		void			initWindow(EngineDTO &settings);
-		void			initInput();
-		void			initResources(EngineDTO &settings);
-		void			initComponents();
+		void			_init();
+		void			_initWindow(EngineDTO &settings);
+		void			_initInput();
+		void			_initResources(EngineDTO &settings);
+		void			_initComponents();
 
-		void			mainLoop();
+		void			_mainLoop();
 
-		void			update();
-		void			cleanup();
+		void			_update();
+		void			_cleanup();
 
-		void			updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view);
-		void			updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view);
+		void			_updateFrustum(const mlm::mat4 &projection, const mlm::mat4 &view);
+		void			_updateShadowFrustum(const mlm::mat4 &projection, const mlm::mat4 &view);
 
-		bool			_updateFrustum = true;
+		bool			_frustumUpdate = true;
 
 		Input			_input;
 		ChunkManager	_chunkManager;

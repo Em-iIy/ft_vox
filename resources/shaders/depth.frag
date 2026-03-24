@@ -10,5 +10,5 @@ void	main()
 {
 	float	depth = texture(uTexture, vertTexUV).r;
 
-    FragColor = vec4(vec3(depth), 1.0);
+	FragColor = vec4(vec3(depth), 1.0);
 }

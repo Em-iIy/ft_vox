@@ -23,7 +23,6 @@ class ChunkManager;
 
 class Chunk {
 	public:
-
 		enum State {
 			UNLOADED = 0,
 			LOADED,
@@ -57,11 +56,11 @@ class Chunk {
 		std::atomic<bool>												_readyToUpload = false;
 
 	private:
-		void															pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);
-		void															addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos);
+		void															_pushBackVertexWrapper(std::vector<Vertex> &vertices, const Vertex &vert);
+		void															_addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos);
 
 		std::mutex														_busyMtx;
-		std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z>	blocks;
+		std::array<Block, CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z>	_blocks;
 		std::mutex														_blockMtx;
 		ChunkMesh														_mesh;
 		ChunkMesh														_waterMesh;

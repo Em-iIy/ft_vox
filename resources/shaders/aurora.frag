@@ -142,5 +142,4 @@ void	main()
 			break ;
 	}
 	FragColor = vec4(color, alpha * upFactor * sAlpha) * smoothstep(0.0, 0.5, uNightFactor);
-	// FragColor.a = 1.0;
 }

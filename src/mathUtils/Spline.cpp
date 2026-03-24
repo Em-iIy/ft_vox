@@ -35,7 +35,7 @@ void	Spline::setPoints(const std::vector<mlm::vec2> &points)
 {
 	if (points.size() < 2)
 		throw std::runtime_error("Spline must contain at least 2 points");
-	
+
 	_points = points;
 	// Sort points based on x value
 	std::sort(_points.begin(), _points.end(),
@@ -70,7 +70,7 @@ float	Spline::evaluate(float t) const
 	const float	localT = (t - p1.x) / (p2.x - p1.x);
 
 	// Create curve
-	return (catmullRom(p0.y, p1.y, p2.y, p3.y, localT));
+	return (_catmullRom(p0.y, p1.y, p2.y, p3.y, localT));
 }
 
 bool	Spline::isReady()
@@ -81,7 +81,7 @@ bool	Spline::isReady()
 }
 
 // https://www.mvps.org/directx/articles/catmull/
-float	Spline::catmullRom(const float y0, const float y1, const float y2, const float y3, const float t) const
+float	Spline::_catmullRom(const float y0, const float y1, const float y2, const float y3, const float t) const
 {
 	const float	t2 = t * t;
 	const float	t3 = t2 * t;

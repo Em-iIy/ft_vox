@@ -42,8 +42,7 @@ struct ChunkManagerDTO {
 class ChunkManager {
 	public:
 		using ChunkCallback = std::function<void()>;
-		struct ChunkTask
-		{
+		struct ChunkTask {
 			std::weak_ptr<Chunk>				ptr;
 			enum class Type {GENERATE, MESH}	type;
 		};
@@ -73,7 +72,7 @@ class ChunkManager {
 
 		bool																isBlockTransparent(const mlm::vec3 &blockCoord);
 		bool																isBlockTransparent(const mlm::ivec3 &blockCoord);
-	
+
 		Expected<mlm::ivec3, bool>											castRayIncluding();
 		Expected<mlm::ivec3, bool>											castRayExcluding();
 		void																placeBlock(Block block);
@@ -84,16 +83,16 @@ class ChunkManager {
 		VoxEngine															&getEngine();
 
 	private:
-		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	chunks;
-		std::mutex															chunksMtx;
-		std::vector<mlm::ivec2>												chunkLoadList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkGenerateList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkMeshList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkUnloadList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkUploadList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkVisibleList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkRenderList = {};
-		std::vector<std::shared_ptr<Chunk>>									chunkShadowRenderList = {};
+		std::unordered_map<mlm::ivec2, std::shared_ptr<Chunk>, ivec2Hash>	_chunks;
+		std::mutex															_chunksMtx;
+		std::vector<mlm::ivec2>												_chunkLoadList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkGenerateList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkMeshList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkUnloadList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkUploadList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkVisibleList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkRenderList = {};
+		std::vector<std::shared_ptr<Chunk>>									_chunkShadowRenderList = {};
 
 		// Multithreading stuff
 		std::deque<ChunkTask>												_queue;
@@ -127,7 +126,7 @@ class ChunkManager {
 
 		// Update the chunk coordinates of the camera if they have changed
 		void																_updateCameraChunkCoord();
-		
+
 		bool																_loadChunk(const mlm::ivec2 &chunkCoord);
 		void																_unloadChunk(std::shared_ptr<Chunk> &chunk);
 

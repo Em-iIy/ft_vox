@@ -7,8 +7,7 @@ Created on: 26/01/2026
 
 #include "SkyGradient.hpp"
 
-struct	FogSettings
-{
+struct	FogSettings {
 	float		fogNear = {};
 	float		fogFar = {};
 	float		waterNear = {};
@@ -16,8 +15,7 @@ struct	FogSettings
 	mlm::vec4	waterColor = {};
 };
 
-struct	SkyTimeSettings
-{
+struct	SkyTimeSettings {
 	// Length of different times of day in seconds
 	float	sunriseLen = {};
 	float	dayLen = {};
@@ -25,8 +23,7 @@ struct	SkyTimeSettings
 	float	nightLen = {};
 };
 
-struct	SolarBody
-{
+struct	SolarBody {
 	mlm::vec4	diskColor = {};
 	float		diskFactor = {};
 	float		diskSize = {};
@@ -35,9 +32,7 @@ struct	SolarBody
 	float		glowShaprness = {};
 };
 
-
-struct	SkyDTO
-{
+struct	SkyDTO {
 	FogSettings		fogSettings;
 	SkyTimeSettings	timeSettings;
 	SolarBody		sun;
@@ -48,22 +43,21 @@ struct	SkyDTO
 	GradientDTO		stop3;
 };
 
-class	Sky
-{
+class	Sky {
 	public:
 		Sky();
 		Sky(const SkyDTO &dto);
 		~Sky();
 
-		void	load(const SkyDTO &dto);
-		void	update(const float deltaTime);
-		void	setGradient(Shader &shader);
-		void	setSolarBodies(Shader &shader);
-		void	setFog(Shader &shader, bool isUnderwater);
-		void	togglePause();
-		float	getTime() const;
-		float	getTimePercent() const;
-		float	getNightTimePercent() const;
+		void			load(const SkyDTO &dto);
+		void			update(const float deltaTime);
+		void			setGradient(Shader &shader);
+		void			setSolarBodies(Shader &shader);
+		void			setFog(Shader &shader, bool isUnderwater);
+		void			togglePause();
+		float			getTime() const;
+		float			getTimePercent() const;
+		float			getNightTimePercent() const;
 
 	private:
 		FogSettings		_fogSettings;

@@ -18,16 +18,15 @@ struct GradientDTO {
 	mlm::vec4	nightHighCol;
 };
 
-class SkyGradient
-{
+class SkyGradient {
 	public:
 		SkyGradient();
 		SkyGradient(const GradientDTO &dto, const SkyTimeSettings &timeSettings);
 		~SkyGradient();
 
-		void		load(const GradientDTO &dto, const SkyTimeSettings &timeSettings);
+		void										load(const GradientDTO &dto, const SkyTimeSettings &timeSettings);
 
-		mlm::vec4	sampleAt(const float t) const;
+		mlm::vec4									sampleAt(const float t) const;
 
 	private:
 		std::vector<std::pair<float, mlm::vec4>>	_stops;

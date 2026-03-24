@@ -13,7 +13,7 @@ VoxEngine::VoxEngine(): _chunkManager(*this), _renderer(*this, _chunkManager, _c
 VoxEngine::~VoxEngine()
 {}
 
-void	VoxEngine::init()
+void	VoxEngine::_init()
 {
 	rng::seed();
 
@@ -21,13 +21,13 @@ void	VoxEngine::init()
 
 	EngineDTO settings = Settings::loadEngine();
 
-	initWindow(settings);
-	initInput();
-	initResources(settings);
-	initComponents();
+	_initWindow(settings);
+	_initInput();
+	_initResources(settings);
+	_initComponents();
 }
 
-void	VoxEngine::initWindow(EngineDTO &settings)
+void	VoxEngine::_initWindow(EngineDTO &settings)
 {
 	Window::create_window(
 		"ft_vox",
@@ -40,7 +40,7 @@ void	VoxEngine::initWindow(EngineDTO &settings)
 		glfwSwapInterval(0);
 }
 
-void	VoxEngine::initInput()
+void	VoxEngine::_initInput()
 {
 	glfwSetWindowUserPointer(Window::get_window(), this);
 	_input.init(Window::get_window(), Window::get_size());
@@ -76,15 +76,11 @@ void	VoxEngine::initInput()
 	_input.addOnPressCallback(GLFW_KEY_TAB, [this]() {_input.toggleWireFrame();});
 	_input.addOnPressCallback(GLFW_KEY_RIGHT_CONTROL, [this]() {_sky.togglePause();});
 
-	// Debug viewing different framebuffers
-	_input.addOnPressCallback(GLFW_KEY_LEFT, [this]() {_renderer.swapFrameBuffer(-1);});
-	_input.addOnPressCallback(GLFW_KEY_RIGHT, [this]() {_renderer.swapFrameBuffer(1);});
-
 	mlm::vec2	size = static_cast<mlm::vec2>(Window::get_size());
 	glfwSetCursorPos(Window::get_window(), size.x / 2.0f, size.y / 2.0f);
 }
 
-void	VoxEngine::initResources(EngineDTO &settings)
+void	VoxEngine::_initResources(EngineDTO &settings)
 {
 	_camera.setPos(mlm::vec3(static_cast<float>(CHUNK_SIZE_X / 2 + 3), static_cast<float>(CHUNK_SIZE_Y / 2 + 40), static_cast<float>(CHUNK_SIZE_Z / 2 + 3)));
 	_camera.loadSettings(settings.cameraSettings);
@@ -97,7 +93,7 @@ void	VoxEngine::initResources(EngineDTO &settings)
 	_sky.load(Settings::loadSky());
 }
 
-void	VoxEngine::initComponents()
+void	VoxEngine::_initComponents()
 {
 	_chunkManager.init(Settings::loadChunkManager());
 	_renderer.init();

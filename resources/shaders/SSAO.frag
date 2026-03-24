@@ -46,7 +46,7 @@ void	main()
 		float	sampleDepth = texture(uGPosition, offset.xy).z;
 		if (sampleDepth >= 0.0)
 			continue ;
-		
+
 		vec3	sampleNormal = texture(uGNormal, offset.xy).xyz;
 		if (dot(sampleNormal, normal) > 0.99)
 			continue ;

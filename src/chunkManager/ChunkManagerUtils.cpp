@@ -15,8 +15,8 @@ static bool	checkValidYCoordinate(const float y)
 
 void	ChunkManager::unloadAll()
 {
-	chunksMtx.lock();
-	chunks.clear();
+	_chunksMtx.lock();
+	_chunks.clear();
 	try
 	{
 		// Reload the terrain generator from settings
@@ -27,7 +27,7 @@ void	ChunkManager::unloadAll()
 	{
 		std::cerr << e.what() << '\n';
 	}
-	chunksMtx.unlock();
+	_chunksMtx.unlock();
 	_updateVisibility = true;
 }
 
@@ -41,9 +41,9 @@ Expected<Block, int>	ChunkManager::getBlock(const mlm::ivec3 &blockCoord)
 	if (checkValidYCoordinate(blockCoord.y))
 		return (1);
 	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
-	chunksMtx.lock();
-	std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
-	chunksMtx.unlock();
+	_chunksMtx.lock();
+	std::shared_ptr<Chunk>	chunk = _chunks[chunkCoord];
+	_chunksMtx.unlock();
 	if (!chunk)
 		return (0);
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
@@ -61,9 +61,9 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 	if (checkValidYCoordinate(blockCoord.y))
 		return ;
 	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
-	chunksMtx.lock();
-	std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
-	chunksMtx.unlock();
+	_chunksMtx.lock();
+	std::shared_ptr<Chunk>	chunk = _chunks[chunkCoord];
+	_chunksMtx.unlock();
 	if (!chunk)
 		return ;
 	mlm::ivec3				blockChunkCoord = getBlockChunkCoord(blockCoord);
@@ -75,27 +75,27 @@ void	ChunkManager::setBlock(const mlm::ivec3 &blockCoord, Block block)
 	// If on chunk boundary -> set neighbor dirty flag for remeshing
 	if (blockChunkCoord.x == 0)
 	{
-		chunksMtx.lock();
-		chunks[chunkCoord + mlm::ivec2(-1, 0)]->_dirty = true;
-		chunksMtx.unlock();
+		_chunksMtx.lock();
+		_chunks[chunkCoord + mlm::ivec2(-1, 0)]->_dirty = true;
+		_chunksMtx.unlock();
 	}
 	if (blockChunkCoord.z == 0)
 	{
-		chunksMtx.lock();
-		chunks[chunkCoord + mlm::ivec2(0, -1)]->_dirty = true;
-		chunksMtx.unlock();
+		_chunksMtx.lock();
+		_chunks[chunkCoord + mlm::ivec2(0, -1)]->_dirty = true;
+		_chunksMtx.unlock();
 	}
 	if (blockChunkCoord.x == CHUNK_SIZE_X - 1)
 	{
-		chunksMtx.lock();
-		chunks[chunkCoord + mlm::ivec2(1, 0)]->_dirty = true;
-		chunksMtx.unlock();
+		_chunksMtx.lock();
+		_chunks[chunkCoord + mlm::ivec2(1, 0)]->_dirty = true;
+		_chunksMtx.unlock();
 	}
 	if (blockChunkCoord.z == CHUNK_SIZE_Z - 1)
 	{
-		chunksMtx.lock();
-		chunks[chunkCoord + mlm::ivec2(0, 1)]->_dirty = true;
-		chunksMtx.unlock();
+		_chunksMtx.lock();
+		_chunks[chunkCoord + mlm::ivec2(0, 1)]->_dirty = true;
+		_chunksMtx.unlock();
 	}
 	// Set chunk dirty flag for remeshing
 	chunk->_dirty = true;
@@ -111,12 +111,12 @@ Expected<Block::Type, int>	ChunkManager::getBlockType(const mlm::ivec3 &blockCoo
 {
 	if (checkValidYCoordinate(blockCoord.y))
 		return (1);
-	
+
 	// Fetch chunk
 	mlm::ivec2				chunkCoord = getChunkCoord(blockCoord);
-	chunksMtx.lock();
-	std::shared_ptr<Chunk>	chunk = chunks[chunkCoord];
-	chunksMtx.unlock();
+	_chunksMtx.lock();
+	std::shared_ptr<Chunk>	chunk = _chunks[chunkCoord];
+	_chunksMtx.unlock();
 	if (!chunk)
 		return (0);
 

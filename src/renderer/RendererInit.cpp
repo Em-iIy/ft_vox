@@ -12,12 +12,12 @@ Renderer::Renderer(VoxEngine &engine, ChunkManager &manager, Camera &camera): _e
 
 void	Renderer::init()
 {
-	initShaders();
-	initMeshes();
-	initFrameBuffers();
-	initSsaoSamples();
-	initSsaoNoise();
-	
+	_initShaders();
+	_initMeshes();
+	_initFrameBuffers();
+	_initSsaoSamples();
+	_initSsaoNoise();
+
 	// Enable default values for depth testing, backface culling and blending
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -25,7 +25,7 @@ void	Renderer::init()
 	glEnable(GL_BLEND);
 }
 
-void	Renderer::initShaders()
+void	Renderer::_initShaders()
 {
 	// Draws textured quad to the screen
 	ShaderManager::loadShader(_quadShader, "./resources/shaders/quad.vert", "./resources/shaders/quad.frag");
@@ -34,8 +34,8 @@ void	Renderer::initShaders()
 	ShaderManager::loadShader(_shadowShader, "./resources/shaders/shadow.vert", "./resources/shaders/shadow.frag");
 
 	// SSAO and blur shaders
-	ShaderManager::loadShader(_ssaoShader, "./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag", [this](){initSsaoSamples();});
-	ShaderManager::loadShader(_ssaoBlurShader, "./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag", [this](){initSsaoBlurShader();});
+	ShaderManager::loadShader(_ssaoShader, "./resources/shaders/quad.vert", "./resources/shaders/SSAO.frag", [this](){_initSsaoSamples();});
+	ShaderManager::loadShader(_ssaoBlurShader, "./resources/shaders/quad.vert", "./resources/shaders/SSAOBlur.frag", [this](){_initSsaoBlurShader();});
 
 	// Draw basic geometry to gBuffers
 	ShaderManager::loadShader(_geometryShader, "./resources/shaders/geometry.vert", "./resources/shaders/geometry.frag");
@@ -51,7 +51,7 @@ void	Renderer::initShaders()
 
 	// Shader for the skybox
 	ShaderManager::loadShader(_solarBodiesShader, "./resources/shaders/sky.vert", "./resources/shaders/solarBodies.frag");
-	
+
 	// Shader for Aurora
 	ShaderManager::loadShader(_auroraShader, "./resources/shaders/sky.vert", "./resources/shaders/aurora.frag");
 
@@ -60,7 +60,7 @@ void	Renderer::initShaders()
 	ShaderManager::loadShader(_depthShader, "./resources/shaders/depth.vert", "./resources/shaders/depth.frag");
 }
 
-void	Renderer::initMeshes()
+void	Renderer::_initMeshes()
 {
 	// Create mesh for highlighting current block
 	std::vector<Vertex>		cubeVertices = {
@@ -159,10 +159,8 @@ void	Renderer::initMeshes()
 	_sphereMesh = Mesh(sphereVertices, sphereIndices);
 }
 
-void	Renderer::initFrameBuffers()
+void	Renderer::_initFrameBuffers()
 {
-	frameBufferIds.emplace_back(0, "Default");
-
 	mlm::ivec2	size = _engine.get_size();
 	_terrainGeometryFrameBuffer.create(size.x, size.y);
 	_terrainGeometryFrameBuffer.bind();
@@ -174,9 +172,6 @@ void	Renderer::initFrameBuffers()
 	_terrainGeometryFrameBuffer.unbind();
 	if (_terrainGeometryFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Terrain Framebuffer missing");
-	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(0), "Geometry Color");
-	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(1), "Geometry Normal");
-	frameBufferIds.emplace_back(_terrainGeometryFrameBuffer.getColorTexture(2), "Geometry Position");
 
 	_waterGeometryFrameBuffer.create(size.x, size.y);
 	_waterGeometryFrameBuffer.bind();
@@ -188,9 +183,6 @@ void	Renderer::initFrameBuffers()
 	_waterGeometryFrameBuffer.unbind();
 	if (_waterGeometryFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
-	frameBufferIds.emplace_back(_waterGeometryFrameBuffer.getColorTexture(0), "Water Color");
-	frameBufferIds.emplace_back(_waterGeometryFrameBuffer.getColorTexture(1), "Water Normal");
-	frameBufferIds.emplace_back(_waterGeometryFrameBuffer.getColorTexture(2), "Water Position");
 
 	_terrainLightingFrameBuffer.create(size.x, size.y);
 	_terrainLightingFrameBuffer.bind();
@@ -199,8 +191,7 @@ void	Renderer::initFrameBuffers()
 	_terrainLightingFrameBuffer.unbind();
 	if (_terrainLightingFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
-	frameBufferIds.emplace_back(_terrainLightingFrameBuffer.getColorTexture(0), "Terrain Lighting Color");
-	
+
 	_waterLightingFrameBuffer.create(size.x, size.y);
 	_waterLightingFrameBuffer.bind();
 	_waterLightingFrameBuffer.attachColorTexture(0, GL_RGBA8, GL_RGBA, GL_FLOAT, true, true, false);
@@ -208,7 +199,6 @@ void	Renderer::initFrameBuffers()
 	_waterLightingFrameBuffer.unbind();
 	if (_waterLightingFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Water Framebuffer missing");
-	frameBufferIds.emplace_back(_waterLightingFrameBuffer.getColorTexture(0), "Water Lighting Color");
 
 	// The shadow framebuffer is as big as possible to have less artifacts
 	_shadowFrameBuffer.create(size.x * 4, size.y * 4);
@@ -225,7 +215,6 @@ void	Renderer::initFrameBuffers()
 	_ssaoFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	if (_ssaoFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("SSAO Framebuffer missing");
-	frameBufferIds.emplace_back(_ssaoFrameBuffer.getColorTexture(0), "SSAO Color");
 
 	_ssaoBlurFrameBuffer.create(size.x, size.y);
 	_ssaoBlurFrameBuffer.bind();
@@ -233,7 +222,6 @@ void	Renderer::initFrameBuffers()
 	_ssaoBlurFrameBuffer.setDrawBuffers({GL_COLOR_ATTACHMENT0});
 	if (_ssaoBlurFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("SSAO Blur Framebuffer missing");
-	frameBufferIds.emplace_back(_ssaoBlurFrameBuffer.getColorTexture(0), "SSAO Blur Color");
 
 	_skyFrameBuffer.create(size.x, size.y);
 	_skyFrameBuffer.bind();
@@ -242,7 +230,6 @@ void	Renderer::initFrameBuffers()
 	_skyFrameBuffer.unbind();
 	if (_skyFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Sky Framebuffer missing");
-	frameBufferIds.emplace_back(_skyFrameBuffer.getColorTexture(0), "Sky Color");
 
 	// Aurora framebuffer is scaled down to save on performance, and later upscaled
 	const float	auroraScale = 0.2f;
@@ -253,10 +240,9 @@ void	Renderer::initFrameBuffers()
 	_auroraFrameBuffer.unbind();
 	if (_auroraFrameBuffer.checkStatus() == false)
 		throw std::runtime_error("Aurora Framebuffer missing");
-	frameBufferIds.emplace_back(_auroraFrameBuffer.getColorTexture(0), "Aurora Color");
 }
 
-void	Renderer::initSsaoSamples()
+void	Renderer::_initSsaoSamples()
 {
 	std::array<mlm::vec3, 8>		ssaoSamples;
 
@@ -268,7 +254,7 @@ void	Renderer::initSsaoSamples()
 		mlm::vec3 sample(
 			rng::rand(gen) * 2.0f - 1.0f,
 			rng::rand(gen) * 2.0f - 1.0f,
-			rng::rand(gen)	
+			rng::rand(gen)
 		);
 		sample = mlm::normalize(sample);
 		sample *= rng::rand(gen);
@@ -295,13 +281,13 @@ void	Renderer::initSsaoSamples()
 	_ssaoShader.set_int("uNoiseTex", 2);
 }
 
-void	Renderer::initSsaoBlurShader()
+void	Renderer::_initSsaoBlurShader()
 {
 	_ssaoBlurShader.use();
 	_ssaoBlurShader.set_int("uTexture", 0);
 }
 
-void	Renderer::initSsaoNoise()
+void	Renderer::_initSsaoNoise()
 {
 	std::array<mlm::vec3, 16>	ssaoNoise;
 
@@ -312,7 +298,7 @@ void	Renderer::initSsaoNoise()
 		mlm::vec3 noise(
 			rng::rand(gen) * 2.0f - 1.0f,
 			rng::rand(gen) * 2.0f - 1.0f,
-			0.0f	
+			0.0f
 		);
 		ssaoNoise[i] = noise;
 	}

@@ -31,51 +31,51 @@ bool	KeyState::isReleased() const
 
 void	Input::addOnPressCallback(int key, InputCallback callback)
 {
-	if (std::find(monitoredKeys.begin(), monitoredKeys.end(), key) == monitoredKeys.end())
-		monitoredKeys.push_back(key);
-	onPressCallbacks[key].push_back(callback);
+	if (std::find(_monitoredKeys.begin(), _monitoredKeys.end(), key) == _monitoredKeys.end())
+		_monitoredKeys.push_back(key);
+	_onPressCallbacks[key].push_back(callback);
 }
 
 void	Input::onPress(int key)
 {
-	std::vector<InputCallback>	&cb = onPressCallbacks[key];
+	std::vector<InputCallback>	&cb = _onPressCallbacks[key];
 	for (InputCallback &callback : cb)
 		callback();
 }
 
 void	Input::addOnReleaseCallback(int key, InputCallback callback)
 {
-	if (std::find(monitoredKeys.begin(), monitoredKeys.end(), key) == monitoredKeys.end())
-		monitoredKeys.push_back(key);
-	onReleaseCallbacks[key].push_back(callback);
+	if (std::find(_monitoredKeys.begin(), _monitoredKeys.end(), key) == _monitoredKeys.end())
+		_monitoredKeys.push_back(key);
+	_onReleaseCallbacks[key].push_back(callback);
 }
 
 void	Input::onRelease(int key)
 {
-	std::vector<InputCallback>	&cb = onReleaseCallbacks[key];
+	std::vector<InputCallback>	&cb = _onReleaseCallbacks[key];
 	for (InputCallback &callback : cb)
 		callback();
 }
 
 void	Input::addOnDownCallback(int key, InputCallback callback)
 {
-	if (std::find(monitoredKeys.begin(), monitoredKeys.end(), key) == monitoredKeys.end())
-		monitoredKeys.push_back(key);
-	onDownCallbacks[key].push_back(callback);
+	if (std::find(_monitoredKeys.begin(), _monitoredKeys.end(), key) == _monitoredKeys.end())
+		_monitoredKeys.push_back(key);
+	_onDownCallbacks[key].push_back(callback);
 }
 
 void	Input::onDown(int key)
 {
-	std::vector<InputCallback>	&cb = onDownCallbacks[key];
+	std::vector<InputCallback>	&cb = _onDownCallbacks[key];
 	for (InputCallback &callback : cb)
 		callback();
 }
 
 void	Input::init(GLFWwindow *window, const mlm::ivec2 &windowSize)
 {
-	lastX = static_cast<float>(windowSize.x) / 2.0f;
-	lastY = static_cast<float>(windowSize.y) / 2.0f;
-	firstMouse = true;
+	_lastX = static_cast<float>(windowSize.x) / 2.0f;
+	_lastY = static_cast<float>(windowSize.y) / 2.0f;
+	_firstMouse = true;
 	_window = window;
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -108,16 +108,16 @@ void	Input::mouseMovementCallback(GLFWwindow *window, double inXPos, double inYP
 	Input &input = pEngine->getInput();
 	float xPos = static_cast<float>(inXPos);
 	float yPos = static_cast<float>(inYPos);
-	if (input.firstMouse)
+	if (input._firstMouse)
 	{
-		input.lastX = xPos;
-		input.lastY = yPos;
-		input.firstMouse = false;
+		input._lastX = xPos;
+		input._lastY = yPos;
+		input._firstMouse = false;
 	}
-	float	xOffset = xPos - input.lastX;
-	float	yOffset = input.lastY - yPos;
-	input.lastX = xPos;
-	input.lastY = yPos;
+	float	xOffset = xPos - input._lastX;
+	float	yOffset = input._lastY - yPos;
+	input._lastX = xPos;
+	input._lastY = yPos;
 
 	pEngine->getCamera().processMouseMovement(xOffset, yOffset);
 }
@@ -134,21 +134,21 @@ void	Input::mouseScrollCallback(GLFWwindow *window, [[maybe_unused]] double xOff
 
 void	Input::handleKeys()
 {
-	for (int key : monitoredKeys)
-		if (keys[key].isDown())
+	for (int key : _monitoredKeys)
+		if (_keys[key].isDown())
 			onDown(key);
 }
 
 // Should be in the window or engine...
 void	Input::toggleWireFrame()
 {
-	wireFrameMode = !wireFrameMode;
-	glPolygonMode(GL_FRONT_AND_BACK, wireFrameMode ? GL_LINE : GL_FILL);
+	_wireFrameMode = !_wireFrameMode;
+	glPolygonMode(GL_FRONT_AND_BACK, _wireFrameMode ? GL_LINE : GL_FILL);
 }
 
 bool	Input::getWireFrameMode()
 {
-	return (wireFrameMode);
+	return (_wireFrameMode);
 }
 
 void	Input::mouseButtonCallback(GLFWwindow* window, int button, int action, [[maybe_unused]] int mods)
@@ -172,7 +172,7 @@ void	Input::mouseButtonCallback(GLFWwindow* window, int button, int action, [[ma
 	default:
 		break;
 	}
-	input.keys[button].updateState(action);
+	input._keys[button].updateState(action);
 }
 
 void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scancode, int action, [[maybe_unused]] int mods)
@@ -198,6 +198,5 @@ void	Input::keyCallback(GLFWwindow *window, int key, [[maybe_unused]] int scanco
 	default:
 		break;
 	}
-	input.keys[key].updateState(action);
+	input._keys[key].updateState(action);
 }
-

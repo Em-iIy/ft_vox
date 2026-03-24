@@ -46,7 +46,7 @@ void	SkyGradient::load(const GradientDTO &dto, const SkyTimeSettings &timeSettin
 	_stops.emplace_back(sunriseStart, dto.nightLowCol);
 	_stops.emplace_back(1.0f, dto.sunriseCol);
 
-	std::sort(_stops.begin(), _stops.end(), 
+	std::sort(_stops.begin(), _stops.end(),
 		[](const auto &a, const auto &b)
 		{
 			return (a.first < b.first);
@@ -56,7 +56,7 @@ void	SkyGradient::load(const GradientDTO &dto, const SkyTimeSettings &timeSettin
 
 mlm::vec4	SkyGradient::sampleAt(const float t) const
 {
-	auto stop = std::find_if(_stops.begin(), _stops.end(), 
+	auto stop = std::find_if(_stops.begin(), _stops.end(),
 		[t](const auto &a)
 		{
 			return (a.first > t);
@@ -81,4 +81,3 @@ mlm::vec4	SkyGradient::sampleAt(const float t) const
 	);
 	return (ret);
 }
-
