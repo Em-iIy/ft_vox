@@ -10,15 +10,15 @@
 		+ add texture to shaders
 	+ shaders
 
-- Skybox
++ Skybox
 	x texture
 	+ spere mesh
 	+ render
 		+ colors
 			+ gradient
 			+ transition through stages
-		- stars
-			- voronoi noise
+		x stars
+			x voronoi noise
 		+ sun
 		+ moon
 		+ aurora
@@ -87,6 +87,11 @@
 		+ sky
 	+ reload
 
+- Logger
+	- create class
+		- add levels
+	- replace print statements
+	- add level to settings
 
 general
 	+ make alternative for std::expected :(
