@@ -7,6 +7,8 @@ Created on: 24/07/2025
 #include "Settings.hpp"
 #include <iostream>
 
+#include "Logger.hpp"
+
 int main(int argc, char **argv)
 {
 	VoxEngine	engine;
@@ -18,7 +20,7 @@ int main(int argc, char **argv)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		Logger::error(e.what());
 		return (1);
 	}
 	return (0);

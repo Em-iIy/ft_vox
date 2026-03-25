@@ -4,6 +4,7 @@ Created on: 21/10/2025
 */
 
 #include "Settings.hpp"
+#include "Logger.hpp"
 
 #include <vector>
 
@@ -28,11 +29,14 @@ void	Settings::loadPaths(int argc, char **argv)
 	{
 		// Load JSON from main settings file
 		JSON::Parser	settingsJSON(argv[1]);
+		JSON::NodePtr	settingsRoot = settingsJSON.getRoot();
+
+		// Set logging level
+		Logger::setLevel(Logger::convertLevel(settingsRoot->get("logger")->getString()));
 
 		// Loop through all the different paths inside the root JSON object
-		JSON::NodePtr	settingsRoot = settingsJSON.getRoot();
-		JSON::ObjectPtr	rootObj = settingsRoot->getObject();
-		for (auto &[key, val] : *rootObj)
+		JSON::ObjectPtr	pathsObj = settingsRoot->get("paths")->getObject();
+		for (auto &[key, val] : *pathsObj)
 		{
 			// Construct the paths and store in map
 			_paths[key] = val->get("path")->getString() + val->get("name")->getString();

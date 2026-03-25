@@ -1,26 +1,29 @@
 {
-	"terrainGenerator": {
-		"path": "resources/settings/",
-		"name": "terrain.json"
-	},
-	"chunkManager": {
-		"path": "resources/settings/",
-		"name": "manager.json"
-	},
-	"renderer": {
-		"path": "",
-		"name": ""
-	},
-	"atlas": {
-		"path": "resources/settings/",
-		"name": "atlas.json"
-	},
-	"sky": {
-		"path": "resources/settings/",
-		"name": "sky.json"
-	},
-	"engine": {
-		"path": "resources/settings/",
-		"name": "engine.json"
+	"logger": "INFO",
+	"paths": {
+		"terrainGenerator": {
+			"path": "resources/settings/",
+			"name": "terrain.json"
+		},
+		"chunkManager": {
+			"path": "resources/settings/",
+			"name": "manager.json"
+		},
+		"renderer": {
+			"path": "",
+			"name": ""
+		},
+		"atlas": {
+			"path": "resources/settings/",
+			"name": "atlas.json"
+		},
+		"sky": {
+			"path": "resources/settings/",
+			"name": "sky.json"
+		},
+		"engine": {
+			"path": "resources/settings/",
+			"name": "engine.json"
+		}
 	}
 }
