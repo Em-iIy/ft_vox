@@ -94,8 +94,13 @@ INC = \
 	-I$(DIR_LIB) \
 
 all:
+	@$(MAKE) submodule
 	@$(MAKE) $(NAME) -j4
 .PHONY: all
+
+build:
+	@$(MAKE) $(NAME) -j4
+.PHONY: build
 
 $(NAME): $(GLU) $(JSP) $(DIR_OBJS) $(OBJS)
 	$(CC) -o $(NAME) $(OBJS) $(GLU) $(JSP) $(CFLAGS) $(LFLAGS)
@@ -107,21 +112,20 @@ $(DIR_OBJS):
 	mkdir -p $@
 
 $(GLU): $(GLU_SM)
-	$(MAKE) -C $(DIR_GLU)
+	@$(MAKE) -C $(DIR_GLU)
 
 $(GLU_SM):
 	@$(MAKE) submodule
 
 $(JSP): $(JSP_SM)
-	$(MAKE) -C $(DIR_JSP)
+	@$(MAKE) -C $(DIR_JSP)
 
 $(JSP_SM):
 	@$(MAKE) submodule
 
 submodule:
-	@echo "fetching submodules..."
-	git submodule init
-	git submodule update
+	@echo "updating submodules..."
+	git submodule update --init --recursive
 .PHONY: submodule
 
 run-tsan:
