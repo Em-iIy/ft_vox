@@ -8,10 +8,19 @@ Created on: 24/03/2026
 #include <iostream>
 #include <unordered_map>
 
+#define RESET "\033[m"
+#define RED "\033[38;5;1m"
+#define GREEN "\033[38;5;2m"
+#define YELLOW "\033[38;5;3m"
+#define BLUE "\033[38;5;4m"
+#define PURPLE "\033[38;5;5m"
+#define ORANGE "\033[38;5;208m"
+#define PINK "\033[38;5;200m"
+
 const std::unordered_map<Logger::Level, std::string>	levelToString = {
-	{Logger::Level::INFO, "INFO"},
-	{Logger::Level::LOG, "LOG"},
-	{Logger::Level::ERROR, "ERROR"},
+	{Logger::Level::INFO, BLUE"[INFO]"},
+	{Logger::Level::LOG, GREEN"[LOG]"},
+	{Logger::Level::ERROR, RED"[ERROR]"},
 };
 
 const std::unordered_map<std::string, Logger::Level>	stringToLevel = {
@@ -64,7 +73,7 @@ void	Logger::_print(const Level level, const std::string &msg)
 		return ;
 	const std::string &levelStr = levelToString.at(level);
 	_printMtx.lock();
-	std::cout << "[" << levelStr << "]\t- " << msg << std::endl;
+	std::cout << levelStr << "\t- " << msg << RESET << std::endl;
 	_printMtx.unlock();
 }
 

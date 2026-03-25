@@ -4,6 +4,7 @@ Created on: 02/02/2026
 */
 
 #include "ShaderManager.hpp"
+#include "Logger.hpp"
 
 std::list<ShaderSrc>	ShaderManager::_shaders;
 
@@ -20,6 +21,7 @@ ShaderManager::ShaderManager() {}
 
 void	ShaderManager::loadShader(Shader &shader, const char *vertexFileName, const char *fragmentFileName, ShaderInit init)
 {
+	Logger::info("Loading shader: " + std::string(vertexFileName) + " " + std::string(fragmentFileName));
 	try
 	{
 		// Create shader
@@ -27,7 +29,7 @@ void	ShaderManager::loadShader(Shader &shader, const char *vertexFileName, const
 	}
 	catch(...)
 	{
-		std::cout << "In shader: " << vertexFileName << " " << fragmentFileName << std::endl << std::endl;
+		Logger::error("In shader: " + std::string(vertexFileName) + " " + std::string(fragmentFileName));
 	}
 	// Fetch stats for the shader files
 	struct stat	vs;
@@ -61,6 +63,7 @@ void	ShaderManager::reloadShaders()
 		{
 			try
 			{
+				Logger::info("Reloading shader: " + std::string(src.vertexFileName) + " " + std::string(src.fragmentFileName));
 				Shader temp = Shader(src.vertexFileName, src.fragmentFileName);
 				src.shader.del();
 				src.shader = temp;
@@ -78,7 +81,7 @@ void	ShaderManager::reloadShaders()
 			}
 			catch(...)
 			{
-				std::cout << "In shader: " << src.vertexFileName << " " << src.fragmentFileName << std::endl << std::endl;
+				Logger::error("In shader: " + std::string(src.vertexFileName) + " " + std::string(src.fragmentFileName));
 			}
 		}
 	}
@@ -86,6 +89,7 @@ void	ShaderManager::reloadShaders()
 
 void	ShaderManager::unloadShaders()
 {
+	Logger::info("Unloading shaders");
 	for (ShaderSrc &src : _shaders)
 		src.shader.del();
 }

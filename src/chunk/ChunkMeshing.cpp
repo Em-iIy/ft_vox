@@ -186,7 +186,6 @@ void	Chunk::_addCube(std::vector<Vertex> &vertices, const mlm::ivec3 &ipos)
 
 void	Chunk::mesh()
 {
-	// float start = glfwGetTime();
 	_busyMtx.lock();
 	std::vector<Vertex> vertices;
 	std::vector<Vertex> waterVertices;
@@ -219,5 +218,4 @@ void	Chunk::mesh()
 	_readyToUpload = true;
 	_busyMtx.unlock();
 	_busy = false;
-	// std::cout << glfwGetTime() - start << std::endl;
 }

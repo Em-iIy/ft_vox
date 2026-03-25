@@ -7,6 +7,7 @@ Created on: 19/08/2025
 #include "ChunkManager.hpp"
 #include "VoxEngine.hpp"
 #include "Coords.hpp"
+#include "Logger.hpp"
 
 #include <memory>
 
@@ -61,7 +62,7 @@ void	ChunkManager::_ThreadRoutine()
 		// If this returns nullptr, the chunk has since been unloaded
 		if (!chunk)
 		{
-			std::cout << "tried to access unloaded chunk!" << std::endl;
+			Logger::log("tried to access unloaded chunk!");
 			continue ;
 		}
 		// Run appropiate task
@@ -94,10 +95,7 @@ ChunkManager::ChunkTask	ChunkManager::_popFromQueue()
 
 void	ChunkManager::renderChunks(Shader &shader)
 {
-	// std::cerr << "DEBUG: t" << getChunkCount() << " l" << chunkLoadList.size() << " g" << chunkGenerateList.size() << " m" << chunkMeshList.size() << " un" << chunkUnloadList.size() << " up" << chunkUploadList.size() << " v" << chunkVisibleList.size() << " r" << chunkRenderList.size() << std::endl;
-	// _queueMtx.lock();
-	// std::cerr << "queue size: " << _queue.size() << std::endl;
-	// _queueMtx.unlock();
+	// Logger::info("t" + std::to_string(getChunkCount()) + " l" + std::to_string(_chunkLoadList.size()) + " g" + std::to_string(_chunkGenerateList.size()) + " m" + std::to_string(_chunkMeshList.size()) + " un" + std::to_string(_chunkUnloadList.size()) + " up" + std::to_string(_chunkUploadList.size()) + " v" + std::to_string(_chunkVisibleList.size()) + " r" + std::to_string(_chunkRenderList.size()));
 	for (auto it = _chunkRenderList.rbegin(); it != _chunkRenderList.rend(); it++)
 	{
 		(*it)->draw(shader);

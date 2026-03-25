@@ -4,6 +4,7 @@ Created on: 25/07/2025
 */
 
 #include "Camera.hpp"
+#include "Logger.hpp"
 
 Camera::Camera(const mlm::vec3 &pos, const mlm::vec3 &up, const float yaw, const float pitch):
 	_pos(pos),
@@ -83,7 +84,7 @@ void	Camera::processMouseScroll(float yOffset)
 		_zoom = 120.0f;
 	else if (_zoom < 1.0f)
 		_zoom = 1.0f;
-	std::cout << _zoom << std::endl;
+	Logger::log("FOV: " + std::to_string(_zoom));
 }
 
 void	Camera::toggleSprint()

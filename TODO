@@ -87,11 +87,11 @@
 		+ sky
 	+ reload
 
-- Logger
-	- create class
-		- add levels
-	- replace print statements
-	- add level to settings
++ Logger
+	+ create class
+		+ add levels
+	+ replace print statements
+	+ add level to settings
 
 general
 	+ make alternative for std::expected :(

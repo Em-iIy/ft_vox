@@ -18,7 +18,6 @@ int	getChunkCount()
 
 Chunk::Chunk(ChunkManager &manager): _manager(manager)
 {
-	std::cout << "default constructor" << std::endl;
 }
 
 Chunk::Chunk(const mlm::ivec2 &chunkPos, ChunkManager &manager): _chunkPos(chunkPos), _manager(manager)

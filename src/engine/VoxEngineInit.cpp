@@ -6,6 +6,7 @@ Created on: 24/03/2026
 #include "VoxEngine.hpp"
 #include "Settings.hpp"
 #include "ShaderManager.hpp"
+#include "Logger.hpp"
 
 VoxEngine::VoxEngine(): _chunkManager(*this), _renderer(*this, _chunkManager, _camera)
 {}
@@ -29,6 +30,7 @@ void	VoxEngine::_init()
 
 void	VoxEngine::_initWindow(EngineDTO &settings)
 {
+	Logger::info("Creating window");
 	Window::create_window(
 		"ft_vox",
 		mlm::ivec2(static_cast<int>(settings.windowSettings.width),

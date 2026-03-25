@@ -6,6 +6,7 @@ Created on: 10/03/2026
 #include "Renderer.hpp"
 #include "VoxEngine.hpp"
 #include "ShaderManager.hpp"
+#include "Logger.hpp"
 
 Renderer::Renderer(VoxEngine &engine, ChunkManager &manager, Camera &camera): _engine(engine), _manager(manager), _camera(camera)
 {}
@@ -62,6 +63,7 @@ void	Renderer::_initShaders()
 
 void	Renderer::_initMeshes()
 {
+	Logger::info("Loading meshes");
 	// Create mesh for highlighting current block
 	std::vector<Vertex>		cubeVertices = {
 		{mlm::vec3(0.0f, 0.0f, 0.0f), mlm::vec3(0.0f), mlm::vec2(0.0f)},
@@ -161,6 +163,7 @@ void	Renderer::_initMeshes()
 
 void	Renderer::_initFrameBuffers()
 {
+	Logger::info("Creating framebuffers");
 	mlm::ivec2	size = _engine.get_size();
 	_terrainGeometryFrameBuffer.create(size.x, size.y);
 	_terrainGeometryFrameBuffer.bind();
@@ -244,6 +247,7 @@ void	Renderer::_initFrameBuffers()
 
 void	Renderer::_initSsaoSamples()
 {
+	Logger::info("Creating SSAO samples");
 	std::array<mlm::vec3, 8>		ssaoSamples;
 
 	rng::fgen	gen = rng::generator(0.0f, 1.0f);
@@ -289,6 +293,7 @@ void	Renderer::_initSsaoBlurShader()
 
 void	Renderer::_initSsaoNoise()
 {
+	Logger::info("Creating SSAO noise");
 	std::array<mlm::vec3, 16>	ssaoNoise;
 
 	rng::fgen	gen = rng::generator(0.0f, 1.0f);

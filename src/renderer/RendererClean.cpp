@@ -5,6 +5,7 @@ Created on: 10/03/2026
 
 #include "Renderer.hpp"
 #include "ShaderManager.hpp"
+#include "Logger.hpp"
 
 Renderer::~Renderer()
 {}
@@ -22,6 +23,7 @@ void	Renderer::_cleanShaders()
 
 void	Renderer::_cleanFrameBuffers()
 {
+	Logger::info("Deleting framebuffers");
 	_terrainGeometryFrameBuffer.destroy();
 	_waterGeometryFrameBuffer.destroy();
 	_shadowFrameBuffer.destroy();

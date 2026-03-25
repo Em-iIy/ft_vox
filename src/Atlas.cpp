@@ -5,6 +5,7 @@ Created on: 27/08/2025
 
 #include "Atlas.hpp"
 #include "Settings.hpp"
+#include "Logger.hpp"
 
 Atlas::Atlas()
 {}
@@ -14,6 +15,7 @@ Atlas::~Atlas()
 
 bool	Atlas::load()
 {
+	Logger::info("Loading atlas");
 	AtlasDTO	atlasDto = Settings::loadAtlas();
 
 	// Read in the image file

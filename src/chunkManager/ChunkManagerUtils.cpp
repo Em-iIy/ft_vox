@@ -6,6 +6,7 @@ Created on: 10/03/2026
 #include "ChunkManager.hpp"
 #include "Coords.hpp"
 #include "Settings.hpp"
+#include "Logger.hpp"
 
 // Check weather the y coordinate is in valid range
 static bool	checkValidYCoordinate(const float y)
@@ -16,16 +17,18 @@ static bool	checkValidYCoordinate(const float y)
 void	ChunkManager::unloadAll()
 {
 	_chunksMtx.lock();
+	Logger::info("Clearing chunks");
 	_chunks.clear();
 	try
 	{
+		Logger::info("Loading terrain generator");
 		// Reload the terrain generator from settings
 		TerrainGeneratorPtr newGenerator = std::make_shared<TerrainGenerator>(Settings::loadTerrainGenerator());
 		_generator.store(newGenerator);
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
+		Logger::error(e.what());
 	}
 	_chunksMtx.unlock();
 	_updateVisibility = true;
