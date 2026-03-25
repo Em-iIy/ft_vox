@@ -1,5 +1,5 @@
 {
-	"logger": "INFO",
+	"logger": "LOG",
 	"paths": {
 		"terrainGenerator": {
 			"path": "resources/settings/",
@@ -8,10 +8,6 @@
 		"chunkManager": {
 			"path": "resources/settings/",
 			"name": "manager.json"
-		},
-		"renderer": {
-			"path": "",
-			"name": ""
 		},
 		"atlas": {
 			"path": "resources/settings/",
