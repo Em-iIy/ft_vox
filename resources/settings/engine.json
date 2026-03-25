@@ -2,7 +2,7 @@
 	"window": {
 		"width": 1024.0,
 		"height": 1024.0,
-		"fullscreen": false,
+		"fullscreen": true,
 		"vsync": true
 	},
 	"camera": {
